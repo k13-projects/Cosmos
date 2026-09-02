@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Builds
+.next/
+out/
+build/
+dist/
+
+# Env
+.env
+.env*.local
+
+# Client design source, ~70MB of binaries (PDF, DOCX, PPTX, PSD/AI, photos).
+# Kept local, not in git. See CLAUDE.md "Asset library" for what's in it and
+# scripts/build-assets.sh to regenerate public/ from it.
+Cosmos Assets/
+**/Cosmos Assets/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+.gstack/
+tsconfig.tsbuildinfo

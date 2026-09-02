@@ -1,0 +1,34 @@
+--- ppt/slides/slide1.xml (0 images) ---
+WEBSITE 
+COSMOS BURGER
+IDEAS
+--- ppt/slides/slide2.xml (2 images) ---
+About us – burgers in San Diego, Delicious every Bite, Fast Delivery 
+HOMEPAGE
+Tagline: 
+Menu:  Order Online link
+See reference
+Banner: Picture and Animated logo
+Locations and opening hours
+Best sellers pictures siluet - Explore our Menu link
+--- ppt/slides/slide3.xml (0 images) ---
+Homepage
+Content categories
+About us
+Order 
+Contact
+Menú
+MENU
+Locations -
+COSMOS BURGER
+--- ppt/slides/slide4.xml (3 images) ---
+ MENU
+See reference
+Items - link to order
+See reference
+--- ppt/slides/slide5.xml (2 images) ---
+See reference
+Locations
+Address &amp; hours
+See reference
+MEDIA: ppt/media/image1.png, ppt/media/image4.png, ppt/media/image5.png, ppt/media/image6.png, ppt/media/image3.png, ppt/media/image2.png
