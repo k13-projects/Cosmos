@@ -81,7 +81,21 @@ export default function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:gap-6 lg:px-8">
-        <a href="#top" aria-label={`${site.name}, home`} className="shrink-0">
+        {/* The logo needs a ground of its own once the page scrolls. Over the
+            hero it floats free, exactly as the blueprint draws it. Past that it
+            passes over section headlines that are themselves yellow, and a
+            yellow mark on a yellow headline is the same ink on the same ink:
+            both become unreadable. It gains the nav pill's own purple ground so
+            the header reads as two floating pills rather than a collision. The
+            negative margin cancels the padding, so nothing moves. */}
+        <a
+          href="#top"
+          aria-label={`${site.name}, home`}
+          className={[
+            "-mx-3 -my-1.5 shrink-0 rounded-[999px] px-3 py-1.5 transition-[background-color,box-shadow] duration-300",
+            stuck ? "bg-purple shadow-[0_10px_30px_rgba(59,4,66,0.35)]" : "bg-transparent shadow-none",
+          ].join(" ")}
+        >
           <CosmosLogo className="h-9 w-auto text-yellow drop-shadow-[0_2px_10px_rgba(59,4,66,0.45)] sm:h-11 lg:h-[52px]" />
         </a>
 

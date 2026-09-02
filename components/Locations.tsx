@@ -32,7 +32,14 @@ export default function Locations() {
         </header>
       </div>
 
-      <div className="relative">
+      {/* The reveal belongs to the rail as a whole, never to the individual
+          cards. A card that starts outside the horizontal scroller never
+          intersects the viewport, so its `.reveal` never flips to `is-visible`:
+          it stays opacity-0 forever while its Order and Directions controls
+          remain in the tab order. That is the WCAG 2.4.7 bug class `inert`
+          exists for, and here the honest fix is to reveal the rail as one unit
+          when the section scrolls into view. */}
+      <div className="reveal relative">
         <ul
           ref={ref}
           /* scroll-pl matches the padding. Without it, snap-start pulls the first
@@ -40,12 +47,8 @@ export default function Locations() {
              and putting the card hard against the viewport edge. */
           className="rail flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:scroll-pl-8 sm:px-8 lg:scroll-pl-12 lg:px-12"
         >
-          {locations.map((l, i) => (
-            <li
-              key={l.id}
-              className="reveal flex w-[80vw] shrink-0 snap-start sm:w-[360px]"
-              style={{ "--i": i } as React.CSSProperties}
-            >
+          {locations.map((l) => (
+            <li key={l.id} className="flex w-[80vw] shrink-0 snap-start sm:w-[360px]">
               <div className="flex w-full flex-col rounded-[40px] bg-cream p-7">
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink">
@@ -54,7 +57,7 @@ export default function Locations() {
                   {l.status && (
                     /* Not decoration: a guest who reads only the card would
                        otherwise drive to a hall that has not opened. */
-                    <span className="shrink-0 rounded-full border-2 border-purple/25 px-2.5 py-1 text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-purple/70">
+                    <span className="shrink-0 rounded-full border-2 border-purple/30 px-2.5 py-1 text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-purple">
                       {l.status}
                     </span>
                   )}

@@ -11,7 +11,8 @@ dist/
 
 # Env
 .env
-.env*.local
+.env*
+!.env.example
 
 # Client design source, ~70MB of binaries (PDF, DOCX, PPTX, PSD/AI, photos).
 # Kept local, not in git. See CLAUDE.md "Asset library" for what's in it and

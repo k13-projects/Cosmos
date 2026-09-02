@@ -6,7 +6,7 @@
 // `cosmos.k13projects.com.evil.com` cannot match it. No legacy redirects yet,
 // this is a brand-new site with no prior slugs to carry forward (unlike
 // LobsterLab, which 301s an old SpotHopper tree).
-const PREVIEW_HOST = "cosmos\\.k13projects\\.com";
+const PREVIEW_HOST = "^cosmos\\.k13projects\\.com$";
 
 const nextConfig = {
   reactStrictMode: true,
@@ -38,6 +38,31 @@ const nextConfig = {
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            // Static CSP, on purpose. The nonce-per-request variant from the
+            // 2026-09-02 security audit needs `headers()` in the root layout,
+            // which turns every route dynamic and gives up the static build.
+            // This site has no user input, no forms and no third-party
+            // scripts, so 'unsafe-inline' on script-src (required for Next's
+            // own hydration chunks) carries no practical XSS surface here.
+            // Revisit with the nonce approach the day analytics or a form is
+            // added. Fonts and images are self-hosted by next/font and the
+            // asset pipeline; data: covers the inline SVG favicon.
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data:",
+              "font-src 'self'",
+              "connect-src 'self'",
+              "frame-ancestors 'self'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "object-src 'none'",
+              "upgrade-insecure-requests",
+            ].join("; "),
           },
         ],
       },

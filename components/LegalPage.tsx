@@ -31,7 +31,14 @@ export default function LegalPage({
       </header>
 
       <main id="main" className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
-        <h1 className="display text-[12vw] text-purple sm:text-6xl">{title}</h1>
+        {/* 8.5vw, not 12vw, and break-words as a guard. The display face is
+            Archivo at wdth 125, so a single long title word cannot wrap and
+            simply runs off: "Accessibility" measured 450px inside a 335px
+            column at 375 and gave the document a 95px horizontal scroll.
+            "Privacy Policy" and "Terms of Use" hid it by having a space to
+            break at. The size makes the real titles fit on one line; the
+            break-words guard means no future title can leak either. */}
+        <h1 className="display break-words text-[8.5vw] text-purple sm:text-6xl">{title}</h1>
         {effective && (
           <p className="mt-4 text-sm font-bold uppercase tracking-[0.14em] text-magenta-ink">
             Effective {effective}

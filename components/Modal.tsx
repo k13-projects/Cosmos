@@ -71,9 +71,27 @@ export default function Modal({ open, onClose, title, subtitle, children, size =
 
     document.addEventListener("keydown", onKeyDown);
 
-    // Always open at the top of the panel, then move focus into it.
+    // Open at the top of the panel, unless the content marked a row as the one
+    // the guest asked for. A card's Order button deep-links into its own hall,
+    // so the pop-up has to land on that row rather than resetting to the top.
+    //
+    // Both moves belong here, in one code path, on purpose: when the content
+    // scrolled itself on mount instead, this reset ran afterwards and silently
+    // undid it, and no amount of delay on the other side is a fix, only a race
+    // with a different number in it.
     const t = window.setTimeout(() => {
-      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+      const sc = scrollRef.current;
+      const anchor = panelRef.current?.querySelector<HTMLElement>("[data-modal-anchor]");
+      if (sc) {
+        if (anchor) {
+          const header = panelRef.current?.querySelector<HTMLElement>("[data-modal-header]");
+          const clear = (header?.getBoundingClientRect().height ?? 0) + 12;
+          const delta = anchor.getBoundingClientRect().top - sc.getBoundingClientRect().top;
+          sc.scrollTop = Math.max(0, sc.scrollTop + delta - clear);
+        } else {
+          sc.scrollTop = 0;
+        }
+      }
       const target = panelRef.current?.querySelector<HTMLElement>(FOCUSABLE);
       (target ?? panelRef.current)?.focus({ preventScroll: true });
     }, 20);
@@ -120,7 +138,10 @@ export default function Modal({ open, onClose, title, subtitle, children, size =
             size === "lg" ? "sm:max-w-3xl" : "sm:max-w-lg",
           ].join(" ")}
         >
-          <div className="sticky top-0 z-10 flex items-start justify-between gap-4 rounded-t-[24px] border-b-2 border-purple/12 bg-cream px-6 pb-5 pt-7 sm:px-8">
+          <div
+            data-modal-header
+            className="sticky top-0 z-10 flex items-start justify-between gap-4 rounded-t-[24px] border-b-2 border-purple/12 bg-cream px-6 pb-5 pt-7 sm:px-8"
+          >
             <div>
               <h2 id="modal-title" className="display text-[28px] text-purple sm:text-4xl">
                 {title}

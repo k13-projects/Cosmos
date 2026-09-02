@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import {
   ORDER_CHANNEL_ORDER,
   orderChannels,
@@ -67,17 +66,13 @@ function ChannelLink({ channel, url }: { channel: OrderChannel; url: string }) {
 
 function LocationRow({ location, highlight }: { location: Location; highlight: boolean }) {
   const live = liveChannels(location);
-  const ref = useRef<HTMLLIElement>(null);
-
-  useEffect(() => {
-    if (!highlight) return;
-    // The pop-up opens at its top; scroll the asked-for row into view inside it.
-    ref.current?.scrollIntoView({ block: "nearest" });
-  }, [highlight]);
 
   return (
     <li
-      ref={ref}
+      /* Modal scrolls to this on open. Declaring the row rather than scrolling
+         to it here is deliberate: a mount-time scrollIntoView ran before the
+         dialog's own "open at the top" reset and was wiped by it. */
+      data-modal-anchor={highlight ? "" : undefined}
       className={[
         "rounded-[18px] border-2 p-4 transition-colors",
         highlight ? "border-magenta bg-white" : "border-purple/12 bg-white/60",
@@ -91,7 +86,7 @@ function LocationRow({ location, highlight }: { location: Location; highlight: b
           <h3 className="mt-0.5 text-lg font-semibold leading-tight text-purple">{location.name}</h3>
         </div>
         {location.status && (
-          <span className="shrink-0 rounded-full border-2 border-purple/25 px-2.5 py-1 text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-purple/70">
+          <span className="shrink-0 rounded-full border-2 border-purple/30 px-2.5 py-1 text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-purple">
             {location.status}
           </span>
         )}
