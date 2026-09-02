@@ -22,7 +22,7 @@ export default function Locations() {
   const { ref, atStart, atEnd, scrollByCard } = useRail<HTMLUListElement>();
 
   return (
-    <section id="locations" className="pattern overflow-hidden py-16 sm:py-20 lg:py-24">
+    <section id="locations" className="pattern scroll-mt-28 overflow-hidden py-16 sm:py-20 lg:scroll-mt-32 lg:py-24">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
         <header className="reveal mb-10 lg:mb-12">
           <h2 className="display text-[13vw] text-yellow sm:text-6xl lg:text-[76px]">Locations</h2>

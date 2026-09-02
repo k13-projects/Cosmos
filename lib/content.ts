@@ -134,19 +134,35 @@ export const about = {
     "Whether you're grabbing a quick bite, hanging with friends, or treating yourself to something seriously delicious, Cosmos is here for good food, good vibes, and big flavor.",
   ],
   /**
-   * The floating burger cascade down the right edge (facts SS4.2). Six plates on
-   * lg, the first three only on small screens, where six would either overlap
-   * the copy or shrink to nothing. `alt` is empty on purpose: these are
-   * decorative, every dish they show is named in the menu pop-up.
+   * The plate wheel down the right edge (facts SS4.2, blueprint page 1).
+   *
+   * The blueprint hangs the six plates on an arc, as if on a wheel whose hub
+   * sits off the right edge of the viewport, the lowest plate spilling over the
+   * seam into the values band. The client folder is literally named "Burgers
+   * circle". components/PlateWheel.tsx rebuilds that geometry.
+   *
+   * NAMES. Three plates are pixel-identical to a named best-seller cutout in
+   * `Cosmos Assets/PHOTOS/Best Sellers/` (RGB RMSE after alpha-bbox crop and
+   * resize: plate 1 -> blue-cheese 50.5, plate 4 -> cosmos-burger 53.0, plate 5
+   * -> spicy-jam 49.4, each a clear win over its runner-up). The other three
+   * match nothing we hold a name for, so they carry an honest generic label
+   * rather than an invented menu name.
+   *
+   * TODO(client, Lorena): confirm the three generic labels, marked below.
    */
   plates: [
-    { src: "/menu/plates/1.png", width: 845, height: 507 },
-    { src: "/menu/plates/2.png", width: 1003, height: 700 },
-    { src: "/menu/plates/3.png", width: 1083, height: 632 },
-    { src: "/menu/plates/4.png", width: 1178, height: 684 },
-    { src: "/menu/plates/5.png", width: 1200, height: 663 },
-    { src: "/menu/plates/6.png", width: 1020, height: 646 },
+    { src: "/menu/plates/1.png", width: 845, height: 507, name: "Blue cheese" },
+    // generic: crispy chicken sandwich, red glaze and slaw. Likely "Hot Chicks".
+    { src: "/menu/plates/2.png", width: 1003, height: 700, name: "Chicken sandwich" },
+    // generic: double smash, cheese, shredded lettuce. Likely "The Basic".
+    { src: "/menu/plates/3.png", width: 1083, height: 632, name: "Smash burger" },
+    { src: "/menu/plates/4.png", width: 1178, height: 684, name: "Cosmos burger" },
+    { src: "/menu/plates/5.png", width: 1200, height: 663, name: "Spicy jam" },
+    // generic: crispy chicken with purple slaw. Likely "Truffle Honey".
+    { src: "/menu/plates/6.png", width: 1020, height: 646, name: "Crispy chicken" },
   ],
+  /** Helper text under the wheel's first plate, for keyboard and screen reader. */
+  platesHint: "Open the full menu",
 } as const;
 
 // docx, verbatim except the two en dashes, which become commas (house rule).
@@ -232,18 +248,17 @@ export const menuSection = {
 } as const;
 
 /**
- * The four full-bleed photo bands that separate the sections (facts SS4.5, 4.7,
+ * The three full-bleed photo bands that separate the sections (facts SS4.5,
  * 4.10, 4.12). Decorative dividers, but each shows real food, so each carries
  * real alt text rather than being hidden.
+ *
+ * The fourth divider in the blueprint, under EXPLORE OUR MENU, is NOT a band:
+ * see `spread` below.
  */
 export const photoBands = {
   fries: {
     src: "/photos/band-fries.webp",
     alt: "Four bowls of Cosmos loaded fries lined up on a wooden board, seen from above",
-  },
-  spread: {
-    src: "/photos/band-spread.webp",
-    alt: "A table spread of Cosmos burgers, chicken tenders and loaded fries on white plates",
   },
   chicken: {
     src: "/photos/band-chicken.webp",
@@ -253,6 +268,24 @@ export const photoBands = {
     src: "/photos/band-phone.webp",
     alt: "A guest photographing a Cosmos burger and a beer with their phone",
   },
+} as const;
+
+/**
+ * The table spread under EXPLORE OUR MENU (facts SS4.7).
+ *
+ * `Cosmos General.png` is a CUTOUT, not a photograph of a scene: it carries an
+ * alpha channel whose transparent top wedge is the shape of the table's back
+ * edge, with the rearmost plates rising above it. The blueprint lays it on the
+ * bottom of the purple pattern band so that wedge fills with pattern and those
+ * plates read as standing in front of it. Flattening it onto a ground (which
+ * this build did on its first pass) throws that away and leaves a square band.
+ * `scripts/build-assets.sh` exports it with alpha intact.
+ */
+export const spread = {
+  src: "/photos/spread.webp",
+  width: 2000,
+  height: 1334,
+  alt: "A table spread of Cosmos burgers, chicken tenders and loaded fries on white plates",
 } as const;
 
 export const hero = {
@@ -588,14 +621,15 @@ export const contact = {
   heading: "Contact info",
   phone: "",
   email: "",
-  /** Rendered only while there is no phone or email to show. */
+  /** The one channel that is definitely monitored. Always shown. */
   fallback: "Questions? Message us on Instagram.",
 } as const;
 
+/** Handles are shown under each icon in the footer, so the row is self-labelling. */
 export const socials = [
-  { id: "instagram", label: "Instagram", href: site.instagram },
-  { id: "facebook", label: "Facebook", href: site.facebook },
-  { id: "tiktok", label: "TikTok", href: site.tiktok },
+  { id: "instagram", label: "Instagram", handle: site.instagramHandle, href: site.instagram },
+  { id: "facebook", label: "Facebook", handle: "/CosmosBurger", href: site.facebook },
+  { id: "tiktok", label: "TikTok", handle: "@cosmosburger.sandiego", href: site.tiktok },
 ] as const;
 
 export type SocialId = (typeof socials)[number]["id"];

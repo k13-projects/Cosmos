@@ -27,7 +27,6 @@ export default function Home() {
         <BestSellers />
         <PhotoBand {...photoBands.fries} />
         <MenuSection />
-        <PhotoBand {...photoBands.spread} />
         <CateringSection />
         <Locations />
         <PhotoBand {...photoBands.chicken} />

@@ -1,33 +1,21 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { hero, site } from "@/lib/content";
-import CosmosLogo from "./CosmosLogo";
 
 /**
- * The hero band, and the P3 signature moment.
+ * The hero band: the photograph, the fade into the purple About band, and the
+ * nav that floats over it. Nothing else.
  *
- * Slide 2 of the client's ideas deck asks for "Banner: Picture and Animated
- * logo" (facts SS4.1), so the wordmark writes itself on over the photo: a
- * clip-path wipe left to right, one sheen sweep behind it, then a slow ambient
- * breathe. All three collapse to the finished state under prefers-reduced-motion
- * (app/globals.css), where the logo simply appears.
+ * The first pass put a large animated wordmark here, on the strength of slide 2
+ * of the client's ideas deck ("Banner: Picture and Animated logo"). Lorena's
+ * blueprint PDF draws a photo and a nav and no wordmark, and the PDF is the
+ * agreement (Lessons 14). The wordmark component stays, in the nav and the
+ * footer, where the blueprint does put it.
  *
- * The animation is armed only once the hero photo has decoded. Playing it
- * against an empty grey box wastes the one moment the page gets to introduce
- * itself, and on a slow connection that is exactly what happens.
+ * The <h1> is the page's accessible name only. The band carries no visible
+ * heading, so a visible one would have to be invented; a screen reader still
+ * needs the document to say what this page is.
  */
 export default function Hero() {
-  const [armed, setArmed] = useState(false);
-
-  useEffect(() => {
-    // Fallback timer as well as the load event: a cached image can finish
-    // decoding before this effect runs, in which case onLoad never fires.
-    const t = window.setTimeout(() => setArmed(true), 400);
-    return () => window.clearTimeout(t);
-  }, []);
-
   return (
     <section id="top" className="relative isolate overflow-hidden bg-purple">
       {/*
@@ -43,16 +31,15 @@ export default function Hero() {
           priority
           sizes="100vw"
           className="object-cover"
-          onLoad={() => setArmed(true)}
         />
 
         {/*
           Two jobs, and they must not become one: a light scrim across the top
-          band so the nav pill and the wordmark hold contrast against the
-          bokeh, and a fade into the purple About band at the very bottom seam.
-          A plain top-to-bottom gradient does both at once and tints the
-          burgers themselves purple, which is the one thing the photography is
-          there for. The stops keep the middle of the frame untouched.
+          band so the nav pill and the logo hold contrast against the bokeh, and
+          a fade into the purple About band at the very bottom seam. A plain
+          top-to-bottom gradient does both at once and tints the burgers
+          themselves purple, which is the one thing the photography is there
+          for. The stops keep the middle of the frame untouched.
         */}
         <div
           aria-hidden="true"
@@ -63,18 +50,9 @@ export default function Hero() {
           }}
         />
 
-        <div className="absolute inset-x-0 top-[26%] flex justify-center px-6">
-          <h1 className="m-0">
-            <span className={armed ? "logo-breathe block" : "block"}>
-              <span className={`sheen block ${armed ? "logo-write" : ""}`}>
-                <CosmosLogo className="h-auto w-[min(76vw,600px)] text-yellow drop-shadow-[0_6px_28px_rgba(59,4,66,0.55)]" />
-              </span>
-            </span>
-            <span className="sr-only">
-              {site.name}, {site.tagline}
-            </span>
-          </h1>
-        </div>
+        <h1 className="sr-only">
+          {site.name}, {site.tagline}
+        </h1>
       </div>
     </section>
   );

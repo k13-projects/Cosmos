@@ -1,30 +1,33 @@
-import Image from "next/image";
+"use client";
+
+import { useRef } from "react";
 import { about } from "@/lib/content";
+import PlateWheel, { PlateRow } from "./PlateWheel";
 
 /**
  * "UNLEASH THE FLAVOR" (facts SS4.2).
  *
- * The blueprint runs a cascade of six floating burger plates down the right
- * edge of this band, spilling over the seam into the magenta values band below.
- * That is the piece flagged as hardest to make responsive in the design
- * handoff, and it is solved by splitting it rather than scaling it:
+ * The blueprint hangs the six plates on an arc down the right edge, as if on a
+ * wheel whose hub sits off-screen right, the lowest one spilling over the seam
+ * into the values band. That is what components/PlateWheel.tsx draws, and the
+ * band's scroll progress turns it. Below 1024px it becomes the three-plate row.
  *
- *   lg and up  the six-plate cascade, absolutely positioned down the right
- *              edge, the last two overhanging into the values band. The copy
- *              column is capped well short of it, so they never meet.
- *   below lg   three plates as a row under the copy, still floating and still
- *              breaking the seam. A cascade squeezed into a phone's right edge
- *              would leave the paragraphs about 28 characters wide, which is
- *              unreadable, and any overlap at all fails the fitcheck measure.
+ * The section is a client component only to hand its own element to the wheel;
+ * every string still comes from lib/content.ts.
  */
 export default function About() {
+  const ref = useRef<HTMLElement>(null);
+
   return (
     <section
       id="about"
-      // z-10 over the values band so the overhanging plates draw on top of it.
+      ref={ref}
+      // z-10 over the values band so the overhanging plate draws on top of it.
       // overflow stays visible for the same reason; the sideways spill is
       // clamped by overflow-x on <body>.
-      className="pattern pattern-soft relative z-10 pb-16 pt-16 sm:pb-20 sm:pt-20 lg:pb-24 lg:pt-28"
+      // scroll-mt clears the fixed header, so a jump to #about can never park
+      // the yellow headline under the yellow logo (Lessons 17).
+      className="pattern pattern-soft relative z-10 scroll-mt-28 pb-16 pt-20 sm:pb-20 sm:pt-24 lg:scroll-mt-32 lg:pb-24 lg:pt-36"
     >
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
         <div className="max-w-[640px]">
@@ -48,53 +51,8 @@ export default function About() {
         </div>
       </div>
 
-      {/* --- the cascade, lg and up ------------------------------------- */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[36%] max-w-[520px] lg:block"
-      >
-        {about.plates.map((plate, i) => (
-          <div
-            key={plate.src}
-            className="absolute w-[62%]"
-            style={{
-              // Evenly spaced down the band; the last two run past 100% so they
-              // break the seam into the values band, as the blueprint does.
-              top: `${4 + i * 19}%`,
-              right: i % 2 === 0 ? "6%" : "26%",
-            }}
-          >
-            <Image
-              src={plate.src}
-              alt=""
-              width={plate.width}
-              height={plate.height}
-              sizes="320px"
-              className="float h-auto w-full drop-shadow-[0_18px_30px_rgba(43,3,48,0.35)]"
-              style={{ animationDelay: `${-(i * 0.65)}s` }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* --- three plates, below lg -------------------------------------- */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none relative -mb-14 mt-10 flex items-end justify-center gap-1 px-4 sm:-mb-16 sm:gap-3 lg:hidden"
-      >
-        {about.plates.slice(0, 3).map((plate, i) => (
-          <Image
-            key={plate.src}
-            src={plate.src}
-            alt=""
-            width={plate.width}
-            height={plate.height}
-            sizes="(max-width: 640px) 33vw, 220px"
-            className="float h-auto w-1/3 max-w-[220px] drop-shadow-[0_14px_24px_rgba(43,3,48,0.35)]"
-            style={{ animationDelay: `${-(i * 0.65)}s` }}
-          />
-        ))}
-      </div>
+      <PlateWheel sectionRef={ref} />
+      <PlateRow />
     </section>
   );
 }

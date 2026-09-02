@@ -1,0 +1,160 @@
+{
+  "report": "Cosmos_QA-Report_2026-09-02_v2.md",
+  "project": "Cosmos Burger",
+  "date": "2026-09-02",
+  "pass": "v2",
+  "tester": "Olga (qa-test-engineer)",
+  "gate": "two-agent Chrome QA gate + house fitcheck",
+  "verdict": "PASS",
+  "approved": true,
+  "branch": "cosmos_sep02_v3",
+  "base_commit": "9bd1689",
+  "committed_by_qa": false,
+  "environment": {
+    "build": "npm run build && npx next start -p 9157",
+    "note": "production build only; next dev does not hydrate in this headless browser on this repo",
+    "browser": "gstack Chromium",
+    "berth": "cosmos",
+    "browse_port": 39157,
+    "url": "http://localhost:9157",
+    "server_stopped_after": true
+  },
+  "fitcheck": {
+    "viewports": [
+      "320x568", "375x667", "430x932", "768x1024", "844x390", "932x430",
+      "1024x768", "1366x768", "1440x900", "1536x864", "1920x1080"
+    ],
+    "trust_gate": "window.innerWidth asserted in band on every run; all 11 returned TRUST ok",
+    "horizontal_leaks": 0,
+    "tap_target_AA_failures": 0,
+    "hidden_but_focusable": 0,
+    "scroll_origin_traps": 0,
+    "text_under_12px_before": 3,
+    "text_under_12px_after": 0,
+    "inputs_under_16px": 0
+  },
+  "anchor_header_clearance": {
+    "combinations_tested": 55,
+    "anchors": ["#about", "#menu", "#catering", "#locations", "#contact"],
+    "overlaps_with_header_band": 0,
+    "overlaps_with_logo_box": 0,
+    "min_clearance_px": 222,
+    "max_clearance_px": 589
+  },
+  "plate_wheel": {
+    "widths": [1024, 1280, 1366, 1440, 1536, 1920],
+    "samples_per_width": 13,
+    "distinct_rotations_per_width": 13,
+    "rotation_range": "2.43deg to 32.00deg",
+    "collisions_with_about_copy": 0,
+    "collisions_with_values_third_column": 0,
+    "min_gap_copy_to_plate_px": { "1024": 114, "1280": 333, "1366": 401, "1440": 446, "1536": 494, "1920": 686 },
+    "min_gap_plate_to_fresh_always_icon_row_px": { "1024": 107, "1280": 54, "1366": 30, "1440": 15, "1536": 15, "1920": 15 },
+    "tooltips_hover_all_six": "pass at 1280 and 1920, uppercase, all on screen",
+    "tooltips_keyboard_focus": "pass",
+    "tooltips_on_touch_row": "FAILED then FIXED (QA-v2-02)"
+  },
+  "spread_cutout": {
+    "widths": [375, 768, 1280, 1920],
+    "seam_gap_px": 0,
+    "squashed": false,
+    "aspect_matches_source": true,
+    "alpha_preserved_in_delivery": true,
+    "delivered_format": "AVIF 1920x1281 hasAlpha yes",
+    "pattern_visible_through_top_wedge": true,
+    "plates_rise_above_table_edge": true
+  },
+  "nav_logo": {
+    "backdrop_present_at_any_width": false,
+    "hit_box_px": { "phone": "134x58", "md": "120x52", "lg": "166x72" },
+    "meets_44px": true,
+    "readable_over_hero": true,
+    "readable_over_purple": true,
+    "readable_over_cream": "yes, entirely dependent on the drop shadow; weakest of the four grounds",
+    "readable_over_yellow_headline_midscroll": "yes, shadow outlines the script; headline pass-through accepted as inherent to a fixed header"
+  },
+  "footer": {
+    "columns_symmetric": true,
+    "column_widths_1280": [502, 502],
+    "column_heights_1280": [130, 130],
+    "column_widths_768": [336, 336],
+    "column_heights_768": [146, 146],
+    "handles_beneath_icons": true,
+    "icon_handle_centre_offset_px": 0,
+    "address_list_present": false
+  },
+  "reduced_motion": {
+    "method": "CDP Emulation.setEmulatedMedia, real media query emulation",
+    "matched_in_band": true,
+    "wheel_rotation_deg": 0,
+    "wheel_hub_transform": "none",
+    "float_animation": "none",
+    "tooltip_on_hover": "works",
+    "tooltip_on_focus": "works",
+    "reveal_elements_stuck_hidden": 0,
+    "override_cleared_after": true
+  },
+  "console": {
+    "routes": ["/", "/privacy", "/terms", "/accessibility", "404"],
+    "javascript_errors": 0,
+    "notes": "only next/image link preload warnings; the single error line is the 404 route returning 404"
+  },
+  "defects": [
+    {
+      "id": "QA-v2-01",
+      "severity": "medium",
+      "title": "FOLLOW US handles at 11px and packed into cells 31px too narrow",
+      "file": "components/Footer.tsx",
+      "status": "fixed",
+      "before": "11px font; 128px cells at 1280; 8px between handle boxes; long handle on 2 lines; 3 fitcheck under-12px entries",
+      "after": "12px font; 162px cells; icons across the full 502px column; long handle on 1 line; 0 under-12px entries"
+    },
+    {
+      "id": "QA-v2-02",
+      "severity": "medium",
+      "title": "Mobile plate row showed no dish name on a touchscreen",
+      "file": "components/PlateWheel.tsx",
+      "status": "fixed",
+      "before": "tap gives :focus but not :focus-visible, then the dialog takes focus; tooltip opacity 0 at 375/430/320",
+      "after": "name is a permanent visible label on the row, opacity 1 at 320/375/430; wheel hover/focus tooltip unchanged; tooltip ARIA scoped to the wheel"
+    },
+    {
+      "id": "QA-v2-03",
+      "severity": "low",
+      "title": "Footer handles broke mid-word at 320, 375 and 768",
+      "file": "components/Footer.tsx",
+      "status": "fixed",
+      "before": "@cosmosbur / ger.sandiego at 768; all three broken at 320",
+      "after": "break opportunity after each dot; single column below 360px; no mid-word breaks at any width"
+    }
+  ],
+  "kazim_five_asks_intact": {
+    "1_hero_is_photo_and_nav_only": true,
+    "2_plate_wheel_turns_with_scroll_instant_caps_tooltip_never_covers_fresh_always": true,
+    "3_spread_is_a_cutout_on_the_pattern": true,
+    "4_nav_logo_no_ground_shadow_only": true,
+    "5_footer_symmetric_no_address_dump": true
+  },
+  "files_changed_by_qa": [
+    "components/Footer.tsx",
+    "components/PlateWheel.tsx"
+  ],
+  "verification_after_changes": {
+    "tsc_noEmit": "clean",
+    "next_build": "clean, 11 static routes",
+    "fitcheck_rerun_all_11": "green",
+    "wheel_sweep_rerun_1440_1536": "0 collisions, 13 distinct rotations",
+    "anchor_clearance_spot_recheck": "clean at 375 and 1440"
+  },
+  "not_tested": [
+    "real hardware and real finger touch",
+    "screen readers",
+    "Safari and Firefox",
+    "the live preview domain",
+    "performance and Core Web Vitals",
+    "external destinations",
+    "scripts/build-assets.sh end to end"
+  ],
+  "screenshots": "docs/handoffs/screens/qa_2026-09-02_v2/",
+  "next": "release-engineer (Kate)"
+}
