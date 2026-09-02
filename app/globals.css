@@ -23,6 +23,12 @@
   --color-tan: #edd9bf; /* review cards only */
   --color-charcoal: #3b3b3b; /* OG / print logo ground. Never a section ground. */
 
+  /* --- menu glyphs, sampled from Lorena's COSMOS MENU.png, 2026-09-02 --- */
+  --color-chilli-bg: #ff914d; /* spicy glyph, circle ground */
+  --color-chilli: #c60c00; /* spicy glyph, pepper body */
+  --color-chilli-stem: #72a82e; /* spicy glyph, stem */
+  --color-veg: #00bf63; /* vegetarian glyph, disc */
+
   /* --- guide tint scales, 80 / 60 / 40 / 20 % --- */
   --color-magenta-80: #d748e6;
   --color-magenta-60: #e176ec;

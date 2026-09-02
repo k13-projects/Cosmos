@@ -10,7 +10,11 @@
  *                 read into docs/intake/BLUEPRINT_FACTS_2026-09-02.md SS4
  *   socials    -> the live site burgerscosmos.com (facts SS1); the docx left
  *                 FOLLOW US blank
- *   menu items -> the live site's item list (facts SS5). No menu file supplied.
+ *   menu items -> Lorena, COSMOS MENU.png, 2026-09-02 (Cosmos Assets/LORENA
+ *                 UPDATE 2026-09-02/), transcribed directly from the image:
+ *                 names, prices, descriptions, spicy/vegetarian marks, the
+ *                 combo offer and the allergen line. Supersedes the old
+ *                 site's item list this build shipped with first.
  *   reviews    -> the docx, verbatim, attribution deliberately non-identifying
  *
  * HOUSE COPY RULES APPLIED (facts SS6.6)
@@ -431,99 +435,133 @@ export const orderPopup = {
 /* -------------------------------------------------------------------------- */
 /* Menu pop-up                                                                 */
 /*                                                                             */
-/* PROVENANCE (Kazim, 2026-09-02): no menu file supplied yet. Every category,   */
-/* item name and photo below comes from the old site, burgerscosmos.com,        */
-/* captured 2026-09-02 (`Cosmos Assets/OLD SITE MENU/`), until Lorena sends the */
-/* real menu. There are NO prices anywhere, by decision: none were ever         */
-/* supplied and an invented price is worse than none. Descriptions exist only   */
-/* for the five signature items and every one is the client's own docx wording; */
-/* nothing is written for them here.                                           */
+/* Lorena, COSMOS MENU.png, 2026-09-02. Transcribed directly from the image     */
+/* (Cosmos Assets/LORENA UPDATE 2026-09-02/), cross-checked item by item:       */
+/* every name, price, description, spicy/vegetarian mark, the combo offer and   */
+/* the allergen footer line are the client's own printed menu, verbatim.        */
 /*                                                                             */
-/* Photos: the five best-seller cutouts (transparent, brand-styled) stay on     */
-/* their five items, kept rather than replaced by the flatter old-site shots.   */
-/* Every other food item now carries its own old-site product photo, so no      */
-/* item in Burgers / Chicken Sandwiches / Artisan Hot Dog / Chicken Tenders /    */
-/* Sides shows the placeholder tile. Those photos are 640px-wide exports        */
-/* (`scripts/build-assets.sh`, the `items` step); the Tile component renders    */
-/* them with `fill` inside a fixed aspect box, so no width/height is stored     */
-/* per item here (unlike `bestSellers`/`plates`, which use a plain `<Image>`).   */
+/* Kids Burger, Tiramisu, Bundle for 4, Drinks and a standalone "More" category  */
+/* existed in the old-site-derived build; none are on the real menu, so all     */
+/* five are gone. Cauliflower Bites moved into Sides, where the real menu puts  */
+/* it. "Chicks Fries" and "Frings" keep the menu's own spelling.                */
 /*                                                                             */
-/* More and Drinks are new categories (Kazim, 2026-09-02), also old-site only:   */
-/* More holds the food extras the old site lists with no photos downloaded, so   */
-/* every item there gets the branded placeholder tile, same as any food item     */
-/* with no photo. Drinks is name-only, no tiles at all, grouped Beer / Wine and  */
-/* Cocktail / Soft the way a physical drinks menu reads.                        */
+/* Photos: unchanged from the old-site pass except BBQ (Lorena sent an updated  */
+/* shot, `BBQ UPDATED.png`, replacing `menu/items/bbq-burger.webp`). Frings and */
+/* Cauliflower Bites have no photo on file, so both render the branded          */
+/* placeholder tile, same as any item with no photo.                           */
 /* -------------------------------------------------------------------------- */
 
 export type MenuItem = {
   name: string;
-  /** Only where the client's own copy supports one. */
+  /** Printed exactly as the menu shows it, e.g. "$13", "$7.5" (not "$7.50"). */
+  price: string;
+  /** Only where the printed menu carries one (the sides below $7.5 do not). */
   description?: string;
   /** Only where we hold real photography of this exact item. */
   image?: { src: string; alt: string };
+  tags?: ("spicy" | "vegetarian")[];
+  /** e.g. "Swap for tots, add $1" (Monkey/Chicks/Cosmos Fries). */
+  note?: string;
 };
 
-/** A tile grid category: photo per item (or the branded placeholder), no prices. */
-export type TileMenuCategory = { id: string; title: string; kind: "tiles"; items: MenuItem[] };
-
-/** A name-only group inside a `kind: "list"` category, e.g. "Beer / Wine". */
-export type MenuItemGroup = { title: string; items: readonly string[] };
-
-/** A name-only category: no tiles, no photos, grouped names (the Drinks list). */
-export type ListMenuCategory = {
+export type MenuCategory = {
   id: string;
   title: string;
-  kind: "list";
-  groups: readonly MenuItemGroup[];
+  /** The italic line under a header, e.g. "Served with signature Cosmos sauce and pickles". */
+  note?: string;
+  items: MenuItem[];
 };
 
-export type MenuCategory = TileMenuCategory | ListMenuCategory;
+/** Order + label for the spicy/vegetarian legend at the foot of the panel. */
+export const menuTagLabels: Record<"spicy" | "vegetarian", string> = {
+  spicy: "Spicy",
+  vegetarian: "Vegetarian",
+};
+export const menuTagOrder: ("spicy" | "vegetarian")[] = ["spicy", "vegetarian"];
 
 export const menuPopup = {
   title: "Our Menu",
   subtitle: "Everything we serve, across all five locations.",
   orderCta: "Order",
-  /** The honest gap, stated on the page rather than hidden. */
-  note: "Prices at the counter and on the ordering apps. Full menu coming soon.",
+  /** Opens the exported source PNG in a new tab. */
+  printedMenuHref: "/menu/cosmos-menu.png",
+  printedMenuLabel: "View the printed menu",
+  /** The combo card at the bottom of Sides, printed menu, verbatim. */
+  combo: {
+    heading: "Upgrade your favorite item into a combo!",
+    body: "Just +$8 for fries and a can of soda. Enjoy regular fries + your choice of soda (Diet Coke, Coca-Cola, Sprite, or Dr. Pepper). No substitutions available.",
+  },
+  /** The allergen footer line, printed menu, verbatim. */
+  note: "May contain allergens. Inform us of any allergies.",
   categories: [
     {
       id: "burgers",
       title: "Burgers",
-      kind: "tiles",
       items: [
-        { name: "BBQ Burger", image: { src: "/menu/items/bbq-burger.webp", alt: "BBQ Burger" } },
         {
-          name: "Better Mac Burger",
-          image: { src: "/menu/items/better-mac-burger.webp", alt: "Better Mac Burger" },
+          name: "The Basic",
+          price: "$13",
+          description: "Ketchup, mustard, onion, pickles, cheddar cheese, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/the-basic-burger.webp", alt: "The Basic Burger" },
         },
         {
-          name: "Blue Cheese Burger",
-          description: "A favorite in our guest reviews.",
+          name: "Cosmos",
+          price: "$13",
+          description:
+            "Cosmos sauce, caramelized onion, cheddar cheese, pickles, 6oz Cosmos patty with brioche bun",
           image: {
-            src: "/menu/best-sellers/blue-cheese.png",
-            alt: "The Blue Cheese smash burger with crumbled blue cheese, lettuce and caramelised onion",
-          },
-        },
-        {
-          name: "Cosmos Burger",
-          description: "Our signature Cosmos Burger.",
-          image: {
-            src: "/menu/best-sellers/cosmos-burger.png",
+            src: "/menu/items/cosmos-burger.webp",
             alt: "The Cosmos Burger, a double smash burger with cheese and pickles",
           },
         },
         {
-          name: "Spicy Jam Burger",
-          description: "Our signature Spicy Jam Burger.",
+          name: "Truffle",
+          price: "$15",
+          description:
+            "Truffle aioli, caramelized onion, cheddar cheese, pickles, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/truffle-burger.webp", alt: "Truffle Burger" },
+        },
+        {
+          name: "Better Mac",
+          price: "$15",
+          description:
+            "Better mac sauce, onion, lettuce, cheddar cheese, pickles, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/better-mac-burger.webp", alt: "Better Mac Burger" },
+        },
+        {
+          name: "Spicy Jam",
+          price: "$15",
+          tags: ["spicy"],
+          description:
+            "Herb aioli, onion, serrano jam, cheddar cheese, pickles, lettuce, 6oz Cosmos patty with brioche bun",
           image: {
-            src: "/menu/best-sellers/spicy-jam.png",
+            src: "/menu/items/spicy-jam-burger.webp",
             alt: "The Spicy Jam smash burger on a white plate",
           },
         },
-        { name: "The Basic Burger", image: { src: "/menu/items/the-basic-burger.webp", alt: "The Basic Burger" } },
-        { name: "Truffle Burger", image: { src: "/menu/items/truffle-burger.webp", alt: "Truffle Burger" } },
         {
-          name: "Vegetarian Burger",
+          name: "BBQ",
+          price: "$15",
+          description:
+            "House made BBQ, crunchy onion, apple wood bacon, cheddar cheese, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/bbq-burger.webp", alt: "BBQ Burger" },
+        },
+        {
+          name: "Blue Cheese",
+          price: "$16",
+          description:
+            "Herb aioli, caramelized onion, arugula, blue cheese, pickles, 6oz Cosmos patty with brioche bun",
+          image: {
+            src: "/menu/items/blue-cheese-burger.webp",
+            alt: "The Blue Cheese smash burger with crumbled blue cheese, lettuce and caramelised onion",
+          },
+        },
+        {
+          name: "Vegetarian",
+          price: "$15",
+          tags: ["vegetarian"],
+          description:
+            "Herb aioli, cheddar cheese, pickled onions, pickles, lettuce, cauliflower fried patty with brioche bun",
           image: { src: "/menu/items/vegetarian-burger.webp", alt: "Vegetarian Burger" },
         },
       ],
@@ -531,152 +569,201 @@ export const menuPopup = {
     {
       id: "chicken-sandwiches",
       title: "Chicken Sandwiches",
-      kind: "tiles",
+      note: "Served with signature Cosmos sauce and pickles",
       items: [
-        { name: "BBQ Chicken Sandwich", image: { src: "/menu/items/bbq-chicken-sandwich.webp", alt: "BBQ Chicken Sandwich" } },
         {
-          name: "Garlic Parm Sandwich",
-          image: { src: "/menu/items/garlic-parm-sandwich.webp", alt: "Garlic Parm Sandwich" },
-        },
-        {
-          name: "Hot Chicks Sandwich",
-          image: { src: "/menu/items/hot-chicks-sandwich.webp", alt: "Hot Chicks Sandwich" },
-        },
-        {
-          name: "The Chicks Sandwich",
+          name: "The Chicks",
+          price: "$14",
+          description: "Herb aioli, pickles, lettuce, cheddar cheese, 2 piece tenders with brioche bun",
           image: { src: "/menu/items/the-chicks-sandwich.webp", alt: "The Chicks Sandwich" },
         },
         {
-          name: "Truffle Honey Sandwich",
+          name: "Hot Chicks",
+          price: "$14",
+          tags: ["spicy"],
+          description:
+            "Herb aioli, pickles, coleslaw, cheddar cheese, 2 piece spicy tenders with brioche bun",
+          image: { src: "/menu/items/hot-chicks-sandwich.webp", alt: "Hot Chicks Sandwich" },
+        },
+        {
+          name: "Truffle Honey",
+          price: "$15",
+          description: "Herb aioli, pickles, lettuce, 2 piece truffle honey tenders with brioche bun",
           image: { src: "/menu/items/truffle-honey-sandwich.webp", alt: "Truffle Honey Sandwich" },
+        },
+        {
+          name: "Garlic Parm",
+          price: "$15",
+          description: "Herb aioli, pickles, lettuce, 2 piece garlic parm tenders with brioche bun",
+          image: { src: "/menu/items/garlic-parm-sandwich.webp", alt: "Garlic Parm Sandwich" },
+        },
+        {
+          name: "BBQ Chicken",
+          price: "$15",
+          description: "Herb aioli, coleslaw, 2 piece bbq tenders, pickles with brioche bun",
+          image: { src: "/menu/items/bbq-chicken-sandwich.webp", alt: "BBQ Chicken Sandwich" },
+        },
+      ],
+    },
+    {
+      id: "chicken-tenders",
+      title: "Chicken Tenders",
+      note: "Served with signature Cosmos sauce and pickles",
+      items: [
+        {
+          name: "The Chicks",
+          price: "$14",
+          description: "3 piece tenders",
+          image: {
+            src: "/menu/items/the-chicks-tender.webp",
+            alt: "The Chicks chicken tenders with a pot of dipping sauce and pickles",
+          },
+        },
+        {
+          name: "Hot Chicks",
+          price: "$14",
+          tags: ["spicy"],
+          description: "3 piece spicy tenders",
+          image: { src: "/menu/items/hot-chicks-tender.webp", alt: "Hot Chicks Tenders" },
+        },
+        {
+          name: "Truffle Honey",
+          price: "$15",
+          description: "3 piece truffle honey tenders",
+          image: { src: "/menu/items/truffle-honey-tender.webp", alt: "Truffle Honey Tenders" },
+        },
+        {
+          name: "Garlic Parm",
+          price: "$15",
+          description: "3 piece garlic parm tenders",
+          image: { src: "/menu/items/garlic-parm-tender.webp", alt: "Garlic Parm Tenders" },
+        },
+        {
+          name: "BBQ Chicken",
+          price: "$15",
+          description: "3 piece bbq chicken tenders",
+          image: { src: "/menu/items/bbq-chicken-tenders.webp", alt: "BBQ Chicken Tenders" },
         },
       ],
     },
     {
       id: "artisan-hot-dog",
       title: "Artisan Hot Dog",
-      kind: "tiles",
-      items: [{ name: "The OG Hot Dog", image: { src: "/menu/items/the-og-hot-dog.webp", alt: "The OG Hot Dog" } }],
-    },
-    {
-      id: "chicken-tenders",
-      title: "Chicken Tenders",
-      kind: "tiles",
       items: [
-        { name: "BBQ Chicken Tenders", image: { src: "/menu/items/bbq-chicken-tenders.webp", alt: "BBQ Chicken Tenders" } },
         {
-          name: "Garlic Parm Tenders",
-          image: { src: "/menu/items/garlic-parm-tender.webp", alt: "Garlic Parm Tenders" },
-        },
-        {
-          name: "Hot Chicks Tenders",
-          image: { src: "/menu/items/hot-chicks-tender.webp", alt: "Hot Chicks Tenders" },
-        },
-        {
-          name: "The Chicks Tenders",
-          description: "One of our best sellers.",
-          image: {
-            src: "/menu/best-sellers/the-chicks.png",
-            alt: "The Chicks chicken tenders with a pot of dipping sauce and pickles",
-          },
-        },
-        {
-          name: "Truffle Honey Tenders",
-          image: { src: "/menu/items/truffle-honey-tender.webp", alt: "Truffle Honey Tenders" },
+          name: "The OG",
+          price: "$12",
+          description:
+            "Herb aioli, ketchup, honey mustard, pickles, caramelized onions, beef frank with brioche bun",
+          image: { src: "/menu/items/the-og-hot-dog.webp", alt: "The OG Hot Dog" },
         },
       ],
     },
     {
       id: "sides",
       title: "Sides",
-      kind: "tiles",
       items: [
-        { name: "Chick Fries", image: { src: "/menu/items/chick-fries.webp", alt: "Chick Fries" } },
-        {
-          name: "Cosmos Fries",
-          image: { src: "/menu/items/cosmos-fries.webp", alt: "Cosmos Fries" },
-        },
         {
           name: "Monkey Fries",
-          description: "Our iconic loaded fries.",
+          price: "$11",
+          note: "Swap for tots, add $1",
+          description: "Cosmos sauce, cheese sauce, pickle mix, caramelized onion, bacon",
           image: {
-            src: "/menu/best-sellers/monkey-fries.png",
+            src: "/menu/items/monkey-fries.webp",
             alt: "A bowl of Monkey Fries loaded with sauce, chives and pickled onion",
           },
         },
         {
-          name: "Regular Fries",
-          image: { src: "/menu/items/regular-fries.webp", alt: "Regular Fries" },
+          name: "Chicks Fries",
+          price: "$12",
+          note: "Swap for tots, add $1",
+          description: "Cosmos sauce, cheese sauce, pickle mix, caramelized onion, chicken tenders",
+          image: { src: "/menu/items/chick-fries.webp", alt: "Chicks Fries" },
         },
-        { name: "Tater Tots", image: { src: "/menu/items/tater-tots.webp", alt: "Tater Tots" } },
+        {
+          name: "Cosmos Fries",
+          price: "$12",
+          note: "Swap for tots, add $1",
+          description: "Cosmos sauce, cheese sauce, pickle mix, caramelized onion, 3oz Cosmos patty",
+          image: { src: "/menu/items/cosmos-fries.webp", alt: "Cosmos Fries" },
+        },
+        {
+          name: "Tater Tots",
+          price: "$7.5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/tater-tots.webp", alt: "Tater Tots" },
+        },
         {
           name: "Truffle Fries",
+          price: "$9.5",
+          tags: ["vegetarian"],
           image: { src: "/menu/items/truffle-fries.webp", alt: "Truffle Fries" },
         },
-        { name: "Onion Rings", image: { src: "/menu/items/onion-rings.webp", alt: "Onion Rings" } },
-        { name: "Coleslaw", image: { src: "/menu/items/coleslaw.webp", alt: "Coleslaw" } },
-      ],
-    },
-    {
-      // Food extras the old site lists with no photos downloaded (facts:
-      // burgerscosmos.com, captured 2026-09-02). Branded placeholder tile,
-      // same as any tiled item with no photo.
-      id: "more",
-      title: "More",
-      kind: "tiles",
-      items: [
-        { name: "Kids Burger" },
-        { name: "Cauliflower Bites" },
-        { name: "Tiramisu" },
-        { name: "Bundle for 4" },
-      ],
-    },
-    {
-      // Name-only, no tiles (old site has no drink photography). Grouped the
-      // way a physical drinks menu reads: Beer / Wine, then Cocktail / Soft.
-      // White Claw sits with the beers (hard seltzer, sold alongside beer at
-      // the counter); Cocktail sits with the soft drinks (no dedicated liquor
-      // list on the old site, one line item).
-      id: "drinks",
-      title: "Drinks",
-      kind: "list",
-      groups: [
         {
-          title: "Beer / Wine",
-          items: [
-            "Latitude 33 Blood Orange IPA",
-            "Hazy IPA",
-            "Buenaveza Lager",
-            "Pupil Societe IPA",
-            "Salty Crew IPA",
-            "Cali Pilsner",
-            "Sierra Nevada Pale Ale",
-            "Sierra Nevada Octoberfest",
-            "Blue Moon",
-            "Pacifico",
-            "Corona",
-            "White Claw",
-            "Sauvignon Blanc",
-            "Chardonnay",
-            "Cabernet Sauvignon",
-            "Grenache Rosé",
-          ],
+          name: "Onion Rings",
+          price: "$7.5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/onion-rings.webp", alt: "Onion Rings" },
         },
         {
-          title: "Cocktail / Soft",
-          items: [
-            "Cocktail",
-            "Booch Craft Strawberry Lemonade",
-            "Nova Kombucha Dragon Fruit",
-            "Lemonade",
-            "Perrier",
-            "Fiji Water",
-          ],
+          name: "Cauliflower Bites",
+          price: "$9",
+          tags: ["vegetarian"],
+          // No photo on file: branded placeholder tile, same as Frings.
+        },
+        {
+          name: "Frings",
+          price: "$9",
+          tags: ["vegetarian"],
+          // No photo on file: branded placeholder tile, same as Cauliflower Bites.
+        },
+        {
+          name: "Regular Fries",
+          price: "$7",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/regular-fries.webp", alt: "Regular Fries" },
+        },
+        {
+          name: "Coleslaw",
+          price: "$5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/coleslaw.webp", alt: "Coleslaw" },
         },
       ],
     },
   ] satisfies MenuCategory[],
 } as const;
+
+/**
+ * `Menu` / `MenuSection` / `MenuItem` JSON-LD (schema.org), built from
+ * `menuPopup` so the structured data can never drift from what the pop-up
+ * shows. One shared object; `app/layout.tsx` gives it a stable `@id` and
+ * points every Restaurant's `hasMenu` at it rather than repeating the whole
+ * menu five times. Decided at the James/Lorena meeting 2026-09-02: the menu
+ * is website content, not only a PDF, for SEO.
+ */
+export function menuStructuredData(id: string) {
+  return {
+    "@type": "Menu",
+    "@id": id,
+    name: `${site.name} Menu`,
+    hasMenuSection: menuPopup.categories.map((category) => ({
+      "@type": "MenuSection",
+      name: category.title,
+      ...(category.note ? { description: category.note } : {}),
+      hasMenuItem: category.items.map((item) => ({
+        "@type": "MenuItem",
+        name: item.name,
+        ...(item.description ? { description: item.description } : {}),
+        offers: {
+          "@type": "Offer",
+          price: item.price.replace(/^\$/, ""),
+          priceCurrency: "USD",
+        },
+      })),
+    })),
+  };
+}
 
 /* -------------------------------------------------------------------------- */
 /* Reviews, verbatim quotes from the client docx                              */
