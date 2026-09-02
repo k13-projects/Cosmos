@@ -1,0 +1,226 @@
+{
+  "report": "docs/reports/Cosmos_Development-Report_2026-09-02.html",
+  "project": "Cosmos Burger",
+  "client": "Tiger Hospitality Group",
+  "type": "Development Report",
+  "date": "2026-09-02",
+  "author": "Gabi (report-writer), K13 Software Studio",
+  "verdict": "PASS",
+  "second_agent_design_review": {
+    "status": "NOT RUN",
+    "owner": "James",
+    "note": "The house rule is a two-agent gate: one agent builds and a second agent reviews it in Chrome. Only the build-side pass below was run, by the agent that wrote the report. The independent design review has not happened yet and this file must not be read as if it had."
+  },
+  "environment": {
+    "browser": "GStack Browser (Chromium)",
+    "berth": "cosmos",
+    "CHROMIUM_PROFILE": "/Users/k13/.gstack/berths/cosmos",
+    "BROWSE_PORT": 39157,
+    "url": "file:///Users/k13/Desktop/PROJECTS/Cosmos/docs/reports/Cosmos_Development-Report_2026-09-02.html"
+  },
+  "artifact": {
+    "bytes": 573808,
+    "standalone": true,
+    "external_http_references": 0,
+    "link_tags": 0,
+    "style_blocks": 1,
+    "script_blocks": 1,
+    "images": 6,
+    "images_embedded_as_data_uri": 6,
+    "images_with_alt": 6,
+    "iframe_form_object_tags": 0,
+    "em_or_en_dashes": 0,
+    "title": "Cosmos Burger | Development Report, September 2026"
+  },
+  "screenshots": {
+    "directory": "docs/handoffs/screens/report_2026-09-02/",
+    "desktop_1280": [
+      "final-1280-hero.png",
+      "d-y1100.png",
+      "d-y2600.png",
+      "d-y4200.png",
+      "d-y5500-figpair.png",
+      "d-y6600.png",
+      "final-1280-ask.png",
+      "d-y8800.png"
+    ],
+    "mobile_375": [
+      "final-375-stats.png",
+      "m-y1500.png",
+      "m-y5200.png",
+      "m-y9000.png",
+      "final-375-ask.png",
+      "m-y11500.png"
+    ]
+  },
+  "embedded_source_screenshots": [
+    {
+      "slot": "desktop hero",
+      "source": "docs/handoffs/screens/qa_2026-09-02/d-01-hero.png",
+      "delivered": "900x562 JPEG q84"
+    },
+    {
+      "slot": "About band",
+      "source": "docs/handoffs/screens/qa_2026-09-02/d-02-about.png",
+      "delivered": "900x562 JPEG q84"
+    },
+    {
+      "slot": "best sellers",
+      "source": "docs/handoffs/screens/qa_2026-09-02/d-04-bestsellers.png",
+      "delivered": "900x562 JPEG q85"
+    },
+    {
+      "slot": "locations",
+      "source": "docs/handoffs/screens/qa_2026-09-02/d-07-locations.png",
+      "delivered": "900x562 JPEG q84"
+    },
+    {
+      "slot": "order pop-up",
+      "source": "docs/handoffs/screens/qa_2026-09-02/d-modal-order.png",
+      "delivered": "900x562 JPEG q85"
+    },
+    {
+      "slot": "mobile view",
+      "source": "docs/handoffs/screens/qa_2026-09-02/m-01-hero.png",
+      "delivered": "375x667 JPEG q86",
+      "note": "No full-page mobile capture exists in the QA set; every m-*.png there is a 375x667 viewport shot. The report labels this honestly as the page at 375 pixels wide, not as a full-page view."
+    }
+  ],
+  "checks": [
+    {
+      "check": "horizontal leak, 320",
+      "result": "0 px",
+      "verdict": "PASS"
+    },
+    {
+      "check": "horizontal leak, 375",
+      "result": "0 px",
+      "verdict": "PASS"
+    },
+    {
+      "check": "horizontal leak, 768",
+      "result": "0 px",
+      "verdict": "PASS"
+    },
+    {
+      "check": "horizontal leak, 1280",
+      "result": "0 px",
+      "verdict": "PASS"
+    },
+    {
+      "check": "horizontal leak, 1920",
+      "result": "0 px",
+      "verdict": "PASS"
+    },
+    {
+      "check": "console errors",
+      "result": "0 on a cleared buffer, at 1280 and 375",
+      "verdict": "PASS",
+      "note": "A single 404 seen on first open was Olga's leftover buffer from localhost:9157/no-such-page-qa, not this file. Confirmed by clearing the buffer and reloading."
+    },
+    {
+      "check": "images load",
+      "result": "6 of 6 complete, naturalWidth > 0",
+      "verdict": "PASS"
+    },
+    {
+      "check": "image alt text",
+      "result": "6 of 6",
+      "verdict": "PASS"
+    },
+    {
+      "check": "standalone / Gmail-safe",
+      "result": "no external stylesheets, fonts, scripts or image hosts; every image a base64 data URI",
+      "verdict": "PASS"
+    },
+    {
+      "check": "renders with scripts stripped",
+      "result": "0 of 57 reveal elements hidden with the .js class removed",
+      "verdict": "PASS",
+      "note": "Fixed during this pass, see findings."
+    },
+    {
+      "check": "reduced motion",
+      "result": "the script returns before adding .js when prefers-reduced-motion is set, so no element is ever hidden or animated",
+      "verdict": "PASS"
+    },
+    {
+      "check": "AA contrast, 22 text and ground pairs",
+      "result": "22 of 22 pass after two fixes",
+      "verdict": "PASS"
+    },
+    {
+      "check": "house copy rule, no em or en dashes",
+      "result": "0",
+      "verdict": "PASS"
+    },
+    {
+      "check": "palette matches the Cosmos brand",
+      "result": "magenta #CD1AE0, yellow #FAF00C, purple #751080, cream #FFF2E1, tan #EDD9BF, plus magenta-deep #B317C4 and magenta-ink #9C1BAA taken from the project's own app/globals.css",
+      "verdict": "PASS"
+    }
+  ],
+  "findings": [
+    {
+      "id": "R-01",
+      "severity": "High",
+      "what": "Every reveal element was hidden by an unscoped .fade-in / .slide-* rule and only made visible by a script at the end of the body. Mail clients strip scripts, so in Gmail the report would have opened as a hero and an almost entirely blank page.",
+      "fix": "FIXED. The hiding rules are now scoped to .js, and the single script that adds that class also wires the observer, so the two can never arrive separately. Verified by removing the class: 0 of 57 elements hidden.",
+      "verified": "browse js, computed opacity of all 57 reveal elements"
+    },
+    {
+      "id": "R-02",
+      "severity": "Medium (WCAG 1.4.3)",
+      "what": "Two pieces of text sat on true magenta #CD1AE0 at 4.36:1, under the 4.5:1 floor: the hero subtitle on the gradient's magenta end, and the white numerals in the What we need from you list.",
+      "fix": "FIXED. Both grounds moved to magenta-deep #B317C4, the project's own token for exactly this case, which gives white 5.47:1. The brand magenta is retained for borders and accents where no text sits on it.",
+      "verified": "relative luminance calculation over 22 pairs"
+    },
+    {
+      "id": "R-03",
+      "severity": "Low",
+      "what": "The display font fell back to Impact on any machine without Archivo, which is condensed and reads nothing like the brand's wide display face.",
+      "fix": "FIXED. Fallback stack is now Archivo, Archivo Expanded, Arial Black, Helvetica Neue, Arial.",
+      "verified": "read of the compiled file"
+    },
+    {
+      "id": "R-04",
+      "severity": "Low",
+      "what": "The order pop-up and phone screenshots shared an equal two-column grid, so the pop-up was rendered at 477 px (its text barely legible) while the phone column ran 250 px taller than its neighbour.",
+      "fix": "FIXED. The grid is 1.85fr / 1fr, the phone image is capped at 430 px tall, and the pair stacks below 720 px.",
+      "verified": "screenshot d-y5500-figpair.png at 1280"
+    },
+    {
+      "id": "R-05",
+      "severity": "Low",
+      "what": "A screenshot taken mid-scroll caught a whole band still transitioning in, blank. A reader jumping down the page could see the same for up to four seconds because of the safety timeout.",
+      "fix": "FIXED. Stagger cut from 80 ms to 45 ms, the show-everything safety net from 4000 ms to 1500 ms, and the observer now fires slightly earlier (threshold 0.05 with a -5% bottom margin).",
+      "verified": "re-screenshot at the same scroll position, content fully rendered"
+    }
+  ],
+  "known_limitations": [
+    "The independent second-agent design review (James) has not been run. This gate is incomplete until it is.",
+    "Rendering was verified in Chromium only. It has not been opened in Gmail, Outlook or Apple Mail. The construction is conservative (one head <style>, no external assets, no forms or iframes, data-URI images), but that is reasoning, not a measurement.",
+    "Poppins and Archivo are not embedded. Both degrade to a system stack by design, so the report is fully readable without them but will not look identical on a machine that has neither."
+  ],
+  "reviews": [
+    {
+      "agent": "James (main session), second-agent design review",
+      "date": "2026-09-02",
+      "viewports": [
+        "1280x900",
+        "375x812"
+      ],
+      "screenshots": [
+        "scratchpad rd_0..7200, rm_0..4800 (session-local)"
+      ],
+      "checks": {
+        "horizontal_overflow": "none at 375 (scrollWidth 375)",
+        "console_errors": 0,
+        "palette": "Cosmos tokens, magenta-deep for text bands",
+        "hierarchy": "hero, numbered band cards, screenshots, quality, asks, next",
+        "fix": "locations caption claimed a photo on each card; cards carry no photo, wording corrected"
+      },
+      "verdict": "PASS"
+    }
+  ]
+}
