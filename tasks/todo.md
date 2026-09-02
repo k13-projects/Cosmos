@@ -57,13 +57,24 @@ Source of truth for scope: `PROJECT_BRIEF.md`, `SCOPE.md`,
 - [x] Menu pop-up + order pop-up wired to real routes/state
 
 ## P5 — Polish
-- [x] Favicon (`app/icon.svg`) + OG image (`app/opengraph-image.png`, `scripts/make-og.py`)
-- [x] sitemap.xml + robots.txt + SEO meta + JSON-LD Restaurant per hall
-- [ ] ADA/508 pass + `prefers-reduced-motion` audit
-- [ ] `fitcheck` (nine viewports, zero AA failures, zero horizontal leaks)
-- [ ] Security headers (already scaffolded in `next.config.mjs`) + cookie flags if any land
-- [x] 404 page in brand (500 still Next default)
-- [ ] Shareable progress report (`docs/reports/Cosmos_Development-Report_<date>.html`)
+- [x] Favicon (`app/icon.svg`) + OG image (`app/opengraph-image.png`, `scripts/make-og.py`) —
+      confirmed live: `/icon.svg` 200 image/svg+xml, `<link rel="icon">` in head, purple tile
+      (`#751080`) behind the yellow glyph so it reads on both light and dark tab chrome (no
+      change needed). OG confirmed 1200x630 PNG, logo + burgers legible at thumbnail size.
+- [x] sitemap.xml + robots.txt + SEO meta + JSON-LD Restaurant per hall — verified by curl:
+      title/description/canonical/OG/Twitter/theme-color/viewport/lang all present.
+- [x] ADA/508 pass + `prefers-reduced-motion` audit — reduced-motion block confirmed in
+      `app/globals.css`; skip-link, focus ring, alt text all present. Full WCAG audit already
+      covered by QA gate (`docs/handoffs/qa_2026-09-02.md`).
+- [x] `fitcheck` — covered by the QA gate (`docs/handoffs/qa_2026-09-02.md`), nine viewports
+      passed there 2026-09-02; not re-run here since nothing layout-affecting changed since.
+- [x] Security headers (`next.config.mjs`) — confirmed live on `/`: CSP, HSTS,
+      X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy all present;
+      CSP checked in-browser (gstack), no "Refused to load" violations. No cookies in this build.
+- [x] 404 page in brand (500 still Next default — acceptable, no server-side logic in this
+      build to trigger one; noted as a known gap, not a blocker)
+- [ ] Shareable progress report (`docs/reports/Cosmos_Development-Report_<date>.html`) — Gabi
+      (report-writer) running in parallel, not this handoff's job.
 
 ## Blocked on client (Lorena, batched — see `SCOPE.md` "Open questions")
 - [ ] Menu content: descriptions + prices for the menu pop-up
