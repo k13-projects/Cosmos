@@ -1,0 +1,6 @@
+{
+  "env": {
+    "CHROMIUM_PROFILE": "/Users/k13/.gstack/berths/cosmos",
+    "BROWSE_PORT": "39157"
+  }
+}

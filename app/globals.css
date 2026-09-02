@@ -1,0 +1,386 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Cosmos Burger brand tokens
+   Source: docs/handoffs/design_2026-09-02.md (Valentina's token sheet), which
+   derives from Caner Ozcan's brand guide + Lorena's Canva blueprint.
+   See also docs/intake/BLUEPRINT_FACTS_2026-09-02.md SS3.
+   The guide's "DB5928" on the third tint row is a Canva artifact and is ignored.
+
+   Typeface in the guide is Horizon (Adobe Font, display). We stand in Archivo
+   at its widest width axis, weight 900, closest free wide-geometric match, and
+   the swap point is isolated to --font-display. See app/layout.tsx, facts SS6.5.
+--------------------------------------------------------------------------- */
+@theme {
+  /* --- brand --- */
+  --color-magenta: #cd1ae0; /* primary: seam tab, stars, REVIEWS, accents */
+  --color-magenta-deep: #b317c4; /* values-band ground; white body clears AA here */
+  --color-magenta-ink: #9c1baa; /* magenta TEXT at body size on cream / tan */
+  --color-yellow: #faf00c; /* headlines on purple, ORDER pills, logo, icons */
+  --color-purple: #751080; /* section grounds, nav pill, body on cream */
+  --color-cream: #fff2e1; /* page ground, location cards */
+  --color-tan: #edd9bf; /* review cards only */
+  --color-charcoal: #3b3b3b; /* OG / print logo ground. Never a section ground. */
+
+  /* --- guide tint scales, 80 / 60 / 40 / 20 % --- */
+  --color-magenta-80: #d748e6;
+  --color-magenta-60: #e176ec;
+  --color-magenta-40: #eba3f3;
+  --color-magenta-20: #f5d1f9;
+  --color-yellow-80: #fbf33d;
+  --color-yellow-60: #fcf66d;
+  --color-yellow-40: #fdf99e;
+  --color-yellow-20: #fefcce;
+  --color-purple-80: #914099;
+  --color-purple-60: #ac70b3;
+  --color-purple-40: #c89fcc;
+  --color-purple-20: #e3cfe6;
+
+  /* --- type. next/font vars set in layout.tsx --- */
+  --font-display: var(--font-cosmos-display), "Horizon", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-cosmos-body), "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  /* --- motion --- */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1); /* reveals, wipes, slides */
+  --ease-ui: cubic-bezier(0.4, 0, 0.2, 1); /* 0.3s hover / focus */
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1); /* badges, stamps. sparingly */
+
+  /* --- shape --- */
+  --radius-pill: 999px;
+  --radius-card: 40px;
+  --radius-modal: 24px;
+  --radius-tile: 16px;
+
+  --shadow-soft: 0 20px 40px rgba(117, 16, 128, 0.18);
+  --shadow-lift: 0 28px 60px rgba(117, 16, 128, 0.24);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* offset anchor targets so the floating nav pill never covers a heading */
+  scroll-padding-top: 7rem;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-purple);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* The plate cascade and the seam tab deliberately overhang their bands.
+     Clamp at the document level so an overhang can never open a sideways
+     scrollbar; each band that needs it clips itself as well. */
+  overflow-x: hidden;
+}
+
+/* Lenis drives scroll; disable native smooth so the two don't fight */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@layer components {
+  /* ---------- display type ---------- */
+  /* Archivo ships as a variable font (app/layout.tsx) so its wdth axis is
+     available; weight 900 + the widest width is the Horizon stand-in. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variation-settings: "wdth" 125;
+    font-stretch: 125%;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+  }
+
+  /* outline + solid two-word stack, e.g. "BLUE / CHEESE" */
+  .text-outline {
+    -webkit-text-stroke: 2px var(--color-purple);
+    color: transparent;
+  }
+  .text-outline-yellow {
+    -webkit-text-stroke-color: var(--color-yellow);
+  }
+  @media (min-width: 1024px) {
+    .text-outline {
+      -webkit-text-stroke-width: 3px;
+    }
+  }
+  @supports not (-webkit-text-stroke: 2px currentColor) {
+    .text-outline {
+      color: var(--color-purple);
+    }
+    .text-outline-yellow {
+      color: var(--color-yellow);
+    }
+  }
+
+  /* ---------- scroll reveal ---------- */
+  /* Hidden ONLY once the inline head script has confirmed JS is running. With
+     no JS, or if the observer never runs, every section stays visible, so the
+     page can never end up blank. components/SmoothScroll.tsx adds .is-visible.
+     Stagger siblings with style={{ "--i": idx }}. */
+  .js .reveal {
+    --reveal-delay: min(calc(var(--i, 0) * 80ms), 400ms);
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.8s var(--ease-brand) var(--reveal-delay),
+      transform 0.8s var(--ease-brand) var(--reveal-delay);
+    will-change: opacity, transform;
+  }
+  .js .reveal.reveal-x {
+    transform: translateX(28px);
+  }
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------- signature sheen ---------- */
+  /* Yellow surfaces only. Never on purple, photos or text. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .sheen::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: 0;
+    width: 42%;
+    height: 140%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.62), transparent);
+    transform: translateX(-160%) skewX(-18deg);
+    pointer-events: none;
+  }
+  .sheen-hover:hover::after,
+  .sheen-hover:focus-visible::after {
+    animation: sheen 2.4s var(--ease-brand) 1;
+  }
+
+  @keyframes sheen {
+    0% {
+      transform: translateX(-160%) skewX(-18deg);
+    }
+    60%,
+    100% {
+      transform: translateX(260%) skewX(-18deg);
+    }
+  }
+
+  /* ---------- ambient float (About plate cascade) ---------- */
+  .float {
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+  @media (max-width: 767px) {
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+  }
+
+  /* ---------- animated hero logo: the P3 signature ---------- */
+  /* A clip-path wipe writes the wordmark on, one sheen sweep follows it, then
+     an ambient breathe holds. components/Hero.tsx adds .logo-write after the
+     hero image has decoded so the reveal is never wasted behind a blank frame. */
+  .logo-write {
+    animation: logo-wipe 0.9s var(--ease-brand) both;
+  }
+  .logo-write::after {
+    animation: sheen 2.4s var(--ease-brand) 0.9s 1;
+  }
+  .logo-breathe {
+    animation: logo-breathe 4s ease-in-out 1.6s infinite;
+  }
+  @keyframes logo-wipe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes logo-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.018);
+    }
+  }
+
+  /* ---------- pattern overlay (purple bands) ---------- */
+  /* Client asset already carries ~36% alpha, so it is layered rather than
+     dimmed with opacity on the band itself. */
+  .pattern {
+    position: relative;
+    background-color: var(--color-purple);
+  }
+  .pattern::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/brand/pattern.png");
+    background-repeat: repeat;
+    background-size: 660px auto;
+    pointer-events: none;
+  }
+  .pattern > * {
+    position: relative;
+    z-index: 1;
+  }
+  /* Quieter variant, for a band whose own artwork must stay the subject. */
+  .pattern-soft::before {
+    opacity: 0.55;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    min-height: 48px;
+    padding-block: 12px;
+    padding-inline: 30px;
+    text-align: center;
+    border: 2px solid transparent;
+    border-radius: var(--radius-pill);
+    transition:
+      transform 0.3s var(--ease-ui),
+      background 0.3s var(--ease-ui),
+      color 0.3s var(--ease-ui),
+      border-color 0.3s var(--ease-ui);
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn-yellow {
+    background: var(--color-yellow);
+    color: var(--color-purple);
+  }
+  .btn-yellow:hover {
+    background: var(--color-yellow-80);
+  }
+  .btn-purple {
+    background: var(--color-purple);
+    color: var(--color-yellow);
+  }
+  .btn-purple:hover {
+    background: var(--color-purple-80);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-purple);
+    border-color: var(--color-purple);
+  }
+  .btn-ghost:hover {
+    background: var(--color-purple);
+    color: var(--color-yellow);
+  }
+  .btn-ghost-yellow {
+    background: transparent;
+    color: var(--color-yellow);
+    border-color: var(--color-yellow);
+  }
+  .btn-ghost-yellow:hover {
+    background: var(--color-yellow);
+    color: var(--color-purple);
+  }
+  .btn-sm {
+    min-height: 44px;
+    padding-inline: 22px;
+    font-size: 13px;
+  }
+  .btn[aria-disabled="true"] {
+    opacity: 0.55;
+    pointer-events: none;
+    transform: none;
+  }
+
+  /* ---------- rails ---------- */
+  /* Scroll-snap rows (best sellers, locations, reviews). The scrollbar is
+     hidden because every rail also ships arrows and keyboard support. */
+  .rail {
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* --- focus ring ---------------------------------------------------------- */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-magenta);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* On a magenta ground the magenta ring is invisible; switch it to yellow. */
+.on-magenta :where(a, button, [tabindex]):focus-visible {
+  outline-color: var(--color-yellow);
+}
+
+/* --- honor reduced motion ------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  /* land in the end state, never hide anything */
+  .js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .logo-write,
+  .logo-breathe {
+    animation: none !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+  .sheen::after {
+    display: none !important;
+  }
+  .float {
+    animation: none !important;
+    transform: none !important;
+  }
+  .btn:hover {
+    transform: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

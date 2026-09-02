@@ -1,0 +1,132 @@
+import type { Metadata, Viewport } from "next";
+import { Poppins, Archivo } from "next/font/google";
+import "./globals.css";
+import SmoothScroll from "@/components/SmoothScroll";
+import { LogoSprite } from "@/components/CosmosLogo";
+import { isProduction, locations, site } from "@/lib/content";
+
+/**
+ * Brand face is Horizon (Adobe Font, not free) for display, Poppins for body,
+ * buttons and nav (guide + mockup, facts SS3). Archivo at its widest width axis,
+ * weight 900, is the free stand-in for Horizon, closest wide-geometric match.
+ * The swap point is isolated to --font-display in globals.css, see facts SS6.5.
+ */
+const body = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-cosmos-body",
+});
+
+const display = Archivo({
+  subsets: ["latin"],
+  // Variable font so the wdth axis is available; weight is pinned to 900 in
+  // CSS (the .display utility) since next/font only allows `axes` when weight
+  // is "variable", not a fixed value.
+  weight: "variable",
+  axes: ["wdth"],
+  display: "swap",
+  variable: "--font-cosmos-display",
+});
+
+const TITLE = "Cosmos Burger | Burgers, Chicken and Fries in San Diego";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
+  title: { default: TITLE, template: "%s | Cosmos Burger" },
+  description: site.description,
+  keywords: [
+    "Cosmos Burger",
+    "smash burgers San Diego",
+    "Spicy Jam Burger",
+    "Monkey Fries",
+    "chicken sandwich San Diego",
+    "Windmill Food Hall",
+    "Global Fork Food Hall",
+    "burger catering San Diego",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: site.url,
+    siteName: site.name,
+    title: TITLE,
+    description: site.description,
+  },
+  twitter: { card: "summary_large_image", title: TITLE, description: site.description },
+  // Preview deploys set NEXT_PUBLIC_SITE_URL, which flips this off so a
+  // preview copy never competes with the real site in search results.
+  robots: { index: isProduction, follow: isProduction },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#751080",
+  width: "device-width",
+  initialScale: 1,
+};
+
+/**
+ * Restaurant schema, one entry per hall, so each counter can rank locally.
+ * Station 8 is included with its Coming Soon status carried as `openingHours`
+ * omitted rather than a fabricated opening time.
+ */
+function structuredData() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": locations.map((l) => ({
+      "@type": "Restaurant",
+      name: `${site.name}, ${l.name}`,
+      servesCuisine: ["American", "Burgers"],
+      priceRange: "$$",
+      url: site.url,
+      image: `${site.url}/opengraph-image`,
+      sameAs: [site.instagram, site.facebook, site.tiktok],
+      address: { "@type": "PostalAddress", streetAddress: l.address },
+      ...(l.status ? {} : { openingHours: "Mo-Su 11:00-21:00" }),
+      parentOrganization: {
+        "@type": "Organization",
+        name: site.operator,
+        url: site.operatorUrl,
+      },
+    })),
+  };
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    // suppressHydrationWarning: the inline script below adds `js` to this
+    // element's class list before React hydrates, which is the whole point of
+    // it, and React would otherwise log that as a mismatch on every dev load.
+    // Scoped to <html> itself, so a real mismatch anywhere inside still warns.
+    <html lang="en" className={`${body.variable} ${display.variable}`} suppressHydrationWarning>
+      <head>
+        {/*
+          Marks the document as JS-capable before first paint. `.reveal` only
+          starts hidden under `.js`, so a no-JS or JS-failed render shows the
+          full page instead of a blank one. Must stay inline and synchronous.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.classList.add('js')`,
+          }}
+        />
+      </head>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData()) }}
+        />
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-yellow focus:px-5 focus:py-3 focus:font-semibold focus:text-purple"
+        >
+          Skip to content
+        </a>
+        <LogoSprite />
+        <SmoothScroll />
+        {children}
+      </body>
+    </html>
+  );
+}
