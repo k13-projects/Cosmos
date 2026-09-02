@@ -13,12 +13,20 @@
   loaded fries), replacing the current WordPress site at burgerscosmos.com. Built from Lorena's
   Canva blueprint; see `docs/intake/BLUEPRINT_FACTS_2026-09-02.md` for the full source read.
 - **For:** client, **Tiger Hospitality Group** (THG). Stakeholder on the desk: **Eren**.
-- **Shortcode:** `cosmos`   ·   **Deploy:** Vercel (planned)   ·   **Repo:** https://github.com/k13-projects/Cosmos.git
+- **Shortcode:** `cosmos`   ·   **Deploy:** Vercel, project `cosmos` (team katalizor-kazims-projects), auto-deploys `main`   ·   **Repo:** https://github.com/k13-projects/Cosmos.git
 - **Sibling:** `LobsterLab` is the nearest sibling (same client, same designer Lorena, same
   one-pager-with-pop-ups shape) — read its `CLAUDE.md` before building. Cosmos Burger has its
   **own** brand: magenta `#CD1AE0` / yellow `#FAF00C` / purple `#751080`, Horizon (stand-in
   Archivo) + Poppins. Never Tiger's black/gold Bebas Neue identity, never Lobster Lab's
   navy/orange Sofia Pro Narrow.
+
+## Stakeholder preview
+- **Address:** https://cosmos.k13projects.com (open, no gate; deployed 2026-09-02 with `Deploy Preview COSMOS`).
+- **Production branch:** `main`. A merged PR redeploys it on its own; never deploy the working tree by CLI.
+- **Out of search on purpose:** `NEXT_PUBLIC_SITE_URL=https://cosmos.k13projects.com` is set on Vercel, so
+  `robots.ts` disallows everything and `next.config.mjs` adds `X-Robots-Tag: noindex` on the preview host.
+  At cutover to the client domain, delete that variable and add the real domain to the project.
+- DNS: CNAME `cosmos -> cname.vercel-dns.com` at GoDaddy (k13projects.com stays on GoDaddy nameservers).
 
 ## Run locally
 - **Assigned dev port: `9157`** (K13 dev-port registry in `CONVENTIONS.md`, one fixed port per
