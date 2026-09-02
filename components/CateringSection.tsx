@@ -7,7 +7,7 @@ import { catering } from "@/lib/content";
  */
 export default function CateringSection() {
   return (
-    <section id="catering" className="bg-cream py-16 sm:py-20 lg:py-24">
+    <section id="catering" className="scroll-mt-28 bg-cream py-16 sm:py-20 lg:scroll-mt-32 lg:py-24">
       <div className="mx-auto max-w-[860px] px-5 text-center sm:px-8">
         <h2 className="reveal display text-[13vw] text-purple sm:text-6xl lg:text-[72px]">
           {catering.title}

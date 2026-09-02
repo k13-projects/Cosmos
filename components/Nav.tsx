@@ -81,22 +81,26 @@ export default function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:gap-6 lg:px-8">
-        {/* The logo needs a ground of its own once the page scrolls. Over the
-            hero it floats free, exactly as the blueprint draws it. Past that it
-            passes over section headlines that are themselves yellow, and a
-            yellow mark on a yellow headline is the same ink on the same ink:
-            both become unreadable. It gains the nav pill's own purple ground so
-            the header reads as two floating pills rather than a collision. The
-            negative margin cancels the padding, so nothing moves. */}
+        {/* No ground behind the logo, ever (Lessons 17). The blueprint floats
+            the bare mark on the photograph and readability comes from a soft
+            purple-tinted shadow, which also carries it over cream and over the
+            yellow band headlines. The earlier purple pill was the wrong fix for
+            a scroll-overlap problem that belongs to scroll-margin, not to the
+            logo.
+
+            Sized to the nav pill: the blueprint's mark is about 1.3x the pill's
+            height and its swoosh dips below the pill line, which the small
+            nudge reproduces. 72px against the 56px lg pill, 58px against the
+            48px phone pill. md (768 to 1023) is the exception at 52px: that is
+            the one width where five links, the CTA and a 1.3x wordmark all
+            compete for the same row, and at 1.3x the pill runs 38px past the
+            viewport. The link keeps its own 44px hit box at every size. */}
         <a
           href="#top"
           aria-label={`${site.name}, home`}
-          className={[
-            "-mx-3 -my-1.5 shrink-0 rounded-[999px] px-3 py-1.5 transition-[background-color,box-shadow] duration-300",
-            stuck ? "bg-purple shadow-[0_10px_30px_rgba(59,4,66,0.35)]" : "bg-transparent shadow-none",
-          ].join(" ")}
+          className="flex min-h-11 shrink-0 items-center"
         >
-          <CosmosLogo className="h-9 w-auto text-yellow drop-shadow-[0_2px_10px_rgba(59,4,66,0.45)] sm:h-11 lg:h-[52px]" />
+          <CosmosLogo className="logo-shadow h-[58px] w-auto translate-y-[3px] text-yellow md:h-[52px] lg:h-[72px] lg:translate-y-[4px]" />
         </a>
 
         {/* The pill itself. Pushed right so the logo keeps the left edge, as in
@@ -109,7 +113,7 @@ export default function Nav() {
         >
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-1 pl-5 pr-2 md:flex lg:gap-3 lg:pl-7"
+            className="hidden items-center gap-0 pl-3 pr-2 md:flex lg:gap-3 lg:pl-7"
           >
             {nav.map((item) => (
               <a
@@ -118,7 +122,7 @@ export default function Nav() {
                 /* min-h-11: this row renders from 768px up, which includes phone
                    landscape, a touchscreen. Line height alone gives a 24px hit
                    box. whitespace-nowrap keeps "About us" on one line at 768. */
-                className="inline-flex min-h-11 items-center whitespace-nowrap px-2 text-[15px] font-semibold text-white transition-colors hover:text-yellow lg:text-[17px]"
+                className="inline-flex min-h-11 items-center whitespace-nowrap px-1.5 text-[14px] font-semibold text-white transition-colors hover:text-yellow lg:px-2 lg:text-[17px]"
               >
                 {item.label}
               </a>

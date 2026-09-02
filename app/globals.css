@@ -57,8 +57,12 @@
 
 html {
   scroll-behavior: smooth;
-  /* offset anchor targets so the floating nav pill never covers a heading */
-  scroll-padding-top: 7rem;
+  /* Offset anchor targets so the fixed header can never park over a section
+     headline (Lessons 17). The header is at most 104px tall (32px padding plus
+     the 72px logo at lg); 8rem clears it with room to breathe. Sections carry
+     a matching scroll-mt as well, so this holds even if a UA ignores
+     scroll-padding on the smooth-scroll path. */
+  scroll-padding-top: 8rem;
 }
 
 body {
@@ -201,35 +205,33 @@ html.lenis body {
     }
   }
 
-  /* ---------- animated hero logo: the P3 signature ---------- */
-  /* A clip-path wipe writes the wordmark on, one sheen sweep follows it, then
-     an ambient breathe holds. components/Hero.tsx adds .logo-write after the
-     hero image has decoded so the reveal is never wasted behind a blank frame. */
-  .logo-write {
-    animation: logo-wipe 0.9s var(--ease-brand) both;
+  /* ---------- the plate wheel (About band) ---------- */
+  /* Geometry and the reasoning behind these numbers: components/PlateWheel.tsx.
+     The blueprint's R is 0.49 of the viewport, on a taller About band than this
+     copy produces. Six plates need roughly six plate heights of vertical room,
+     so R is scaled back to 0.394vw and the plates to 0.15vw: that is what makes
+     the whole arc, plus its 32 degrees of turn, fit between the band's top edge
+     and the values band's icon row with clearance at every width from 1024 up.
+     Clamped so the arc neither collapses at 1024 nor swings off a wide monitor. */
+  .plate-wheel {
+    --wheel-r: clamp(430px, 39.4vw, 560px);
+    --plate-w: clamp(165px, 15vw, 210px);
   }
-  .logo-write::after {
-    animation: sheen 2.4s var(--ease-brand) 0.9s 1;
+  .wheel-hub {
+    transform: rotate(var(--wheel-rot, 0deg));
+    will-change: transform;
   }
-  .logo-breathe {
-    animation: logo-breathe 4s ease-in-out 1.6s infinite;
+  .wheel-hub .plate-tip {
+    /* The tooltip must not inherit the plate's own easing; it is instant. */
+    transition-timing-function: linear;
   }
-  @keyframes logo-wipe {
-    from {
-      clip-path: inset(0 100% 0 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-  @keyframes logo-breathe {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.018);
-    }
+
+  /* ---------- logo readability ---------- */
+  /* The wordmark sits on photography, on cream and on purple with no ground of
+     its own (Lessons 17). A purple-tinted double shadow is what separates it,
+     tight enough not to read as a glow. */
+  .logo-shadow {
+    filter: drop-shadow(0 2px 4px rgb(59 4 66 / 0.55)) drop-shadow(0 6px 18px rgb(59 4 66 / 0.45));
   }
 
   /* ---------- pattern overlay (purple bands) ---------- */
@@ -359,10 +361,9 @@ html.lenis body {
     transform: none !important;
     transition: none !important;
   }
-  .logo-write,
-  .logo-breathe {
-    animation: none !important;
-    clip-path: none !important;
+  /* The wheel is a still arc: PlateWheel.tsx never attaches its scroll handler
+     under reduced motion, and the plates stop bobbing. */
+  .wheel-hub {
     transform: none !important;
   }
   .sheen::after {

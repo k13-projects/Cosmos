@@ -50,26 +50,21 @@ photo "cosmos 2-121.jpg" band-chicken 2048
 # Phone photographing a burger, band above footer
 photo "cosmos 1-64.jpg" band-phone 2048
 
-# Cosmos General.png has alpha (a spread of plates), flatten onto the cream
-# ground before encoding so it doesn't render with a transparent hole where a
-# photo band expects an opaque image.
+# Cosmos General.png is a CUTOUT, not a scene. Its alpha channel is the shape
+# of the table's back edge, with the rearmost plates rising above it, because
+# the blueprint lays it on the bottom of the purple pattern band and lets the
+# pattern fill that wedge. Matting it onto a ground destroys the whole point, so
+# it is exported WITH alpha and only resized. cwebp keeps the alpha channel.
 GENERAL_SRC="$SRC/PHOTOS/Cosmos General.png"
 if [ ! -f "$GENERAL_SRC" ]; then
   echo "  ERROR: photo source not found: PHOTOS/Cosmos General.png" >&2
   exit 1
 fi
-python3 - "$GENERAL_SRC" "$TMP/general-flat.png" <<'PY'
-import sys
-from PIL import Image
-src, out = sys.argv[1], sys.argv[2]
-im = Image.open(src).convert("RGBA")
-bg = Image.new("RGBA", im.size, "#FFF2E1")
-bg.alpha_composite(im)
-bg.convert("RGB").save(out)
-PY
-sips -Z 2048 "$TMP/general-flat.png" >/dev/null
-cwebp -q 84 -m 6 -quiet "$TMP/general-flat.png" -o "$PUB/photos/band-spread.webp"
-echo "  photos/band-spread.webp"
+cp "$GENERAL_SRC" "$TMP/spread.png"
+sips -Z 2000 "$TMP/spread.png" >/dev/null
+cwebp -q 84 -alpha_q 100 -m 6 -quiet "$TMP/spread.png" -o "$PUB/photos/spread.webp"
+rm -f "$PUB/photos/band-spread.webp" # superseded by the cutout above
+echo "  photos/spread.webp"
 
 # Trim a transparent PNG to its alpha bounding box (padded 4% each side) and
 # cap the output width at 1200px. Keeps the cutout's own alpha intact.

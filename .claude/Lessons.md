@@ -64,3 +64,25 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
 11. **The browse daemon is shared between parallel agents and is NOT isolated.** Viewports and tabs
     bleed across sessions, this produced five phantom failures in one sweep. Assert
     `window.innerWidth` in-band inside every measurement.
+
+### Blueprint fidelity, corrected by Kazim 2026-09-02
+14. **The client PDF wins over everything, including K13 DNA and the client's own slide deck.**
+    We put a giant animated Cosmos wordmark with a sheen in the hero because the ideas deck said
+    "animated logo" and the house has a signature-moment habit. The PDF hero is a photo and a nav,
+    nothing else. Kazim: "bize böyle bir şey verilmemiş." Add a K13 flourish only where the PDF
+    leaves a gap, never on top of what it draws.
+15. **A transparent PNG from the client is a sticker, not a photo.** `Cosmos General.png` has an
+    alpha channel because it is meant to sit on the purple pattern with the plates rising over the
+    table's top edge (depth). We flattened it on cream and shipped a square band. Never matte a
+    client cutout; ask what the transparency is for by looking at where the PDF places it.
+16. **Read the geometry of the mockup, not just the inventory.** The About plates in the PDF hang
+    on an arc along the right edge, like a wheel whose hub is off-screen. We rendered a straight
+    column. Kazim wants the wheel: it turns with scroll, hover shows an instant CAPS tooltip that
+    stays, and it never covers "Fresh always" (the PDF does not).
+17. **Logo top-left: no ground behind it, ever.** Readability comes from a soft shadow, and the
+    logo is sized to the nav pill's height. The purple backdrop added at the QA gate for the
+    scroll-overlap bug was the wrong fix; the right one is the shadow plus keeping section
+    headlines clear of the fixed header.
+18. **Footer contact block: never dump addresses.** Locations already live in their own section.
+    CONTACT INFO and FOLLOW US are two symmetric, tidy columns; the handle sits under its label,
+    not beside it.

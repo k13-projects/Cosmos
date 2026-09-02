@@ -16,7 +16,10 @@ export default function Values() {
   return (
     <section
       aria-label="What Cosmos stands for"
-      className="on-magenta bg-magenta-deep pb-16 pt-20 sm:pb-20 sm:pt-24 lg:pb-24 lg:pt-28"
+      // lg:pt-36 is not decoration. The blueprint's lowest plate spills over
+      // this seam, and this padding is the clear lane it lands in: the wheel is
+      // sized so its deepest reach stays above the icon row (components/PlateWheel.tsx).
+      className="on-magenta bg-magenta-deep pb-16 pt-20 sm:pb-20 sm:pt-24 lg:pb-24 lg:pt-36"
     >
       <div className="mx-auto grid max-w-[1100px] grid-cols-1 gap-12 px-5 sm:grid-cols-3 sm:gap-8 sm:px-8">
         {values.map((value, i) => {
