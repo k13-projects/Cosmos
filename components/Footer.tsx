@@ -13,7 +13,7 @@ import { socialIcons } from "./Icons";
  * not belong here (Lessons 18).
  *
  * CONTACT INFO renders only what exists. The docx left it blank and no phone or
- * email is confirmed for these four halls, so it offers the one channel that is
+ * email is confirmed for these five halls, so it offers the one channel that is
  * definitely monitored. Fill `contact.phone` or `contact.email` in
  * lib/content.ts and each appears here with no code change.
  */

@@ -141,25 +141,22 @@ export const about = {
    * seam into the values band. The client folder is literally named "Burgers
    * circle". components/PlateWheel.tsx rebuilds that geometry.
    *
-   * NAMES. Three plates are pixel-identical to a named best-seller cutout in
-   * `Cosmos Assets/PHOTOS/Best Sellers/` (RGB RMSE after alpha-bbox crop and
-   * resize: plate 1 -> blue-cheese 50.5, plate 4 -> cosmos-burger 53.0, plate 5
-   * -> spicy-jam 49.4, each a clear win over its runner-up). The other three
-   * match nothing we hold a name for, so they carry an honest generic label
-   * rather than an invented menu name.
+   * NAMES. Matched by photo against the old site's item shots (James,
+   * 2026-09-02, `Cosmos Assets/OLD SITE MENU/`), one glance per plate rather
+   * than pixel RMSE: plate 1 -> Blue cheese, plate 2 -> BBQ chicken sandwich,
+   * plate 3 -> Better Mac burger, plate 4 -> Cosmos burger, plate 5 -> Spicy
+   * jam, plate 6 -> Hot Chicks sandwich. `.display` already renders names in
+   * caps, so these stay natural case here.
    *
-   * TODO(client, Lorena): confirm the three generic labels, marked below.
+   * TODO(client, Lorena): confirm all six against the real menu.
    */
   plates: [
     { src: "/menu/plates/1.png", width: 845, height: 507, name: "Blue cheese" },
-    // generic: crispy chicken sandwich, red glaze and slaw. Likely "Hot Chicks".
-    { src: "/menu/plates/2.png", width: 1003, height: 700, name: "Chicken sandwich" },
-    // generic: double smash, cheese, shredded lettuce. Likely "The Basic".
-    { src: "/menu/plates/3.png", width: 1083, height: 632, name: "Smash burger" },
+    { src: "/menu/plates/2.png", width: 1003, height: 700, name: "BBQ chicken sandwich" },
+    { src: "/menu/plates/3.png", width: 1083, height: 632, name: "Better Mac burger" },
     { src: "/menu/plates/4.png", width: 1178, height: 684, name: "Cosmos burger" },
     { src: "/menu/plates/5.png", width: 1200, height: 663, name: "Spicy jam" },
-    // generic: crispy chicken with purple slaw. Likely "Truffle Honey".
-    { src: "/menu/plates/6.png", width: 1020, height: 646, name: "Crispy chicken" },
+    { src: "/menu/plates/6.png", width: 1020, height: 646, name: "Hot Chicks sandwich" },
   ],
   /** Helper text under the wheel's first plate, for keyboard and screen reader. */
   platesHint: "Open the full menu",
@@ -300,12 +297,14 @@ export const hero = {
 /* -------------------------------------------------------------------------- */
 /* Locations                                                                   */
 /*                                                                             */
-/* Four food halls, exactly as the docx and the blueprint list them. Oceanside  */
-/* is deliberately NOT here: the docx puts it in the ORDER ONLINE pop-up only,  */
-/* not in the LOCATIONS section, even though the current live site treats it as */
-/* a flagship. Followed literally per facts SS6.1 and flagged for Lorena.       */
+/* Five food halls. The docx and blueprint list four; Oceanside was docx-only, */
+/* order-pop-up-only, even though the current live site treats it as a         */
+/* flagship. Kazim decided (2026-09-02) it gets a full Locations card too, so   */
+/* it is now in this array like every other hall, placed right after Carlsbad. */
 /*                                                                             */
-/* Hours are the docx's single 11:00 AM to 9:00 PM for all four (facts SS6.9).  */
+/* Hours are the docx's single 11:00 AM to 9:00 PM for the original four       */
+/* (facts SS6.9); Oceanside's own hours and phone are the live site's           */
+/* (burgerscosmos.com, captured 2026-09-02), since the docx never covered it.   */
 /* Station 8's address follows the docx, which disagrees with THG-Website       */
 /* (9145 Scholars Drive South); the docx is newer and the client's own          */
 /* (facts SS6.7).                                                              */
@@ -321,17 +320,21 @@ export type Location = {
   mapsQuery: string;
   /** Set only when the location is NOT simply trading, so it stays meaningful. */
   status?: "Coming Soon";
+  /**
+   * Public phone number, display format. Rendered with `telHref` below.
+   * Confirmed for Oceanside only (live site); the other four have none
+   * confirmed yet, so the field stays optional rather than guessed.
+   */
+  phone?: string;
   /** Storefronts for THIS location. Empty string = not connected yet. */
   ordering: OrderLinks;
 };
 
 /**
- * `(760) 607-9227` -> `+17606079227`, for a `tel:` href.
+ * `(760) 607-7083` -> `+17606077083`, for a `tel:` href.
  *
  * Kept as a helper rather than a second field per location so the display
- * string and the dial string can never drift. Unused today because no phone
- * number is confirmed for the halls (see `contact` below), and kept because the
- * moment the client supplies one it is the only correct way to render it.
+ * string and the dial string can never drift.
  */
 export function telHref(phone: string): string {
   return `tel:+1${phone.replace(/\D/g, "")}`;
@@ -350,6 +353,26 @@ export const locations: Location[] = [
       toastDelivery: "",
       // Public on burgerscosmos.com; the locale prefix has been stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-carlsbad-26018232/29386346/",
+    },
+  },
+  {
+    // Oceanside (Kazim, 2026-09-02): promoted from the order-pop-up-only row
+    // it used to be to a full Locations card, placed right after Carlsbad.
+    // Address, hours and phone are the live site's (burgerscosmos.com,
+    // captured 2026-09-02); the docx never covered this hall at all.
+    id: "oceanside",
+    area: "Oceanside",
+    name: "Cosmos Burger Oceanside",
+    address: "208 N Coast Hwy, Oceanside, CA 92054",
+    hours: "Mon to Thu 11:00 AM to 8:45 PM, Fri and Sat to 9:45 PM, Sun to 8:45 PM",
+    mapsQuery: "Cosmos Burger, 208 N Coast Hwy, Oceanside, CA 92054",
+    phone: "(760) 607-7083",
+    ordering: {
+      toastPickup: "",
+      toastDelivery: "",
+      // Public on burgerscosmos.com; the locale prefix has been stripped.
+      doordash:
+        "https://www.doordash.com/store/cosmos-burger-oceanside-oceanside-25982698/51403146/",
     },
   },
   {
@@ -385,34 +408,14 @@ export const locations: Location[] = [
 ];
 
 /**
- * The ORDER ONLINE pop-up's own list. It is NOT `locations`: the docx lists
- * five rows here and only four cards in the Locations section, the extra row
- * being Oceanside (facts SS5, SS6.1). Kept as a separate list so the pop-up can
- * carry Oceanside without inventing a location card for it.
+ * The ORDER ONLINE pop-up's own list. Used to diverge from `locations`
+ * (Oceanside was a pop-up-only row, invented nowhere else); now that
+ * Oceanside has a real Locations card too, every hall has exactly one row in
+ * each place, from the same object, so the pop-up is simply the same list.
+ * Kept as its own export, rather than importing `locations` directly at every
+ * call site, so a future divergence has one place to happen again.
  */
-export const orderRows: Location[] = [
-  locations[0],
-  {
-    id: "oceanside",
-    area: "Oceanside",
-    // The docx says only "Oceanside". The street address below is from the
-    // current live site and is shown in the pop-up for recognition only.
-    name: "208 N Coast Hwy",
-    address: "208 N Coast Hwy, Oceanside, CA 92054",
-    hours: "11:00 AM to 9:00 PM",
-    mapsQuery: "Cosmos Burger, 208 N Coast Hwy, Oceanside, CA 92054",
-    ordering: {
-      toastPickup: "",
-      toastDelivery: "",
-      // Public on burgerscosmos.com; the locale prefix has been stripped.
-      doordash:
-        "https://www.doordash.com/store/cosmos-burger-oceanside-oceanside-25982698/51403146/",
-    },
-  },
-  locations[1],
-  locations[2],
-  locations[3],
-];
+export const orderRows: Location[] = locations;
 
 export const orderPopup = {
   title: "Order Online",
@@ -428,18 +431,28 @@ export const orderPopup = {
 /* -------------------------------------------------------------------------- */
 /* Menu pop-up                                                                 */
 /*                                                                             */
-/* TODO(client, Lorena): no menu file was supplied. Categories and item names   */
-/* below come from the current live site (facts SS5). There are NO prices       */
-/* anywhere, by decision, because none were supplied and an invented price is   */
-/* worse than none. Descriptions exist only for the five signature items and    */
-/* every one of them is drawn from the client's own docx wording, nothing is    */
-/* written for them here.                                                      */
+/* PROVENANCE (Kazim, 2026-09-02): no menu file supplied yet. Every category,   */
+/* item name and photo below comes from the old site, burgerscosmos.com,        */
+/* captured 2026-09-02 (`Cosmos Assets/OLD SITE MENU/`), until Lorena sends the */
+/* real menu. There are NO prices anywhere, by decision: none were ever         */
+/* supplied and an invented price is worse than none. Descriptions exist only   */
+/* for the five signature items and every one is the client's own docx wording; */
+/* nothing is written for them here.                                           */
 /*                                                                             */
-/* Photos: the five best-seller cutouts are the only item photography we have.  */
-/* The six plate cutouts are NOT reused for other items: their dishes cannot be */
-/* matched to a menu name with confidence, and a burger photographed under the  */
-/* wrong name is a promise the kitchen cannot keep. Everything else gets the    */
-/* branded placeholder tile.                                                   */
+/* Photos: the five best-seller cutouts (transparent, brand-styled) stay on     */
+/* their five items, kept rather than replaced by the flatter old-site shots.   */
+/* Every other food item now carries its own old-site product photo, so no      */
+/* item in Burgers / Chicken Sandwiches / Artisan Hot Dog / Chicken Tenders /    */
+/* Sides shows the placeholder tile. Those photos are 640px-wide exports        */
+/* (`scripts/build-assets.sh`, the `items` step); the Tile component renders    */
+/* them with `fill` inside a fixed aspect box, so no width/height is stored     */
+/* per item here (unlike `bestSellers`/`plates`, which use a plain `<Image>`).   */
+/*                                                                             */
+/* More and Drinks are new categories (Kazim, 2026-09-02), also old-site only:   */
+/* More holds the food extras the old site lists with no photos downloaded, so   */
+/* every item there gets the branded placeholder tile, same as any food item     */
+/* with no photo. Drinks is name-only, no tiles at all, grouped Beer / Wine and  */
+/* Cocktail / Soft the way a physical drinks menu reads.                        */
 /* -------------------------------------------------------------------------- */
 
 export type MenuItem = {
@@ -450,23 +463,41 @@ export type MenuItem = {
   image?: { src: string; alt: string };
 };
 
-export type MenuCategory = { id: string; title: string; items: MenuItem[] };
+/** A tile grid category: photo per item (or the branded placeholder), no prices. */
+export type TileMenuCategory = { id: string; title: string; kind: "tiles"; items: MenuItem[] };
+
+/** A name-only group inside a `kind: "list"` category, e.g. "Beer / Wine". */
+export type MenuItemGroup = { title: string; items: readonly string[] };
+
+/** A name-only category: no tiles, no photos, grouped names (the Drinks list). */
+export type ListMenuCategory = {
+  id: string;
+  title: string;
+  kind: "list";
+  groups: readonly MenuItemGroup[];
+};
+
+export type MenuCategory = TileMenuCategory | ListMenuCategory;
 
 export const menuPopup = {
   title: "Our Menu",
-  subtitle: "Everything we serve, across all four food halls.",
+  subtitle: "Everything we serve, across all five locations.",
   orderCta: "Order",
   /** The honest gap, stated on the page rather than hidden. */
-  note: "Full menu with prices coming soon.",
+  note: "Prices at the counter and on the ordering apps. Full menu coming soon.",
   categories: [
     {
       id: "burgers",
       title: "Burgers",
+      kind: "tiles",
       items: [
-        { name: "BBQ" },
-        { name: "Better Mac" },
+        { name: "BBQ Burger", image: { src: "/menu/items/bbq-burger.webp", alt: "BBQ Burger" } },
         {
-          name: "Blue Cheese",
+          name: "Better Mac Burger",
+          image: { src: "/menu/items/better-mac-burger.webp", alt: "Better Mac Burger" },
+        },
+        {
+          name: "Blue Cheese Burger",
           description: "A favorite in our guest reviews.",
           image: {
             src: "/menu/best-sellers/blue-cheese.png",
@@ -474,7 +505,7 @@ export const menuPopup = {
           },
         },
         {
-          name: "Cosmos",
+          name: "Cosmos Burger",
           description: "Our signature Cosmos Burger.",
           image: {
             src: "/menu/best-sellers/cosmos-burger.png",
@@ -482,61 +513,89 @@ export const menuPopup = {
           },
         },
         {
-          name: "Spicy Jam",
+          name: "Spicy Jam Burger",
           description: "Our signature Spicy Jam Burger.",
           image: {
             src: "/menu/best-sellers/spicy-jam.png",
             alt: "The Spicy Jam smash burger on a white plate",
           },
         },
-        { name: "The Basic" },
-        { name: "Truffle" },
-        { name: "Vegetarian" },
+        { name: "The Basic Burger", image: { src: "/menu/items/the-basic-burger.webp", alt: "The Basic Burger" } },
+        { name: "Truffle Burger", image: { src: "/menu/items/truffle-burger.webp", alt: "Truffle Burger" } },
+        {
+          name: "Vegetarian Burger",
+          image: { src: "/menu/items/vegetarian-burger.webp", alt: "Vegetarian Burger" },
+        },
       ],
     },
     {
       id: "chicken-sandwiches",
       title: "Chicken Sandwiches",
+      kind: "tiles",
       items: [
-        { name: "BBQ" },
-        { name: "Garlic Parm" },
-        { name: "Hot Chicks" },
-        // No photo: the client's "THE CHICKS" cutout is the tenders plate, and
-        // it is used on the Chicken Tenders row below. A tenders photo under a
-        // sandwich name would misdescribe the dish.
-        { name: "The Chicks" },
-        { name: "Truffle Honey" },
+        { name: "BBQ Chicken Sandwich", image: { src: "/menu/items/bbq-chicken-sandwich.webp", alt: "BBQ Chicken Sandwich" } },
+        {
+          name: "Garlic Parm Sandwich",
+          image: { src: "/menu/items/garlic-parm-sandwich.webp", alt: "Garlic Parm Sandwich" },
+        },
+        {
+          name: "Hot Chicks Sandwich",
+          image: { src: "/menu/items/hot-chicks-sandwich.webp", alt: "Hot Chicks Sandwich" },
+        },
+        {
+          name: "The Chicks Sandwich",
+          image: { src: "/menu/items/the-chicks-sandwich.webp", alt: "The Chicks Sandwich" },
+        },
+        {
+          name: "Truffle Honey Sandwich",
+          image: { src: "/menu/items/truffle-honey-sandwich.webp", alt: "Truffle Honey Sandwich" },
+        },
       ],
     },
     {
       id: "artisan-hot-dog",
       title: "Artisan Hot Dog",
-      items: [{ name: "The OG" }],
+      kind: "tiles",
+      items: [{ name: "The OG Hot Dog", image: { src: "/menu/items/the-og-hot-dog.webp", alt: "The OG Hot Dog" } }],
     },
     {
       id: "chicken-tenders",
       title: "Chicken Tenders",
+      kind: "tiles",
       items: [
-        { name: "BBQ" },
-        { name: "Garlic Parm" },
-        { name: "Hot Chicks" },
+        { name: "BBQ Chicken Tenders", image: { src: "/menu/items/bbq-chicken-tenders.webp", alt: "BBQ Chicken Tenders" } },
         {
-          name: "The Chicks",
+          name: "Garlic Parm Tenders",
+          image: { src: "/menu/items/garlic-parm-tender.webp", alt: "Garlic Parm Tenders" },
+        },
+        {
+          name: "Hot Chicks Tenders",
+          image: { src: "/menu/items/hot-chicks-tender.webp", alt: "Hot Chicks Tenders" },
+        },
+        {
+          name: "The Chicks Tenders",
           description: "One of our best sellers.",
           image: {
             src: "/menu/best-sellers/the-chicks.png",
             alt: "The Chicks chicken tenders with a pot of dipping sauce and pickles",
           },
         },
-        { name: "Truffle Honey" },
+        {
+          name: "Truffle Honey Tenders",
+          image: { src: "/menu/items/truffle-honey-tender.webp", alt: "Truffle Honey Tenders" },
+        },
       ],
     },
     {
       id: "sides",
       title: "Sides",
+      kind: "tiles",
       items: [
-        { name: "Chick Fries" },
-        { name: "Cosmos Fries" },
+        { name: "Chick Fries", image: { src: "/menu/items/chick-fries.webp", alt: "Chick Fries" } },
+        {
+          name: "Cosmos Fries",
+          image: { src: "/menu/items/cosmos-fries.webp", alt: "Cosmos Fries" },
+        },
         {
           name: "Monkey Fries",
           description: "Our iconic loaded fries.",
@@ -545,11 +604,75 @@ export const menuPopup = {
             alt: "A bowl of Monkey Fries loaded with sauce, chives and pickled onion",
           },
         },
-        { name: "Regular Fries" },
-        { name: "Tater Tots" },
-        { name: "Truffle Fries" },
-        { name: "Onion Rings" },
-        { name: "Coleslaw" },
+        {
+          name: "Regular Fries",
+          image: { src: "/menu/items/regular-fries.webp", alt: "Regular Fries" },
+        },
+        { name: "Tater Tots", image: { src: "/menu/items/tater-tots.webp", alt: "Tater Tots" } },
+        {
+          name: "Truffle Fries",
+          image: { src: "/menu/items/truffle-fries.webp", alt: "Truffle Fries" },
+        },
+        { name: "Onion Rings", image: { src: "/menu/items/onion-rings.webp", alt: "Onion Rings" } },
+        { name: "Coleslaw", image: { src: "/menu/items/coleslaw.webp", alt: "Coleslaw" } },
+      ],
+    },
+    {
+      // Food extras the old site lists with no photos downloaded (facts:
+      // burgerscosmos.com, captured 2026-09-02). Branded placeholder tile,
+      // same as any tiled item with no photo.
+      id: "more",
+      title: "More",
+      kind: "tiles",
+      items: [
+        { name: "Kids Burger" },
+        { name: "Cauliflower Bites" },
+        { name: "Tiramisu" },
+        { name: "Bundle for 4" },
+      ],
+    },
+    {
+      // Name-only, no tiles (old site has no drink photography). Grouped the
+      // way a physical drinks menu reads: Beer / Wine, then Cocktail / Soft.
+      // White Claw sits with the beers (hard seltzer, sold alongside beer at
+      // the counter); Cocktail sits with the soft drinks (no dedicated liquor
+      // list on the old site, one line item).
+      id: "drinks",
+      title: "Drinks",
+      kind: "list",
+      groups: [
+        {
+          title: "Beer / Wine",
+          items: [
+            "Latitude 33 Blood Orange IPA",
+            "Hazy IPA",
+            "Buenaveza Lager",
+            "Pupil Societe IPA",
+            "Salty Crew IPA",
+            "Cali Pilsner",
+            "Sierra Nevada Pale Ale",
+            "Sierra Nevada Octoberfest",
+            "Blue Moon",
+            "Pacifico",
+            "Corona",
+            "White Claw",
+            "Sauvignon Blanc",
+            "Chardonnay",
+            "Cabernet Sauvignon",
+            "Grenache Rosé",
+          ],
+        },
+        {
+          title: "Cocktail / Soft",
+          items: [
+            "Cocktail",
+            "Booch Craft Strawberry Lemonade",
+            "Nova Kombucha Dragon Fruit",
+            "Lemonade",
+            "Perrier",
+            "Fiji Water",
+          ],
+        },
       ],
     },
   ] satisfies MenuCategory[],
@@ -613,8 +736,9 @@ export const reviews: Review[] = [
 /**
  * CONTACT INFO is blank in the docx (facts SS6.4). The live WordPress site
  * carries two hall phone numbers and a third unattributed one, and no email
- * anywhere, so nothing here is confirmed for the four food halls this site
- * covers. Rather than publish a number that may ring the wrong counter, the
+ * anywhere, so nothing here is confirmed for the five food halls this site
+ * covers (Oceanside's own confirmed number lives on its Locations card, not
+ * here). Rather than publish a number that may ring the wrong counter, the
  * footer offers the one channel that is definitely monitored, Instagram DMs,
  * and lists the halls.
  *

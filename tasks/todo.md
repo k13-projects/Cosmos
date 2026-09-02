@@ -77,11 +77,15 @@ Source of truth for scope: `PROJECT_BRIEF.md`, `SCOPE.md`,
       (report-writer) running in parallel, not this handoff's job.
 
 ## Blocked on client (Lorena, batched — see `SCOPE.md` "Open questions")
-- [ ] Menu content: descriptions + prices for the menu pop-up
-- [ ] Ordering URLs: Toast + DoorDash for San Clemente, Little Italy, UCSD Campus
+- [ ] Menu content: real menu (PDF or item list) with descriptions + prices; names and photos are
+      the old site's in the meantime
+- [ ] Ordering URLs: Toast + DoorDash per food hall (Carlsbad DoorDash and Oceanside DoorDash are
+      already public)
 - [ ] Contact info for the footer (address/phone/email)
-- [ ] Oceanside: confirm it's order-pop-up-only, or should get a Locations card
-- [ ] Fonts: does THG have Adobe Fonts for Horizon, or does the Archivo stand-in ship permanently
+- [ ] Plate names: confirm the six wheel-plate names, matched by photo (one-glance, not client-
+      confirmed)
+- [ ] Chicken sandwich photo: the original, wider photo used in the PDF band, if Lorena still has
+      it (the file we hold can't reproduce the blueprint's exact crop)
 
 ---
 

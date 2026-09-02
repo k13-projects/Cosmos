@@ -7,9 +7,10 @@
    See also docs/intake/BLUEPRINT_FACTS_2026-09-02.md SS3.
    The guide's "DB5928" on the third tint row is a Canva artifact and is ignored.
 
-   Typeface in the guide is Horizon (Adobe Font, display). We stand in Archivo
-   at its widest width axis, weight 900, closest free wide-geometric match, and
-   the swap point is isolated to --font-display. See app/layout.tsx, facts SS6.5.
+   Typeface in the guide is Horizon (Adobe Font, display). Archivo, at its
+   widest width axis and weight 900, ships as the permanent display face
+   (Kazim, 2026-09-02), the closest free wide-geometric match. See
+   app/layout.tsx, facts SS6.5.
 --------------------------------------------------------------------------- */
 @theme {
   /* --- brand --- */

@@ -6,10 +6,10 @@ import { LogoSprite } from "@/components/CosmosLogo";
 import { isProduction, locations, site } from "@/lib/content";
 
 /**
- * Brand face is Horizon (Adobe Font, not free) for display, Poppins for body,
- * buttons and nav (guide + mockup, facts SS3). Archivo at its widest width axis,
- * weight 900, is the free stand-in for Horizon, closest wide-geometric match.
- * The swap point is isolated to --font-display in globals.css, see facts SS6.5.
+ * Poppins for body, buttons and nav (guide + mockup, facts SS3). Display face
+ * ships as Archivo at its widest width axis, weight 900, permanently (Kazim,
+ * 2026-09-02): the guide itself was set in Horizon (Adobe Font, not free),
+ * Archivo is the wide-geometric match K13 chose in its place. See facts SS6.5.
  */
 const body = Poppins({
   subsets: ["latin"],

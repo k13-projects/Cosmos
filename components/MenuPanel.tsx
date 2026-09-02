@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { menuPopup, type MenuItem } from "@/lib/content";
+import { menuPopup, type MenuItem, type MenuItemGroup } from "@/lib/content";
 import { MenuPlaceholderIcon } from "./Icons";
 
 /**
@@ -12,6 +12,9 @@ import { MenuPlaceholderIcon } from "./Icons";
  * No prices and no descriptions beyond the five the client's copy supports.
  * None were supplied, and an invented price or a made-up description is worse
  * than an honest gap, so the gap is stated at the foot of the panel instead.
+ *
+ * Drinks (Kazim, 2026-09-02) is a `kind: "list"` category instead: no old-site
+ * drink photography exists, so it renders as grouped names, not tiles.
  */
 
 function Tile({ item }: { item: MenuItem }) {
@@ -42,6 +45,28 @@ function Tile({ item }: { item: MenuItem }) {
   );
 }
 
+/** Drinks: grouped names, no photos, no tiles (no drink photography exists). */
+function DrinkGroups({ groups }: { groups: readonly MenuItemGroup[] }) {
+  return (
+    <div className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+      {groups.map((group) => (
+        <div key={group.title}>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-magenta-ink">
+            {group.title}
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {group.items.map((name) => (
+              <li key={name} className="text-[15px] leading-snug text-purple">
+                {name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function MenuPanel({ onOrder }: { onOrder: () => void }) {
   return (
     <div className="space-y-10">
@@ -61,11 +86,15 @@ export default function MenuPanel({ onOrder }: { onOrder: () => void }) {
             </button>
           </div>
 
-          <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4">
-            {category.items.map((item) => (
-              <Tile key={`${category.id}-${item.name}`} item={item} />
-            ))}
-          </ul>
+          {category.kind === "list" ? (
+            <DrinkGroups groups={category.groups} />
+          ) : (
+            <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4">
+              {category.items.map((item) => (
+                <Tile key={`${category.id}-${item.name}`} item={item} />
+              ))}
+            </ul>
+          )}
         </section>
       ))}
 

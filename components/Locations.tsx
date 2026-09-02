@@ -1,6 +1,6 @@
 "use client";
 
-import { locations } from "@/lib/content";
+import { locations, telHref } from "@/lib/content";
 import { OrderOnlineButton } from "./Buttons";
 import RailArrow from "./RailArrow";
 import { useRail } from "./useRail";
@@ -28,7 +28,7 @@ function mapsHref(query: string) {
  * "LOCATIONS, Find us" (facts SS4.9). Cream cards on a horizontal scroll-snap
  * rail, at the blueprint's own card size and arrow placement.
  *
- * The rail is kept at every width rather than stacking on mobile: four cards
+ * The rail is kept at every width rather than stacking on mobile: five cards
  * stacked is a tall column of near-identical blocks, and the snap row is
  * exactly what the blueprint draws. Each card is a plain element carrying two
  * real controls, Directions and Order, so nothing is nested inside a link.
@@ -114,7 +114,29 @@ export default function Locations() {
                   {l.hours}
                 </p>
 
-                {/* mt-auto pins the controls to the card's floor, so the four
+                {l.phone && (
+                  /* Only Oceanside carries one today; the other halls stay
+                     unconfirmed rather than guessed (see the `phone` field's
+                     comment in lib/content.ts). */
+                  <a
+                    href={telHref(l.phone)}
+                    className="-ml-1 mt-1 inline-flex min-h-11 w-fit items-center gap-2 self-start rounded-lg px-1 text-[15px] font-semibold text-purple underline decoration-purple/30 underline-offset-4 transition hover:decoration-magenta"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <span className="sr-only">Call {l.name}, </span>
+                    {l.phone}
+                  </a>
+                )}
+
+                {/* mt-auto pins the controls to the card's floor, so the five
                     cards line their buttons up even when one address wraps. */}
                 <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                   <OrderOnlineButton

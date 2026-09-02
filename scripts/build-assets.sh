@@ -3,7 +3,7 @@
 #
 # Source:  Cosmos Assets/   (gitignored, ~70MB, client design source)
 # Output:  public/photos, public/menu/best-sellers, public/menu/plates,
-#          public/brand   (committed)
+#          public/menu/items, public/brand   (committed)
 #
 # Idempotent, safe to re-run. Requires macOS `sips`, `cwebp` (brew install
 # webp) and python3 with Pillow.
@@ -25,7 +25,7 @@ command -v cwebp >/dev/null || { echo "ERROR: cwebp not found. brew install webp
 command -v sips >/dev/null || { echo "ERROR: sips not found (macOS only)."; exit 1; }
 python3 -c "import PIL" 2>/dev/null || { echo "ERROR: python3 Pillow not found. pip3 install Pillow"; exit 1; }
 
-mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/brand"
+mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/menu/items" "$PUB/brand"
 
 # --------------------------------------------------------------------------- #
 # BAND CROPS (Lessons 19: "photo bands are crops, not slots")
@@ -159,6 +159,41 @@ for i in 1 2 3 4 5 6; do
   trim_png "$src" "$PUB/menu/plates/$i.png"
   echo "  menu/plates/$i.png"
 done
+
+echo "==> menu items (Kazim, 2026-09-02: old-site product shots, one per menuPopup item)"
+# Source: Cosmos Assets/OLD SITE MENU/<category>__<Item-Name>.webp|png, white-background
+# product shots ~1000px wide, captured from burgerscosmos.com 2026-09-02. slug =
+# lowercase of the <Item-Name> part (hyphens kept as the filename already words them),
+# e.g. "burgers__BBQ-Burger.webp" -> "bbq-burger.webp". 640w q82, PNG sources go through
+# sips first (same pattern as the pattern.png step below), webp sources are decoded with
+# dwebp first since cwebp's own encoder does not read webp back in.
+ITEMS_SRC="$SRC/OLD SITE MENU"
+if [ ! -d "$ITEMS_SRC" ]; then
+  echo "  ERROR: menu item source not found: OLD SITE MENU/" >&2
+  exit 1
+fi
+command -v dwebp >/dev/null || { echo "ERROR: dwebp not found. brew install webp"; exit 1; }
+ITEM_COUNT=0
+for src in "$ITEMS_SRC"/*; do
+  [ -f "$src" ] || continue
+  base="$(basename "$src")"
+  ext="${base##*.}"
+  ext_lower="$(echo "$ext" | tr '[:upper:]' '[:lower:]')"
+  slug="$(echo "${base#*__}" | sed -E "s/\.[^.]+$//" | tr '[:upper:]' '[:lower:]')"
+
+  work="$TMP/item.png"
+  if [ "$ext_lower" = "png" ]; then
+    cp "$src" "$work"
+  else
+    dwebp -quiet "$src" -o "$work"
+  fi
+  sips -Z 640 "$work" >/dev/null
+  cwebp -q 82 -quiet "$work" -o "$PUB/menu/items/$slug.webp"
+  rm -f "$work"
+  ITEM_COUNT=$((ITEM_COUNT + 1))
+  echo "  menu/items/$slug.webp"
+done
+echo "  ($ITEM_COUNT item photos)"
 
 echo "==> brand"
 LOGO_SRC="$SRC/LOGO & BRAND IDENTITY/COSMOS BURGER LOGO.svg"

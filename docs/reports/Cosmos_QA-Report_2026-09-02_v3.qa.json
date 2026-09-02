@@ -1,0 +1,123 @@
+{
+  "report": "Cosmos_QA-Report_2026-09-02_v3.md",
+  "project": "Cosmos Burger",
+  "date": "2026-09-02",
+  "pass": "v3",
+  "tester": "Olga (qa-test-engineer)",
+  "gate": "two-agent Chrome QA gate, fidelity gate on engineering_2026-09-02_v3",
+  "verdict": "PASS",
+  "approved": true,
+  "report_only": true,
+  "branch": "cosmos_sep02_v4",
+  "committed_by_qa": false,
+  "edited_source_by_qa": false,
+  "environment": {
+    "build": "production server already running, not started/stopped/restarted by QA",
+    "browser": "gstack Chromium",
+    "berth": "cosmos",
+    "browse_port": 39157,
+    "url": "http://localhost:9157"
+  },
+  "fidelity": {
+    "bands_total": 13,
+    "widths": [1280, 375],
+    "side_by_sides_reviewed": 26,
+    "miss": 0,
+    "minor": 2,
+    "match": 24,
+    "minor_items": [
+      {"band": "chicken", "reason": "source photo narrower than blueprint's original, already flagged to client", "new_finding": false},
+      {"band": "reviews", "reason": "site-wide 48px page gutter vs blueprint's ~10% margin, already flagged as Natalia Risk 3", "new_finding": false}
+    ],
+    "screens_dir": "docs/handoffs/screens/qa_2026-09-02_v3/"
+  },
+  "fitcheck": {
+    "viewports": ["320x568", "375x667", "430x932", "768x1024", "844x390", "932x430", "1024x768", "1280x900", "1366x900", "1536x900", "1920x1080"],
+    "trust_gate": "window.innerWidth asserted in band on every run; all 11 returned TRUST ok",
+    "horizontal_leaks": 0,
+    "tap_target_AA_failures": 0,
+    "hidden_but_focusable": 0,
+    "scroll_origin_traps": 0,
+    "first_fold_visible_px_min": 55,
+    "tap_target_44px_advisory_count": {"phone": 12, "desktop": 10},
+    "image_upscale_flag": {
+      "raised_by_harness": true,
+      "verified_false_positive": true,
+      "method": "curl of currentSrc + in-page fetch()/createImageBitmap() decode of identical URL, both match true source dimensions",
+      "root_cause": "img.naturalWidth under-reports under this harness's CDP viewport override; live image bytes are correct at every width checked"
+    }
+  },
+  "anchor_header_clearance": {
+    "anchors": ["#about", "#menu", "#locations", "#catering", "#contact"],
+    "widths": [1280, 375],
+    "overlaps_with_header": 0,
+    "min_clearance_px_1280": 152,
+    "min_clearance_px_375": 158
+  },
+  "plate_wheel": {
+    "widths_swept": [1024, 1280, 1366, 1440, 1536, 1920],
+    "step_degrees": 5,
+    "steps_per_width": 72,
+    "sweep_validity_check": "single-plate 8-point circle sample produced 8 distinct (x,y) pairs, confirms sweep is not stalled",
+    "running_on_arrival": true,
+    "rot_t0_deg": 18.68,
+    "rot_t3s_deg": 36.07,
+    "ambient_rate_deg_per_s_approx": 2.3,
+    "target_rate_deg_per_s": 2.143,
+    "scroll_boost_confirmed": true,
+    "focus_pause_confirmed": true,
+    "focus_pulls_offscreen_plate_into_view": true,
+    "focus_resume_confirmed": true,
+    "hover_pause_confirmed_partial": true,
+    "hover_full_cycle_captured": false,
+    "hover_not_captured_reason": "harness hover command times out against a continuously-moving target; focus used as verified proxy sharing the same CSS/JS condition",
+    "reduced_motion": {
+      "method": "CDP Emulation.setEmulatedMedia",
+      "wheel_rot_deg": 0,
+      "hub_transform": "none",
+      "held_static_across_2s": true,
+      "tooltip_on_focus_still_works": true,
+      "override_cleared_after": true
+    },
+    "collisions_with_about_copy": 0,
+    "collisions_with_fresh_always": 0,
+    "min_gap_about_copy_px": {"1024": 135, "1280": 358, "1366": 429, "1440": 473, "1536": 521, "1920": 713},
+    "vertical_overlap_with_fresh_always_ever": {"1024": false, "1280": false, "1366": false, "1440": true, "1536": true, "1920": true},
+    "min_gap_fresh_always_px_where_overlap_occurs": {"1440": 418, "1536": 466, "1920": 658},
+    "note": "About-copy figures reproduce Natalia's own table exactly. Fresh-always figures corrected from her 1D horizontal-only comparison (which read as a 15-165px near-miss) to a true 2D rectangle-overlap check: zero collisions, real clearance is 418-658px where rows even intersect, no intersection at all below 1440."
+  },
+  "locations_rail": {
+    "density_1280": "2 full cards + 3rd cut, confirmed",
+    "card_count": 4,
+    "arrows_keyboard_reachable": true,
+    "arrows_disable_at_edges": true,
+    "order_pill_opens_popup_on_correct_row": true,
+    "coming_soon_badge_present": true,
+    "coming_soon_location": "Station 8 Public Market",
+    "swipe_scroll_at_375": true,
+    "rail_snap_confirmed": true,
+    "arrow_hit_box_px_375": "48x48"
+  },
+  "console": {
+    "widths_checked": [375, 1280, 1920],
+    "javascript_errors": 0,
+    "advisory_warnings_only": ["link preload not consumed: hero.webp", "link preload not consumed: spicy-jam.png"]
+  },
+  "not_tested": [
+    "real hardware / real touch gesture (Input.dispatchTouchEvent not on this harness's CDP allowlist)",
+    "clean uninterrupted hover-then-unhover cycle on the plate wheel (focus used as verified proxy)",
+    "screen readers",
+    "Safari and Firefox",
+    "the live preview domain",
+    "performance / Core Web Vitals"
+  ],
+  "risks_carried_forward_not_new": [
+    "hero 86vh cap vs blueprint's full 1.2674 aspect (Natalia Human Gate 1, Kazim's call)",
+    "chicken band scale tighter than blueprint, needs Lorena's wider original (Natalia Risk 2)",
+    "site-wide 48px page gutter vs blueprint's ~10% margin (Natalia Risk 3)"
+  ],
+  "findings_for_james": [],
+  "files_changed_by_qa": [],
+  "screenshots": "docs/handoffs/screens/qa_2026-09-02_v3/",
+  "next": "security-auditor"
+}
