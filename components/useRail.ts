@@ -41,7 +41,11 @@ export function useRail<T extends HTMLElement>() {
     const el = ref.current;
     if (!el) return;
     const card = el.querySelector("li");
-    const step = card ? card.getBoundingClientRect().width + 16 : el.clientWidth * 0.8;
+    // The gap is read, not assumed: the Locations rail widens it to 3.2vw at lg
+    // to match the blueprint's density, and a hardcoded 16 stepped short of one
+    // card there, leaving the rail parked between two snap points.
+    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
+    const step = card ? card.getBoundingClientRect().width + gap : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   }, []);
 

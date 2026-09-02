@@ -154,3 +154,19 @@ Single page with anchors. Nav: **About us · Our Menu · Locations · Catering �
   behind `prefers-reduced-motion`. P3 signature = the animated hero logo.
 - Copy lives in one `lib/content.ts` with provenance comments; components never hardcode strings.
 - Legal routes as LobsterLab: `/accessibility`, `/privacy`, `/terms` (human legal review flag).
+
+## 8. Geometry addendum (added after Kazim's second review, 2026-09-02)
+Missing from the first read, and the reason two bands shipped wrong: the PDF's crops and
+densities, measured on the 1332 px slices (1024 pt at 1.3x).
+- **Photo bands are crops with their own aspect** (height as a fraction of width): hero ≈ 0.78,
+  fries ≈ 0.35, spread = alpha sticker over the pattern, chicken sandwich ≈ 0.49 (whole sandwich
+  centered, bowls left/right, hot dog behind), phone ≈ 0.62 (hand + phone + plate). Crop the
+  source to the PDF's framing in `scripts/build-assets.sh`; never a uniform vh with object-cover.
+- **Locations rail:** cream cards ≈ 33% of the width, ≈ 22% tall, gap ≈ 40 px, first card at
+  ≈ 11% from the left, two full cards + a third cut at the edge, « arrow at left, mid-height.
+- **Reviews:** heading + italic sub-line in a left column (≈ 32%), tan cards ≈ 30% wide from
+  ≈ 50% of the width, scrolling right.
+- **Hero:** photo + nav only. No wordmark in the hero (the slide deck's "animated logo" line is
+  overruled by the PDF; Kazim 2026-09-02).
+- **About plates:** an arc on the right edge (the client folder is "Burgers circle"); built as an
+  endless wheel with scroll-added velocity and instant CAPS tooltips.

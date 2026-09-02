@@ -259,14 +259,17 @@ export const photoBands = {
   fries: {
     src: "/photos/band-fries.webp",
     alt: "Four bowls of Cosmos loaded fries lined up on a wooden board, seen from above",
+    ratio: 1332 / 618,
   },
   chicken: {
     src: "/photos/band-chicken.webp",
     alt: "A Cosmos crispy chicken sandwich topped with slaw, with loaded fries behind it",
+    ratio: 1332 / 647,
   },
   phone: {
     src: "/photos/band-phone.webp",
     alt: "A guest photographing a Cosmos burger and a beer with their phone",
+    ratio: 1332 / 821,
   },
 } as const;
 
@@ -291,6 +294,7 @@ export const spread = {
 export const hero = {
   src: "/photos/hero.webp",
   alt: "Seven Cosmos smash burgers stacked on a wooden board under warm string lights",
+  ratio: 1332 / 1051,
 } as const;
 
 /* -------------------------------------------------------------------------- */
