@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="#751080">
+  <!-- gabled porch wing, arched entry -->
+  <path fill-rule="evenodd" d="
+    M100,190 L100,150 L182,150 L182,190 Z
+    M96,150 L141,116 L186,150 Z
+    M126,168 a15,15 0 0 1 30,0 v22 h-30 Z
+  "/>
+  <!-- mission tower -->
+  <path d="M56,190 L56,86 L106,86 L106,190 Z"/>
+  <!-- pyramidal tile roof + overhang ledge -->
+  <path d="M46,86 H116 V78 H46 Z M50,78 L81,44 L112,78 Z"/>
+  <!-- finial -->
+  <rect x="79.5" y="30" width="3" height="14"/>
+  <circle cx="81" cy="27" r="3"/>
+</svg>

@@ -60,6 +60,13 @@
 
   --shadow-soft: 0 20px 40px rgba(117, 16, 128, 0.18);
   --shadow-lift: 0 28px 60px rgba(117, 16, 128, 0.24);
+
+  /* Locations card corner watermark (design_2026-09-02_v2.md, row C picked by
+     Kazim). One-line tune: the trace line art is thin, so it reads clean well
+     past the original 15-20% brief; Kazim's correction moved the target range
+     to 60-80%. See docs/handoffs/engineering_2026-09-02_v6.md for the picked
+     value and the contrast check behind it. */
+  --mark-opacity: 0.7;
 }
 
 html {

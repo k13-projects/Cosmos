@@ -332,6 +332,14 @@ export type Location = {
   phone?: string;
   /** Storefronts for THIS location. Empty string = not connected yet. */
   ordering: OrderLinks;
+  /**
+   * The corner watermark (design_2026-09-02_v2.md, row C: "detailed trace").
+   * Purple (`#751080`) Canny line art, `public/locations/trace/*.png`, decorative
+   * only, so `alt` stays empty and the component adds `aria-hidden`. `width`/
+   * `height` are the source PNG's real pixel size (intrinsic, for next/image),
+   * not the rendered size, which is set in CSS.
+   */
+  mark: { src: string; width: number; height: number; alt: string };
 };
 
 /**
@@ -358,6 +366,7 @@ export const locations: Location[] = [
       // Public on burgerscosmos.com; the locale prefix has been stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-carlsbad-26018232/29386346/",
     },
+    mark: { src: "/locations/trace/windmill.png", width: 613, height: 800, alt: "" },
   },
   {
     // Oceanside (Kazim, 2026-09-02): promoted from the order-pop-up-only row
@@ -378,6 +387,11 @@ export const locations: Location[] = [
       doordash:
         "https://www.doordash.com/store/cosmos-burger-oceanside-oceanside-25982698/51403146/",
     },
+    // PROVISIONAL (design_2026-09-02_v2.md Risks): drawn from an old-site
+    // archive photo, not Lorena's current storefront shot, which has not
+    // landed yet. Re-check the mark against her photo when it arrives; swap
+    // this src if the awning/trellis silhouette does not match.
+    mark: { src: "/locations/trace/oceanside.png", width: 800, height: 704, alt: "" },
   },
   {
     id: "san-clemente",
@@ -387,6 +401,7 @@ export const locations: Location[] = [
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 1720 N El Camino Real, San Clemente, CA 92672",
     ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
+    mark: { src: "/locations/trace/miramar.png", width: 800, height: 776, alt: "" },
   },
   {
     id: "little-italy",
@@ -396,6 +411,7 @@ export const locations: Location[] = [
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 550 W Date St, San Diego, CA 92101",
     ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
+    mark: { src: "/locations/trace/global-fork.png", width: 450, height: 800, alt: "" },
   },
   {
     id: "ucsd",
@@ -408,6 +424,7 @@ export const locations: Location[] = [
     mapsQuery: "Station 8 Public Market, 9165 Theatre District Dr, La Jolla, CA 92037",
     status: "Coming Soon",
     ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
+    mark: { src: "/locations/trace/station-8.png", width: 800, height: 466, alt: "" },
   },
 ];
 

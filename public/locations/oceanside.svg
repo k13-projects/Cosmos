@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="#751080">
+  <!-- pergola / trellis gable above the awning -->
+  <path d="M40,96 L100,44 L160,96 L150,96 L100,58 L50,96 Z"/>
+  <rect x="97" y="44" width="4" height="20"/>
+  <!-- scalloped shake awning band -->
+  <path fill-rule="evenodd" d="
+    M34,96 H166 V116
+    C160,116 160,128 154,128
+    C148,128 148,116 142,116
+    C136,116 136,128 130,128
+    C124,128 124,116 118,116
+    C112,116 112,128 106,128
+    C100,128 100,116 94,116
+    C88,116 88,128 82,128
+    C76,128 76,116 70,116
+    C64,116 64,128 58,128
+    C52,128 52,116 46,116
+    C40,116 40,128 34,128
+    Z"/>
+  <!-- storefront wall + posts to the ground -->
+  <path fill-rule="evenodd" d="
+    M44,128 h112 v62 h-112 Z
+    M60,150 h14 v40 h-14 Z
+    M126,150 h14 v40 h-14 Z
+  "/>
+</svg>
