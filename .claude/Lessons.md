@@ -53,6 +53,13 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
    stale server keeps serving the previous build, so fixes look like they did nothing. Cost two
    cycles. Use `pkill -f next-server`, then verify the new markup is actually served with `curl`.
 4. **Say what you could not test.** An untested area reported as passing is worse than no report.
+5. **`next start` serves images from `.next/cache/images`, which survives `npm run build`.**
+   Re-cropping a photo in `scripts/build-assets.sh` and rebuilding is not enough: the optimizer
+   keeps serving the old bytes under the same `/_next/image?url=...` key, so a corrected crop
+   screenshots as the old one. Cost one cycle on the band fidelity gate. `rm -rf .next/cache/images`
+   before restarting, and check the shot against the exported file, not against the last shot.
+   Related: killing a slow `/_next/image` request mid-flight leaves that width wedged for the life
+   of the process. Restart the server rather than retrying the URL.
 
 ### Agents
 8. **Agents audit; one hand edits.** Parallel agents editing the same files clobber each other.
@@ -86,3 +93,20 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
 18. **Footer contact block: never dump addresses.** Locations already live in their own section.
     CONTACT INFO and FOLLOW US are two symmetric, tidy columns; the handle sits under its label,
     not beside it.
+
+### The fidelity gate, corrected by Kazim 2026-09-02 (second round)
+19. **Photo bands are crops, not slots.** Each band in the PDF has its own aspect and framing
+    (hero ~0.78 of width, fries ~0.35, chicken sandwich ~0.49, phone ~0.62). We gave every band
+    one height and let `object-cover` pick the middle, so a portrait sandwich photo showed only
+    the bun. Intake must record aspect + framing per band; the build must reproduce the PDF's crop
+    (crop the asset in `build-assets.sh` when the source framing differs), never a uniform vh.
+20. **Rails match the PDF's density.** Locations in the PDF shows two full cards and a third cut,
+    big cards (~33% of the width), the « arrow on the left at mid-height. We showed four narrow
+    cards. Card count visible, card size and arrow placement are part of the spec, not styling
+    freedom. Same for Reviews (heading left, cards to the right, scrolling).
+21. **QA on a mockup-driven build is not done without the fidelity gate:** one side-by-side per
+    band (PDF slice vs screenshot at 1280 and 375) with a per-band verdict written in the QA
+    report. Measurements (leaks, tap targets, collisions) do not replace looking. Owner: Olga;
+    James blocks the merge without it.
+22. **Attribution for the 2026-09-02 miss:** James (intake spec omitted geometry), Olga (gate
+    skipped the side-by-side), Natalia (fidelity table compared inventory, not geometry).

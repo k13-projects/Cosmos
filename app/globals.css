@@ -208,14 +208,17 @@ html.lenis body {
   /* ---------- the plate wheel (About band) ---------- */
   /* Geometry and the reasoning behind these numbers: components/PlateWheel.tsx.
      The blueprint's R is 0.49 of the viewport, on a taller About band than this
-     copy produces. Six plates need roughly six plate heights of vertical room,
-     so R is scaled back to 0.394vw and the plates to 0.15vw: that is what makes
-     the whole arc, plus its 32 degrees of turn, fit between the band's top edge
-     and the values band's icon row with clearance at every width from 1024 up.
+     copy produces, so R is scaled back and the plates with it.
+
+     The wheel is now a closed ring turning endlessly rather than a 32 degree
+     sweep, so the arc reaches 0.103 R deeper than it used to at some phase of
+     every revolution. R is trimmed from 0.394vw to 0.355vw and the hub raised
+     to 61% of the band (PlateWheel.tsx) to put that floor back inside the
+     values band's clear lane, at every width from 1024 up and at every phase.
      Clamped so the arc neither collapses at 1024 nor swings off a wide monitor. */
   .plate-wheel {
-    --wheel-r: clamp(430px, 39.4vw, 560px);
-    --plate-w: clamp(165px, 15vw, 210px);
+    --wheel-r: clamp(390px, 35.5vw, 505px);
+    --plate-w: clamp(150px, 13.5vw, 190px);
   }
   .wheel-hub {
     transform: rotate(var(--wheel-rot, 0deg));

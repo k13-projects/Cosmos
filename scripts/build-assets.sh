@@ -27,28 +27,65 @@ python3 -c "import PIL" 2>/dev/null || { echo "ERROR: python3 Pillow not found. 
 
 mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/brand"
 
-# jpeg/png -> webp at a capped width. usage: photo <src> <out-name> <max-width> <quality>
-photo() {
-  local src="$SRC/PHOTOS/$1" out="$2" w="$3" q="${4:-84}"
+# --------------------------------------------------------------------------- #
+# BAND CROPS (Lessons 19: "photo bands are crops, not slots")
+#
+# Each band in the blueprint has its own aspect AND its own framing, and two of
+# the four sources are portrait. Letting `object-cover` pick the middle of a
+# 1690x2533 portrait inside a 2.06 band showed the top of a bun and nothing
+# else. So the crop is baked here instead: deterministic, reviewable, and the
+# component only has to hold the aspect.
+#
+# The boxes below were registered against the blueprint render
+# (Cosmos Assets/_derived/mockup, stitched, 1332 CSS px wide) by normalised
+# cross-correlation over crop width and offset. Reported NCC in the handoff:
+# hero 0.929, fries 0.885, phone 0.998.
+#
+# `cosmos 2-121.jpg` is the exception. The blueprint's chicken band was cut
+# from a WIDER original than the file we hold: the sandwich is ~28% of the
+# band's width there and ~41% of this file's width, so their crop runs about
+# 380px past each edge of ours. We cannot reproduce it pixel for pixel. The box
+# below reproduces its framing instead, at its exact aspect: the whole sandwich
+# centred, a fries bowl cut at each edge, the plate rim just inside the bottom.
+# The hot dog behind is outside what this file can show at 2.06.
+#
+# usage: crop_photo <src> <out-name> <left> <top> <right> <bottom> <max-width>
+crop_photo() {
+  local src="$SRC/PHOTOS/$1" out="$2"
   if [ ! -f "$src" ]; then
     echo "  ERROR: photo source not found: PHOTOS/$1" >&2
     exit 1
   fi
-  cp "$src" "$TMP/w.src"
-  sips -Z "$w" "$TMP/w.src" >/dev/null
-  cwebp -q "$q" -m 6 -quiet "$TMP/w.src" -o "$PUB/photos/$out.webp"
+  python3 - "$src" "$TMP/band.png" "$3" "$4" "$5" "$6" "$7" <<'PY'
+import sys
+from PIL import Image
+
+src, out = sys.argv[1], sys.argv[2]
+left, top, right, bottom, max_w = (int(v) for v in sys.argv[3:8])
+im = Image.open(src).convert("RGB")
+if right > im.width or bottom > im.height or left < 0 or top < 0:
+    raise SystemExit(f"ERROR: crop box {(left, top, right, bottom)} outside {im.size} for {src}")
+im = im.crop((left, top, right, bottom))
+# Never upscale: a band that is softer than its box is a resolution note in the
+# handoff, an invented one is a lie about the source.
+if im.width > max_w:
+    im = im.resize((max_w, round(im.height * max_w / im.width)), Image.LANCZOS)
+im.save(out)
+print(f"    crop {right - left}x{bottom - top} -> {im.width}x{im.height}, aspect {im.width / im.height:.4f}")
+PY
+  cwebp -q 86 -m 6 -quiet "$TMP/band.png" -o "$PUB/photos/$out.webp"
   echo "  photos/$out.webp"
 }
 
-echo "==> photos"
-# Hero: stacked burgers under string lights
-photo "cosmos 1-84.jpg" hero 2048
-# Fries bowls, top-down, band under Best Sellers
-photo "Chick fries,cosmos,truffle,monkey.jpg" band-fries 2048
-# Chicken sandwich hero, band above Reviews
-photo "cosmos 2-121.jpg" band-chicken 2048
-# Phone photographing a burger, band above footer
-photo "cosmos 1-64.jpg" band-phone 2048
+echo "==> photos (band crops reproduce the blueprint's own framing)"
+# Hero: stacked burgers under string lights. Blueprint aspect 1332:1051 = 1.2674
+crop_photo "cosmos 1-84.jpg" hero 360 140 1885 1343 2000
+# Fries bowls, top-down, band under Best Sellers. Blueprint 1332:618 = 2.1553
+crop_photo "Chick fries,cosmos,truffle,monkey.jpg" band-fries 0 192 2048 1142 2000
+# Chicken sandwich, band above Reviews. Blueprint 1332:647 = 2.0587
+crop_photo "cosmos 2-121.jpg" band-chicken 0 1250 1690 2071 2000
+# Phone photographing a burger, band above footer. Blueprint 1332:821 = 1.6224
+crop_photo "cosmos 1-64.jpg" band-phone 0 615 1510 1546 2000
 
 # Cosmos General.png is a CUTOUT, not a scene. Its alpha channel is the shape
 # of the table's back edge, with the rearmost plates rising above it, because

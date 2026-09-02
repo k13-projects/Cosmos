@@ -9,14 +9,35 @@ function mapsHref(query: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
+/* -------------------------------------------------------------------------- *
+ * Rail density, measured off the blueprint render (page 1, 1332 CSS px wide)
+ *
+ *   card          443 x 289 px   = 33.3% of the viewport, aspect 1.533
+ *   gap            43 px         =  3.2% of the viewport
+ *   first card    x 143          = 10.7% of the viewport
+ *   « arrow       x 33 to 100, y centred on the cards (card mid-height 751)
+ *   at rest       two full cards and a third cut by the right edge
+ *
+ * The first build showed four narrow 360px cards, which is a different section
+ * (Lessons 20). Everything below is in vw so the density is the blueprint's at
+ * every width rather than the container's, and the third card still bleeds off
+ * the edge the way the blueprint draws it.
+ * -------------------------------------------------------------------------- */
+
 /**
- * "LOCATIONS, Find us" (facts SS4.9). Four cream cards on a horizontal
- * scroll-snap rail with the blueprint's own arrows.
+ * "LOCATIONS, Find us" (facts SS4.9). Cream cards on a horizontal scroll-snap
+ * rail, at the blueprint's own card size and arrow placement.
  *
  * The rail is kept at every width rather than stacking on mobile: four cards
- * stacked is a 2,400px column of near-identical blocks, and the snap row is
+ * stacked is a tall column of near-identical blocks, and the snap row is
  * exactly what the blueprint draws. Each card is a plain element carrying two
  * real controls, Directions and Order, so nothing is nested inside a link.
+ *
+ * The arrows are one pair, placed twice. Below 1024 they sit in a row under the
+ * rail, where they cover nothing; from 1024 the wrapper becomes `display:
+ * contents` and each arrow lands in the blueprint's own lane, « at 2.4vw and »
+ * mirrored, both at the cards' mid-height. Swiping and trackpad scrolling still
+ * drive the rail directly at every width.
  */
 export default function Locations() {
   const { ref, atStart, atEnd, scrollByCard } = useRail<HTMLUListElement>();
@@ -45,13 +66,16 @@ export default function Locations() {
           /* scroll-pl matches the padding. Without it, snap-start pulls the first
              card flush to the port, resting the rail at scrollLeft == padding-left
              and putting the card hard against the viewport edge. */
-          className="rail flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:scroll-pl-8 sm:px-8 lg:scroll-pl-12 lg:px-12"
+          className="rail flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:scroll-pl-8 sm:px-8 lg:gap-[min(3.2vw,46px)] lg:scroll-pl-[10.7vw] lg:pl-[10.7vw] lg:pr-8"
         >
           {locations.map((l) => (
-            <li key={l.id} className="flex w-[80vw] shrink-0 snap-start sm:w-[360px]">
-              <div className="flex w-full flex-col rounded-[40px] bg-cream p-7">
+            <li
+              key={l.id}
+              className="flex w-[78vw] shrink-0 snap-start sm:w-[60vw] lg:w-[min(33.3vw,480px)] lg:aspect-[443/289]"
+            >
+              <div className="flex w-full flex-col rounded-[40px] bg-cream p-7 lg:p-8">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink lg:text-sm">
                     {l.area}
                   </p>
                   {l.status && (
@@ -63,15 +87,22 @@ export default function Locations() {
                   )}
                 </div>
 
-                <h3 className="mt-2 text-[22px] font-bold leading-tight text-purple">
+                <h3 className="mt-2 text-[22px] font-bold leading-tight text-purple lg:text-[29px]">
                   {l.name}
                   {l.status && <span className="sr-only"> ({l.status})</span>}
                 </h3>
 
-                <p className="mt-3 text-[15px] leading-snug text-purple/80">{l.address}</p>
+                <p className="mt-2 text-[15px] leading-snug text-purple/80 lg:text-[16px]">
+                  {l.address}
+                </p>
 
-                <p className="mt-3 flex items-center gap-2 text-[15px] font-semibold text-purple">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <p className="mt-2 flex items-center gap-2 text-[15px] font-semibold text-purple lg:text-[16px]">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                    className="h-4 w-4 shrink-0 lg:h-[18px] lg:w-[18px]"
+                  >
                     <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                     <path
                       d="M12 7v5.2l3.2 1.9"
@@ -83,7 +114,9 @@ export default function Locations() {
                   {l.hours}
                 </p>
 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+                {/* mt-auto pins the controls to the card's floor, so the four
+                    cards line their buttons up even when one address wraps. */}
+                <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                   <OrderOnlineButton
                     className="btn-sm"
                     variant="purple"
@@ -114,18 +147,24 @@ export default function Locations() {
           ))}
         </ul>
 
-        <div className="mx-auto mt-4 flex max-w-[1400px] items-center gap-2 px-5 sm:px-8 lg:px-12">
+        {/* `lg:contents` dissolves this row so each arrow can position itself
+            against the rail instead. One pair of controls, two placements.
+            The -8px is half the rail's own pb-4: without it the arrows centre
+            on the scroller, which sits 8px below the cards' own mid-height. */}
+        <div className="mt-4 flex items-center justify-center gap-2 px-5 sm:px-8 lg:contents">
           <RailArrow
             direction="prev"
             onClick={() => scrollByCard(-1)}
             disabled={atStart}
             label="Previous locations"
+            className="lg:absolute lg:left-[2.4vw] lg:top-[calc(50%-8px)] lg:z-10 lg:-translate-y-1/2"
           />
           <RailArrow
             direction="next"
             onClick={() => scrollByCard(1)}
             disabled={atEnd}
             label="Next locations"
+            className="lg:absolute lg:right-[2.4vw] lg:top-[calc(50%-8px)] lg:z-10 lg:-translate-y-1/2"
           />
         </div>
       </div>

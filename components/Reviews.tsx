@@ -35,8 +35,14 @@ export default function Reviews() {
   return (
     <section aria-labelledby="reviews-heading" className="bg-cream py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-12">
-          <header className="reveal self-center">
+        {/* Column split measured off the blueprint (page 2, 1332 CSS px): the
+            heading block runs to about 31.4% of the viewport, the first tan
+            card starts at 50% of it, and the cards run off the right edge. The
+            50% track reproduces that start at 1280, 1440 and 1920 alike, and
+            the heading text is capped at the blueprint's own measure rather
+            than filling the track. */}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,50%)_minmax(0,1fr)] lg:gap-0">
+          <header className="reveal self-center lg:max-w-[31.4vw]">
             <h2 id="reviews-heading" className="display text-[13vw] text-magenta sm:text-6xl">
               {reviewsSection.title}
             </h2>
@@ -66,14 +72,17 @@ export default function Reviews() {
             ref={ref}
             /* scroll-pl matches the padding, or snap-start rests the rail at
                scrollLeft == padding-left and the first card loses its gutter. */
-            className="rail reveal -mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:-mx-8 sm:scroll-pl-8 sm:px-8 lg:mx-0 lg:scroll-pl-0 lg:px-0"
+            /* -mr-12 at lg carries the rail out through the section's own
+               gutter, so the second card is cut by the page edge the way the
+               blueprint draws it instead of stopping 48px short. */
+            className="rail reveal -mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:-mx-8 sm:scroll-pl-8 sm:px-8 lg:-mr-12 lg:ml-0 lg:scroll-pl-0 lg:pl-0 lg:pr-0"
           >
             {/* Keyed on the quote, not the author: attributions are deliberately
                 non-identifying and therefore repeat. */}
             {reviews.map((r) => (
               <li
                 key={r.quote.slice(0, 40)}
-                className="flex w-[82vw] shrink-0 snap-start flex-col rounded-[40px] bg-tan p-7 sm:w-[340px]"
+                className="flex w-[82vw] shrink-0 snap-start flex-col rounded-[40px] bg-tan p-7 sm:w-[340px] lg:w-[min(30vw,430px)]"
               >
                 <Stars />
                 <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-purple">

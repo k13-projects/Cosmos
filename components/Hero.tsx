@@ -19,11 +19,20 @@ export default function Hero() {
   return (
     <section id="top" className="relative isolate overflow-hidden bg-purple">
       {/*
-        min-h floor relaxes on short viewports. A flat floor plus the floating
-        nav leaves phone landscape with nothing of the next section visible, so
-        nothing signals that the page continues.
+        The band carries the blueprint's own aspect, 1332:1051 (Lessons 19), and
+        public/photos/hero.webp is cropped to the same ratio by
+        scripts/build-assets.sh, so the framing is the blueprint's at every
+        width rather than whatever object-cover picks.
+
+        max-h is what keeps a fold: at 1332:1051 the band is 1010px tall at
+        1280, taller than most laptop viewports, and a hero with nothing under
+        it does not say the page continues. min-h floors it on short viewports
+        for the same reason in the other direction.
       */}
-      <div className="relative h-[86vh] min-h-[min(460px,78vh)] w-full">
+      <div
+        className="relative max-h-[86vh] min-h-[min(460px,78vh)] w-full"
+        style={{ aspectRatio: String(hero.ratio) }}
+      >
         <Image
           src={hero.src}
           alt={hero.alt}
@@ -40,13 +49,19 @@ export default function Hero() {
           top-to-bottom gradient does both at once and tints the burgers
           themselves purple, which is the one thing the photography is there
           for. The stops keep the middle of the frame untouched.
+
+          The fade starts at 87%, not 74%. Now that the band carries the
+          blueprint's crop, the bottom of the frame is the wooden board and the
+          front row of burgers, and a fade over the lower quarter painted them
+          purple. The blueprint draws no fade at all; this is the narrowest seam
+          that still stops the photo ending on a hard line into the About band.
         */}
         <div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgb(117 16 128 / 0.42) 0%, rgb(117 16 128 / 0.10) 26%, rgb(117 16 128 / 0) 46%, rgb(117 16 128 / 0) 74%, rgb(117 16 128 / 0.95) 100%)",
+              "linear-gradient(to bottom, rgb(117 16 128 / 0.42) 0%, rgb(117 16 128 / 0.10) 26%, rgb(117 16 128 / 0) 46%, rgb(117 16 128 / 0) 87%, rgb(117 16 128 / 0.95) 100%)",
           }}
         />
 
