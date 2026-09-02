@@ -160,13 +160,20 @@ export default function PlateWheel({
 }
 
 /**
- * The three-plate row below 1024px. Same plates, same tooltips, no wheel: a
- * six-plate arc squeezed into a phone's right edge leaves the paragraphs about
- * 28 characters wide, and any overlap at all fails the fitcheck measure.
+ * The three-plate row below 1024px. Same plates, no wheel: a six-plate arc
+ * squeezed into a phone's right edge leaves the paragraphs about 28 characters
+ * wide, and any overlap at all fails the fitcheck measure.
+ *
+ * The names are ALWAYS on here, never hover-revealed. This row only renders on
+ * widths that are overwhelmingly touchscreens, and a touchscreen has no hover:
+ * a tap fires `:focus` but not `:focus-visible`, and then the menu dialog takes
+ * the focus anyway, so a hover/focus tooltip is invisible on the exact device
+ * this row exists for. Unlabelled it is three anonymous photographs that happen
+ * to be buttons. mt-16 rather than mt-10 is the headroom the name sits in.
  */
 export function PlateRow() {
   return (
-    <div className="pointer-events-none relative -mb-14 mt-10 flex items-end justify-center gap-1 px-4 sm:-mb-16 sm:gap-3 lg:hidden">
+    <div className="pointer-events-none relative -mb-14 mt-16 flex items-end justify-center gap-1 px-4 sm:-mb-16 sm:gap-3 lg:hidden">
       {about.plates.slice(0, 3).map((plate, i) => (
         <div key={plate.src} className="w-1/3 max-w-[220px]">
           <Plate plate={plate} index={i} placement="above" />
@@ -206,7 +213,10 @@ function Plate({
     <button
       type="button"
       onClick={openMenu}
-      aria-describedby={tipId}
+      // Only the wheel's pill is a tooltip. The row's pill is a permanently
+      // visible label whose text is already in the button's accessible name, so
+      // pointing at it here would make a screen reader say the dish twice.
+      aria-describedby={placement === "left" ? tipId : undefined}
       style={style}
       className="group pointer-events-auto relative block w-full rounded-[999px] focus-visible:outline-offset-8"
     >
@@ -228,17 +238,21 @@ function Plate({
 
       <span
         id={tipId}
-        role="tooltip"
+        role={placement === "left" ? "tooltip" : undefined}
+        aria-hidden={placement === "left" ? undefined : true}
         className={[
-          "plate-tip pointer-events-none absolute z-10 rounded-[999px] bg-yellow px-4 py-2",
-          "text-[13px] leading-tight text-purple opacity-0 shadow-[0_8px_20px_rgba(43,3,48,0.35)]",
-          "transition-opacity duration-[80ms] group-hover:opacity-100 group-focus-visible:opacity-100",
+          "plate-tip pointer-events-none absolute z-10 rounded-[999px] bg-yellow px-3 py-1.5",
+          "text-[13px] leading-tight text-purple shadow-[0_8px_20px_rgba(43,3,48,0.35)] sm:px-4 sm:py-2",
           placement === "left"
-            ? "right-[84%] top-1/2 -translate-y-1/2 whitespace-nowrap lg:text-[15px]"
-            : // Centred over a ~112px plate on a 375px screen. Capped and
-              // allowed to wrap so the longest name cannot push a pixel of the
-              // document past the viewport, which would open a sideways scroll.
-              "bottom-[92%] left-1/2 w-max max-w-[30vw] -translate-x-1/2 text-center",
+            ? // The wheel: hover or keyboard focus, on the same frame as the
+              // pointer. Opens LEFT because the arc lives on the right edge.
+              "right-[84%] top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 transition-opacity" +
+              " duration-[80ms] group-hover:opacity-100 group-focus-visible:opacity-100 lg:text-[15px]"
+            : // The touch row: always on. Centred over a ~112px plate on a
+              // 375px screen, capped and allowed to wrap so the longest name
+              // cannot push a pixel of the document past the viewport, which
+              // would open a sideways scroll.
+              "bottom-[96%] left-1/2 w-max max-w-[31vw] -translate-x-1/2 text-center opacity-100",
         ].join(" ")}
       >
         <span className="display block tracking-[0.02em]">{plate.name}</span>

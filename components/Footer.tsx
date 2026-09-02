@@ -17,6 +17,33 @@ import { socialIcons } from "./Icons";
  * definitely monitored. Fill `contact.phone` or `contact.email` in
  * lib/content.ts and each appears here with no code change.
  */
+/**
+ * A handle with a real break opportunity after every dot.
+ *
+ * `@cosmosburger.sandiego` is one unbreakable word to CSS, so in a 107px grid
+ * cell `break-words` chopped it mid-syllable ("@cosmosbur / ger.sandiego").
+ * A `<wbr>` after each dot lets it wrap where a reader would expect
+ * ("@cosmosburger. / sandiego") at every width, with no effect where the handle
+ * already fits on one line.
+ */
+function Handle({ text }: { text: string }) {
+  const parts = text.split(".");
+  return (
+    <>
+      {parts.map((part, i) => (
+        <span key={`${part}-${i}`}>
+          {part}
+          {i < parts.length - 1 && (
+            <>
+              .<wbr />
+            </>
+          )}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
@@ -40,8 +67,25 @@ export default function Footer() {
             {/* The handle sits UNDER its icon, so the row reads as three
                 labelled channels rather than three anonymous glyphs. */}
             {/* A three-column grid, not a flex row: the handles are 14 to 22
-                characters and a fixed-width flex cell runs them into each other. */}
-            <ul className="mx-auto mt-6 grid max-w-[400px] grid-cols-3 gap-x-2">
+                characters and a fixed-width flex cell runs them into each other.
+
+                The grid takes the WHOLE column from sm up rather than a 400px
+                cap. The cap made every cell 128px at 1280, which is 31px short
+                of the longest handle (`@cosmosburger.sandiego` measures 159px at
+                12px Poppins): it wrapped to two lines while its neighbours held
+                one, and the three handle boxes sat 8px apart, so the row read as
+                one packed line of text under three widely spaced glyphs instead
+                of three labelled channels. At the full 502px the cells are 162px
+                and only the long handle fills its own; the other two get about
+                30px of air a side and each handle sits visibly under its icon.
+                Below sm the cap is irrelevant (the column is already narrower)
+                and the long handle wraps to two lines, which is correct there.
+
+                One column below 360px. At 320 the three cells are 88px and even
+                `/CosmosBurger` (95px, and dotless, so `<wbr>` cannot help it)
+                has to break mid-word. Stacking gives every handle the full 280px
+                and the row stays tidy at the floor width. */}
+            <ul className="mx-auto mt-6 grid max-w-[400px] grid-cols-1 gap-y-6 min-[360px]:grid-cols-3 min-[360px]:gap-x-2 min-[360px]:gap-y-0 sm:max-w-none">
               {socials.map((s) => {
                 const Icon = socialIcons[s.id];
                 return (
@@ -55,7 +99,12 @@ export default function Footer() {
                       <span className="flex h-11 w-11 items-center justify-center rounded-full text-yellow">
                         <Icon className="h-6 w-6" />
                       </span>
-                      <span className="w-full break-words text-[11px] leading-snug sm:text-[12px]">{s.handle}</span>
+                      {/* 12px, not 11: below 12 this is the only text on the
+                          page under the legibility floor the fitcheck enforces,
+                          and it is a link label. */}
+                      <span className="w-full break-words text-[12px] leading-snug">
+                        <Handle text={s.handle} />
+                      </span>
                       <span className="sr-only">
                         {site.name} on {s.label} (opens in a new tab)
                       </span>
