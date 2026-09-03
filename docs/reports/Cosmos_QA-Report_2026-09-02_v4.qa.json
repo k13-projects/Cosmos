@@ -1,0 +1,168 @@
+{
+  "report": "Cosmos_QA-Report_2026-09-02_v4.md",
+  "project": "Cosmos Burger",
+  "date": "2026-09-02",
+  "pass": "v4",
+  "tester": "Olga (qa-test-engineer)",
+  "gate": "two-agent Chrome QA gate, plate wheel gesture matrix on engineering_2026-09-02_v7",
+  "verdict": "PASS",
+  "approved": true,
+  "report_only": false,
+  "branch": "cosmos_sep02_v10",
+  "committed_by_qa": false,
+  "edited_source_by_qa": true,
+  "environment": {
+    "build": "production, rebuilt and restarted by QA (pkill next-server; rm -rf .next/cache/images; npm run build && npm run start)",
+    "url": "http://localhost:9157",
+    "server_left_running": true,
+    "browser": "Playwright Chromium from ~/.claude/skills/gstack/node_modules/playwright, driven from bun",
+    "why_not_browse": "browse has no Input.* and no Emulation.* in its CDP allowlist, so real mouse, real touch and real reduced-motion emulation are not reachable through it",
+    "rotation_read_from": "--wheel-rot on .wheel-hub, cross-checked against the rendered matrix() of getComputedStyle(.wheel-hub).transform"
+  },
+  "input_fidelity": {
+    "mouse": "real, Input.dispatchMouseEvent via page.mouse (move/down/up/wheel)",
+    "touch": "real, Input.dispatchTouchEvent via page.touchscreen and a raw CDPSession",
+    "keyboard": "real, page.keyboard.press",
+    "reduced_motion": "real, Emulation.setEmulatedMedia via context reducedMotion",
+    "performance_counters": "real, CDP Performance.getMetrics",
+    "hover": "real mouse.move at raw coordinates, no actionability wait, wheel left turning",
+    "synthetic_or_weaker": [
+      {"what": "hidden tab pause", "method": "Document.prototype.hidden overridden plus a dispatched visibilitychange", "why": "Playwright pins every page to visibilityState visible; headed mode, ignoreDefaultArgs on the backgrounding flags, Page.setWebLifecycleState and Emulation.setFocusEmulationEnabled all fail to hide it"},
+      {"what": "pointercancel", "method": "synthetic PointerEvent", "why": "no mouse gesture produces one and touch is excluded from the drag by design; the pointerup-outside-window and window-blur paths beside it were driven with real input"}
+    ]
+  },
+  "matrix": {
+    "rows_total": 11,
+    "rows_passed": 11,
+    "widths_wheel": ["1280x900", "1440x900"],
+    "widths_touch": ["1024x768", "375x812"],
+    "rows": [
+      {"n": 1, "row": "ambient on arrival, after idle, hidden tab and back", "verdict": "PASS", "method": "real timing; hidden tab semi-synthetic"},
+      {"n": 2, "row": "mouse drag both directions, no click/dialog/nav/ghost, momentum then decay", "verdict": "PASS", "method": "real mouse", "fixed": ["D1", "D2"]},
+      {"n": 3, "row": "slow press with no movement opens the menu", "verdict": "PASS", "method": "real mouse"},
+      {"n": 4, "row": "drag ending off-element, off-window, pointercancel, blur", "verdict": "PASS", "method": "real mouse, pointercancel synthetic"},
+      {"n": 5, "row": "hover pause and resume, tooltip, rapid sweep", "verdict": "PASS", "method": "real mouse, wheel turning"},
+      {"n": 6, "row": "Tab reaches each plate, tooltip, Enter, Escape, Tab away", "verdict": "PASS", "method": "real keyboard", "fixed": ["D3"]},
+      {"n": 7, "row": "trackpad scroll adds velocity and decays, no runaway", "verdict": "PASS", "method": "real mouse.wheel"},
+      {"n": 8, "row": "touch at 1024 and the phone row at 375", "verdict": "PASS", "method": "real touch"},
+      {"n": 9, "row": "reduced motion", "verdict": "PASS", "method": "real Emulation.setEmulatedMedia"},
+      {"n": 10, "row": "no leak, no console errors, no copy collision over a revolution", "verdict": "PASS", "method": "real measurement and real drags"},
+      {"n": 11, "row": "frame time and layout thrash during a drag and a throw", "verdict": "PASS", "method": "real Performance.getMetrics plus rAF"}
+    ]
+  },
+  "numbers": {
+    "ambient_target_deg_per_s": 2.143,
+    "ambient_measured_deg_per_s": {"1280_arrival": 2.16, "1280_idle_10s": 2.14, "1440_arrival": 2.15, "1440_idle_10s": 2.14},
+    "hidden_tab_drift_deg_over_2500ms": 0.0,
+    "drag_following_error_deg": -0.01,
+    "drag_rotation_followed_deg": 22.74,
+    "drag_pointer_angle_sweep_deg": 22.75,
+    "plate_ray_vs_pointer_ray_deg": [-134.64, -134.65],
+    "clicks_during_drag": 0,
+    "dialogs_during_drag": 0,
+    "downloads_during_any_test": 0,
+    "native_drag_events_during_a_real_300px_drag": [],
+    "images_draggable_false": 24,
+    "throw_deg_per_s": {
+      "forward_1280": {"t0_3": 106.07, "t1": 39.09, "t3": 5.56, "flat_frames": 0},
+      "forward_1440": {"t0_3": 90.57, "t1": 33.84, "t3": 5.01, "flat_frames": 0},
+      "reverse_1280": {"t0_3": -82.13, "t1": -26.89, "t3": -0.54, "flat_frames": 5, "flat_ms": 41.3},
+      "reverse_1440": {"t0_3": -75.3, "t1": -24.57, "t3": -0.33, "flat_frames": 6, "flat_ms": 50.4},
+      "parked_hand_1280": {"t0_3": 2.2, "t1": 2.14, "t3": 2.15, "flat_frames": 0},
+      "parked_hand_1440": {"t0_3": 2.2, "t1": 2.14, "t3": 2.14, "flat_frames": 0}
+    },
+    "click_rule_distance_only": {"hold_1515ms_0px": "menu opens", "hold_1400ms_2px": "menu opens", "travel_9px": "menu does not open"},
+    "lost_release_resume_deg_per_s": {"off_element": 2.15, "outside_window": 2.15, "window_blur": 2.14, "pointercancel": 2.15, "native_dragstart": 2.12},
+    "hover": {"drift_while_hovered_deg_over_2500ms": 0.0, "resume_deg_per_s_after_34ms": {"1280": 2.25, "1440": 2.08}, "tooltip_text_transform": "uppercase", "orphan_tooltips_after_sweep": 0, "crossfade_ms": 80},
+    "keyboard": {"tab_stops": 6, "plates_total": 24, "all_fully_on_screen": true, "aim_error_deg": 0.0, "drift_while_focused_deg_over_1500ms": 0.0, "resume_after_focus_leaves_deg_per_s": 2.19},
+    "trackpad": {"gentle_peak_deg_per_s": 9.6, "gentle_decay_back_to_deg_per_s": 2.15, "flick_scroll_px": 5927, "flick_wheel_deg": 3.11, "flick_peak_deg_per_s": 56.5, "cap_deg_per_s": 150, "cap_reached": false, "settled_after_flick_deg_per_s": 2.14},
+    "touch": {"tablet_swipe_page_scroll_px": 316, "tablet_tap_opens_menu": true, "tablet_long_press_1400ms_download": false, "tablet_resume_after_touch_close_deg_per_s": 2.14, "phone_tap_opens_menu": true, "phone_labels_opacity": 1, "phone_tap_targets": ["112x67", "112x78", "112x65"]},
+    "reduced_motion": {"drift_deg_over_3s": 0.0, "hub_transform": "matrix(1, 0, 0, 1, 0, 0)", "float_animation_name": "none", "drag_rotation_deg": 24.61, "momentum_deg_after_1500ms": 0.0, "hover_tooltip": true, "focus_tooltip": true, "click_opens_menu": true},
+    "leak": {"375": [375, 375], "768": [768, 768], "1280": [1280, 1280], "1920": [1920, 1920], "leaks": 0},
+    "console_errors": 0,
+    "collision_sweep": {
+      "1280": {"swept_deg": 363.06, "samples": 433, "largest_step_deg": 1.27, "buckets_covered": "72/72", "overlaps": 0, "closest_approach_px": 58.0},
+      "1440": {"swept_deg": 358.27, "samples": 433, "largest_step_deg": 1.15, "buckets_covered": "72/72", "overlaps": 0, "closest_approach_px": 80.0},
+      "method": "2D rectangle intersection, every on-screen plate image against the heading, all three About paragraphs and the Fresh always column, driven by real mouse drags"
+    },
+    "performance": {
+      "drag_2s": {"frames": 241, "avg_ms": 8.33, "p95_ms": 9.0, "max_ms": 9.4, "over_16_7ms": 0, "layouts": 0, "style_recalcs": 246},
+      "throw_2s": {"frames": 240, "avg_ms": 8.33, "p95_ms": 9.1, "max_ms": 9.2, "over_16_7ms": 0, "layouts": 0, "style_recalcs": 241},
+      "long_tasks": 0
+    }
+  },
+  "defects_found_and_fixed": [
+    {
+      "id": "D1",
+      "severity": "high",
+      "title": "the wheel stopped dead mid-throw and stayed stopped",
+      "cause": "onPointerLeave on the hub lifted the hover suspension, but during a throw the plates slide out from under a motionless pointer and fire pointerleave with no hand movement; the next plate then arrived under the same still pointer and the hover pause swallowed the throw",
+      "repro": "1440x900, 250px throw released with the hand held still, 2 of 4 runs; never at 1280 (geometry and phase dependent)",
+      "before": {"worst_flat_frames": 319, "worst_standstill_ms": 2657, "final_speed_deg_per_s": 0.0},
+      "after": {"runs": 8, "widths": [1280, 1440], "flat_frames": 0, "final_speed_deg_per_s_range": [2.15, 2.44]},
+      "fix": "only a real window pointermove (onIdleMove) lifts the hover suspension; the pointerleave listener is removed. A stuck suspension can only suppress the pause, never freeze the wheel, so the Lessons 25 hazard runs one way and this removes it",
+      "file": "components/PlateWheel.tsx"
+    },
+    {
+      "id": "D2",
+      "severity": "medium",
+      "title": "a slow drag ended in a dead beat",
+      "cause": "a throwless release carried a released speed of zero and subtracted ambient from it, setting the wheel's speed to exactly nothing at the moment of release",
+      "before": {"flat_frames": 5, "standstill_ms": 42.5, "speed_at_50ms_deg_per_s": 0.0, "avg_0_to_0_3s": 0.57, "avg_0_3_to_1s": 1.6},
+      "after": {"flat_frames": 0, "standstill_ms": 0, "speed_at_50ms_deg_per_s_range": [1.3, 2.35], "avg_0_to_0_3s": 2.2, "avg_0_3_to_1s": 2.14},
+      "fix": "a throwless release (stale hand, no velocity sample, or reduced motion) hands the wheel straight back to the ambient turn instead of decelerating it to a standstill first",
+      "file": "components/PlateWheel.tsx"
+    },
+    {
+      "id": "D3",
+      "severity": "high",
+      "title": "the keyboard focus ring landed below the fold",
+      "cause": "Chrome scrolls a newly focused element into view by the smallest amount that reveals it where it is, and does so after focusin; the wheel then eases that plate up to a full diameter away. Separately, Lenis owns the page scroll and a native scrollIntoView issued while Lenis has an animation in flight settles between the two",
+      "evidence": {"hub_top_at_focusin": 403, "hub_top_500ms_later": 967, "native_scrollIntoView_landed_at": 268, "native_scrollIntoView_target": 574},
+      "before": {"tab_from_page_top": "top 1089 in a 900px viewport, scrollY 95, off screen", "band_in_view_nav_at_600ms": "3 of 3 off screen at top 916"},
+      "after": {"tab_from_page_top": "top 399, on screen", "band_in_view_all_paces": "9 of 9 on screen", "all_six_plates_1280": "fully on screen", "all_six_plates_1440": "fully on screen", "aim_error_deg": 0.0},
+      "fix": "lib/scroller.ts publishes the Lenis instance from SmoothScroll so anything moving the page asks the scroll owner instead of racing it (native fallback under reduced motion, where Lenis never starts); the wheel centres the hub through it on a 500ms timer armed by a keyboard focus, after the browser's own scroll has landed. Gated on :focus-visible and bails while a pointer is down",
+      "side_effect_check": {"mouse_click_page_move_px": 0, "mouse_drag_page_move_px": 0},
+      "files": ["components/PlateWheel.tsx", "components/SmoothScroll.tsx", "lib/scroller.ts"]
+    }
+  ],
+  "recorded_not_fixed": [
+    {
+      "title": "a reverse throw passes through zero for 40 to 110 ms",
+      "detail": "throwing the wheel against its ambient direction requires it to decelerate through a standstill before resuming forwards; measured 41 to 109 ms under 0.25 deg/s at the crossing over six runs",
+      "why_not_fixed": "the dwell is set by AMBIENT / BOOST_DECAY_S = 2.143 / 0.45 = 4.76 deg/s squared; shortening it means shortening BOOST_DECAY_S, which would cut every forward throw short. Forward throws and parked releases both show zero flat frames, so the wheel is never left stopped",
+      "lever": "BOOST_DECAY_S in components/PlateWheel.tsx",
+      "for": "Kazim"
+    },
+    {
+      "title": "at 375, mid-scroll, the fixed Cosmos wordmark sits over the About paragraph text",
+      "detail": "visible in docs/handoffs/screens/qa_2026-09-02_v4/mobile-row-375.png; Lesson 17's drop shadow is doing some work but the overlap is legible-ish rather than clean",
+      "why_not_fixed": "out of this gate's scope",
+      "for": "designer, next pass"
+    }
+  ],
+  "behaviour_confirmed_as_designed_not_a_bug": [
+    "closing the menu with the Escape key returns focus to the plate with :focus-visible, and the wheel then holds still until focus moves; this is the focus pause, not a stuck wheel",
+    "a 1400ms long press on a touchscreen opens the menu, which is the distance-only click rule James set, applied consistently",
+    "a 5927px scroll flick turns the wheel only about 3 degrees because the band leaves the viewport and the IntersectionObserver stops the loop",
+    "184 of 286 frames in a rapid hover sweep show two pills above zero opacity, which is the 80ms cross-fade between plates; at 40ms only one is at full opacity"
+  ],
+  "not_tested": [
+    "a real browser tab switch (Playwright pins pages visible; the handler and its document.hidden read were exercised, the browser's own switch was not)",
+    "a real pointercancel (dispatched synthetically; no mouse gesture produces one and touch is excluded from the drag by design)",
+    "real hardware: a physical mouse, a physical trackpad, a physical touchscreen",
+    "the OS-level reduced-motion setting (the media query was emulated at the browser level)",
+    "screen readers",
+    "Safari and Firefox",
+    "the live preview domain"
+  ],
+  "widths_swept": [375, 768, 1024, 1280, 1440, 1920],
+  "files_changed_by_qa": [
+    "components/PlateWheel.tsx",
+    "components/SmoothScroll.tsx",
+    "lib/scroller.ts"
+  ],
+  "build_checks": {"tsc_noEmit": "clean", "next_build": "clean", "console_errors": 0},
+  "screenshots": "docs/handoffs/screens/qa_2026-09-02_v4/",
+  "next": "security-auditor"
+}

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { setScroller } from "@/lib/scroller";
 
 /**
  * Lenis smooth scroll + the IntersectionObserver that drives `.reveal`.
@@ -17,6 +18,9 @@ export default function SmoothScroll() {
 
     const startLenis = () => {
       lenis = new Lenis({ duration: 1.05, wheelMultiplier: 1, touchMultiplier: 1.6 });
+      // Publish it: anything else that has to move the page must go through the
+      // owner of the scroll rather than race it (lib/scroller.ts).
+      setScroller(lenis);
       const raf = (time: number) => {
         lenis?.raf(time);
         frame = requestAnimationFrame(raf);
@@ -26,6 +30,7 @@ export default function SmoothScroll() {
 
     const stopLenis = () => {
       cancelAnimationFrame(frame);
+      setScroller(null);
       lenis?.destroy();
       lenis = undefined;
     };

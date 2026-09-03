@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useId, useRef } from "react";
 import { about } from "@/lib/content";
+import { scrollPageTo } from "@/lib/scroller";
 import { useModals } from "./ModalProvider";
 
 /* -------------------------------------------------------------------------- *
@@ -73,6 +74,20 @@ const angleFor = (i: number): number => FIRST_ANGLE_DEG + i * SPOKE_STEP_DEG;
 
 /** The angle, in the visible window, that a focused plate is brought to. */
 const VIEW_ANGLE_DEG = 180;
+/**
+ * How much clear room a keyboard-focused plate needs above and below the hub
+ * before the band is scrolled to it. A plate is about 190px wide and roughly
+ * half that tall, so this leaves the whole ring and its focus ring inside the
+ * viewport rather than flush against an edge.
+ */
+const FOCUS_EDGE_MARGIN_PX = 140;
+/**
+ * How long to wait after a keyboard focus before correcting the page's scroll.
+ * Long enough for the browser's own scroll-into-view (and Lenis's easing of it)
+ * to have landed, so the correction is measured against where the page actually
+ * ended up rather than where it was on the way there.
+ */
+const FOCUS_SCROLL_SETTLE_MS = 500;
 
 /**
  * The blueprint's plate wheel (facts SS4.2, Lessons 16), turning endlessly.
@@ -145,6 +160,7 @@ export default function PlateWheel({
     let lastScrollY = window.scrollY;
     let onScreen = true;
     let focusTarget: number | null = null;
+    let focusScrollTimer = 0;
 
     // The grab gesture.
     let pointerId: number | null = null;
@@ -155,7 +171,6 @@ export default function PlateWheel({
     let dragMovedPx = 0;
     let dragStartX = 0;
     let dragStartY = 0;
-    let dragStartMs = 0;
     let dragLastMs = 0;
     let dragged = false; // this press has passed the click threshold
     let suppressClick = false;
@@ -273,7 +288,25 @@ export default function PlateWheel({
       window.removeEventListener("pointermove", onIdleMove);
     };
 
-    /** Ignore hover until the hand moves again, so nothing can strand the wheel. */
+    /**
+     * Ignore hover until the hand moves again, so nothing can strand the wheel.
+     *
+     * `onIdleMove` above is the ONLY thing allowed to lift this, because a real
+     * `pointermove` is the only proof the hand moved. It used to be lifted by
+     * `pointerleave` on the hub as well, and that was wrong in the one case it
+     * mattered: during a throw the plates slide out from under a motionless
+     * pointer, which fires `pointerleave` on the hub with no hand movement at
+     * all. The suspension lifted, the next plate arrived under the same still
+     * pointer, and the hover pause swallowed the throw. Measured at the QA gate,
+     * 1440x900, a 250px throw released with the hand held still: 2.62 seconds of
+     * dead standstill, and it stayed stopped until the hand moved. Intermittent,
+     * because it depends on a plate leaving the pointer before the next arrives,
+     * which is why it never showed at 1280.
+     *
+     * Leaving this flag set can never freeze the wheel (it only suppresses the
+     * pause), so there is no Lessons 25 hazard in having one fewer way to clear
+     * it. The hazard is all on the other side.
+     */
     const suspendHover = (): void => {
       hoverBlocked = true;
       syncDragFlag();
@@ -311,16 +344,23 @@ export default function PlateWheel({
 
       // Hand the wheel back to the ambient loop at the speed it had. `boost` is
       // the amount ABOVE ambient and decays with the same e-fold the scroll
-      // throw uses, so the wheel eases back to ambient and never stops. A hand
-      // that had already come to rest throws nothing, and reduced motion never
-      // throws at all.
+      // throw uses, so the wheel eases back to ambient and never stops.
+      //
+      // A hand that had already come to rest, and reduced motion, have no throw
+      // to give. That is NOT the same as throwing zero: carrying a released
+      // speed of zero means subtracting ambient here, which sets the wheel's
+      // speed to exactly nothing at the moment of release and then creeps it
+      // back up over about a second and a half. Measured at the QA gate: five
+      // frames, 42.5ms, of dead standstill after a slow drag, and 0.00 deg/s
+      // still at +50ms. The wheel is never allowed to stand still (Lessons 25,
+      // 26), so a throwless release hands it straight back to the ambient turn.
       const stale = !event || event.timeStamp - dragLastMs > DRAG_STALE_MS;
-      const released = reduced.matches || stale || !dragVelSeen ? 0 : dragVel;
-      boost = reduced.matches
+      const noThrow = reduced.matches || stale || !dragVelSeen;
+      boost = noThrow
         ? 0
         : Math.max(
             -MAX_BOOST_DEG_PER_S,
-            Math.min(MAX_BOOST_DEG_PER_S, released - AMBIENT_DEG_PER_S),
+            Math.min(MAX_BOOST_DEG_PER_S, dragVel - AMBIENT_DEG_PER_S),
           );
       dragVel = 0;
       dragVelSeen = false;
@@ -377,7 +417,6 @@ export default function PlateWheel({
       dragMovedPx = 0;
       dragStartX = event.clientX;
       dragStartY = event.clientY;
-      dragStartMs = event.timeStamp;
       dragLastMs = event.timeStamp;
       dragged = false;
       suppressClick = false;
@@ -422,17 +461,29 @@ export default function PlateWheel({
       event.stopPropagation();
     };
 
-    const onPointerLeave = (): void => {
-      hoverBlocked = false;
-      syncDragFlag();
-    };
-
     const onWindowBlur = (): void => {
       endDrag();
       suspendHover();
     };
 
     /* --- keyboard ---------------------------------------------------------- */
+
+    /**
+     * Bring the hub within the viewport, which is where a focused plate comes to
+     * rest (VIEW_ANGLE_DEG is 180, so the plate ends up level with the hub).
+     *
+     * Through `scrollPageTo`, never natively: Lenis owns this page's scroll, and
+     * a native call made while Lenis has an animation in flight settles between
+     * the two rather than winning. See lib/scroller.ts.
+     */
+    const centreHub = (): void => {
+      if (pointerId !== null) return; // a hand is on the wheel; leave the page alone
+      const hubTop = hub.getBoundingClientRect().top;
+      if (hubTop < FOCUS_EDGE_MARGIN_PX || hubTop > window.innerHeight - FOCUS_EDGE_MARGIN_PX) {
+        scrollPageTo(window.scrollY + hubTop - window.innerHeight / 2);
+      }
+    };
+
 
     const onFocusIn = (event: Event): void => {
       const spoke = spokeOf(event.target);
@@ -454,6 +505,22 @@ export default function PlateWheel({
       while (target - rot < -180) target += 360;
       focusTarget = target;
       if (!running) write();
+
+      // And put the band where that plate is GOING, which the browser gets
+      // wrong on its own. Chrome scrolls a newly focused element into view by
+      // the smallest amount that reveals it WHERE IT IS, and the wheel is about
+      // to move that plate to the hub's own level, up to a full diameter away.
+      // The two disagree and the focus ring lands off screen. Measured at the
+      // QA gate, 1280x900, a visitor already looking at the About band tabbing
+      // forward into the wheel: the ring settled at top 916 in a 900px
+      // viewport, three runs out of three, and stayed there.
+      //
+      // The correction cannot be made here. Chrome's scroll runs AFTER focusin
+      // (measured: hub at 403 when this fires, at 967 half a second later), so
+      // a check now reads a page that is about to move and correctly decides to
+      // do nothing. It has to run once that scroll has landed.
+      window.clearTimeout(focusScrollTimer);
+      focusScrollTimer = window.setTimeout(centreHub, FOCUS_SCROLL_SETTLE_MS);
     };
 
     const onVisibility = (): void => {
@@ -495,7 +562,6 @@ export default function PlateWheel({
     };
 
     hub.addEventListener("pointerdown", onPointerDown);
-    hub.addEventListener("pointerleave", onPointerLeave);
     hub.addEventListener("dragstart", onDragStart);
     hub.addEventListener("click", onClickCapture, true);
     hub.addEventListener("focusin", onFocusIn);
@@ -507,7 +573,6 @@ export default function PlateWheel({
     return () => {
       reduced.removeEventListener("change", apply);
       hub.removeEventListener("pointerdown", onPointerDown);
-      hub.removeEventListener("pointerleave", onPointerLeave);
       hub.removeEventListener("dragstart", onDragStart);
       hub.removeEventListener("click", onClickCapture, true);
       hub.removeEventListener("focusin", onFocusIn);
@@ -516,6 +581,7 @@ export default function PlateWheel({
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerCancel);
       window.removeEventListener("pointermove", onIdleMove);
+      window.clearTimeout(focusScrollTimer);
       root.classList.remove("wheel-grabbing");
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
