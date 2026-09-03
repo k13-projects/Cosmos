@@ -110,3 +110,16 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
     James blocks the merge without it.
 22. **Attribution for the 2026-09-02 miss:** James (intake spec omitted geometry), Olga (gate
     skipped the side-by-side), Natalia (fidelity table compared inventory, not geometry).
+
+### Interactive motion components, corrected by Kazim 2026-09-02 (plate wheel)
+24. **Any image inside a draggable or scroll-driven component must be `draggable={false}`** with
+    `user-select: none` and `-webkit-user-drag: none`, or the browser's native image drag takes
+    over: Kazim "dragged the wheel", the ghost image followed, and releasing it triggered an image
+    download. Native drag also swallows `pointerout`, so a hover-paused wheel never resumed.
+25. **Every pause state needs an exit that does not depend on the event you hope for.** Hover
+    pause must clear on `pointerleave`, `pointerup`, `pointercancel`, `dragstart`, window blur
+    and visibility change; belt and braces, re-check `:hover` on the next frame.
+26. **If a gesture is possible, it must be designed, not accidental.** Kazim liked dragging the
+    wheel; make drag-to-spin a real gesture (pointer capture, velocity, momentum decaying back
+    to the ambient speed, click-vs-drag threshold so a drag never opens the menu pop-up), and
+    have QA test the gesture matrix (mouse, trackpad, touch, keyboard, reduced motion).

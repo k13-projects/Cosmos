@@ -243,6 +243,41 @@ html.lenis body {
     transition-timing-function: linear;
   }
 
+  /* ---------- plates: drag proofing and the grab gesture ---------- */
+  /* Lessons 24. A plate is a photograph inside a control, and a photograph is a
+     drag source to the browser: the native drag hijacks the gesture, a ghost
+     image follows the pointer, dropping it opens or downloads the file, and it
+     swallows `pointerout`, so a hover-paused wheel never resumes. Killed here
+     and with `draggable={false}` in PlateWheel.tsx. `pointer-events: none` on
+     the image also puts every pointer event on the button, which is the element
+     the wheel listens to and hit-tests `:hover` on. */
+  .plate-btn,
+  .plate-btn img {
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .plate-btn img {
+    pointer-events: none;
+  }
+
+  /* While the wheel is being thrown, the tooltips are noise: the plates slide
+     under a still pointer, so the pill would strobe from one name to the next.
+     Set by PlateWheel.tsx for the length of the gesture, and for as long after
+     it as the hand has not moved again. */
+  .wheel-hub[data-drag] .plate-tip {
+    opacity: 0 !important;
+  }
+
+  /* The pointer is captured for the whole drag, so it spends most of it off the
+     plate it grabbed, and off the wheel entirely. The cursor has to say
+     "grabbing" everywhere until the hand lets go. */
+  html.wheel-grabbing,
+  html.wheel-grabbing * {
+    cursor: grabbing !important;
+    user-select: none !important;
+  }
+
   /* ---------- logo readability ---------- */
   /* The wordmark sits on photography, on cream and on purple with no ground of
      its own (Lessons 17). A purple-tinted double shadow is what separates it,
@@ -378,10 +413,14 @@ html.lenis body {
     transform: none !important;
     transition: none !important;
   }
-  /* The wheel is a still arc: PlateWheel.tsx never attaches its scroll handler
-     under reduced motion, and the plates stop bobbing. */
+  /* The wheel is a still arc: PlateWheel.tsx never starts its rAF loop or its
+     scroll handler under reduced motion, and pins --wheel-rot to 0, so nothing
+     turns it on its own. The rotate() stays live rather than being forced to
+     `none`, because a deliberate drag is the visitor's own hand and not motion,
+     and it must still move the wheel here (it is thrown with no momentum). The
+     plates stop bobbing. */
   .wheel-hub {
-    transform: none !important;
+    will-change: auto;
   }
   .sheen::after {
     display: none !important;
