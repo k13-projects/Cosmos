@@ -108,7 +108,7 @@ export default function Locations() {
                 />
                 <div className="relative z-10 flex w-full flex-1 flex-col">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink lg:text-sm">
+                    <p className="halo text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink lg:text-sm">
                       {l.area}
                     </p>
                     {l.status && (
@@ -120,32 +120,19 @@ export default function Locations() {
                     )}
                   </div>
 
-                  <h3 className="mt-2 text-[22px] font-bold leading-tight text-purple lg:text-[29px]">
+                  <h3 className="halo mt-2 text-[22px] font-bold leading-tight text-purple lg:text-[29px]">
                     {l.name}
                     {l.status && <span className="sr-only"> ({l.status})</span>}
                   </h3>
 
-                  <p className="mt-2 text-[15px] leading-snug text-purple/80 lg:text-[16px]">
+                  <p className="halo mt-2 text-[15px] leading-snug text-purple/80 lg:text-[16px]">
                     {l.address}
                   </p>
 
-                  {/* `lg:max-w-[76%]` only: hours is the one line long enough
-                      to wrap (Oceanside's hours string does, at 1280 and
-                      1440), and a wrapped line runs the full card width by
-                      default, straight under the mark's corner. Below lg the
-                      card is not aspect-locked (it grows with content), so the
-                      default `bottom-[88px]` mark position above already
-                      clears it and this is a no-op there. Address and the
-                      phone link (already `w-fit`) never reach that far, so
-                      they are left alone; constraining them too force-wraps a
-                      short, already-one-line address for no reason. Shrinking
-                      the mark instead of the text does not work either: even
-                      at 10% width (illegibly small) Oceanside's hours string
-                      still does not clear, a pre-existing gap between tha
-                      hall's content and the card's fixed 1280/1440 height,
-                      unrelated to the mark. See Risks in
-                      docs/handoffs/engineering_2026-09-02_v6.md. */}
-                  <p className="mt-2 flex items-center gap-2 text-[15px] font-semibold text-purple lg:max-w-[76%] lg:text-[16px]">
+                  {/* Every text block carries `.halo` (globals.css): a cream ground with a
+                      feathered edge that knocks the corner mark out wherever copy or a
+                      control sits, so nothing ever overlaps (Kazim, 2026-09-02). */}
+                  <p className="halo mt-2 flex items-center gap-2 text-[15px] font-semibold text-purple lg:text-[16px]">
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
@@ -169,7 +156,7 @@ export default function Locations() {
                        comment in lib/content.ts). */
                     <a
                       href={telHref(l.phone)}
-                      className="-ml-1 mt-1 inline-flex min-h-11 w-fit items-center gap-2 self-start rounded-lg px-1 text-[15px] font-semibold text-purple underline decoration-purple/30 underline-offset-4 transition hover:decoration-magenta"
+                      className="halo -ml-1 mt-1 inline-flex min-h-11 w-fit items-center gap-2 self-start rounded-lg px-1 text-[15px] font-semibold text-purple underline decoration-purple/30 underline-offset-4 transition hover:decoration-magenta"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path
@@ -187,7 +174,7 @@ export default function Locations() {
 
                   {/* mt-auto pins the controls to the card's floor, so the five
                       cards line their buttons up even when one address wraps. */}
-                  <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
+                  <div className="halo mt-auto flex flex-wrap items-center gap-3 pt-5">
                     <OrderOnlineButton
                       className="btn-sm"
                       variant="purple"

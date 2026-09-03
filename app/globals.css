@@ -402,3 +402,18 @@ html.lenis body {
     scroll-behavior: auto !important;
   }
 }
+
+/* --- location-card text halo ------------------------------------------- */
+/* The building mark is large and flush in the card corner. Text and controls
+   must never sit on top of it, so each block "opens up" the mark beneath it:
+   a cream ground with a feathered edge (the blurred second shadow), sized to
+   the block's own width. The mark stays; the copy always reads on plain cream. */
+.halo {
+  width: fit-content;
+  max-width: 100%;
+  background: var(--color-cream);
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 6px var(--color-cream),
+    0 0 12px 12px var(--color-cream);
+}
