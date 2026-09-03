@@ -3,6 +3,7 @@
 #
 # Source:  Cosmos Assets/   (gitignored, ~70MB, client design source)
 # Output:  public/photos, public/menu/best-sellers, public/menu/plates,
+#          public/menu/items, public/menu/cosmos-menu.{png,webp},
 #          public/brand   (committed)
 #
 # Idempotent, safe to re-run. Requires macOS `sips`, `cwebp` (brew install
@@ -25,7 +26,7 @@ command -v cwebp >/dev/null || { echo "ERROR: cwebp not found. brew install webp
 command -v sips >/dev/null || { echo "ERROR: sips not found (macOS only)."; exit 1; }
 python3 -c "import PIL" 2>/dev/null || { echo "ERROR: python3 Pillow not found. pip3 install Pillow"; exit 1; }
 
-mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/brand"
+mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/menu/items" "$PUB/brand"
 
 # --------------------------------------------------------------------------- #
 # BAND CROPS (Lessons 19: "photo bands are crops, not slots")
@@ -92,9 +93,17 @@ crop_photo "cosmos 1-64.jpg" band-phone 0 615 1510 1546 2000
 # the blueprint lays it on the bottom of the purple pattern band and lets the
 # pattern fill that wedge. Matting it onto a ground destroys the whole point, so
 # it is exported WITH alpha and only resized. cwebp keeps the alpha channel.
-GENERAL_SRC="$SRC/PHOTOS/Cosmos General.png"
+#
+# Lorena's `additional photo.png` (LORENA UPDATE 2026-09-02/) is the same
+# cutout, same size (2528x1686) and same alpha bbox as PHOTOS/Cosmos
+# General.png, verified by pixel diff: the two differ ONLY in a 470x230px
+# patch at the bottom right, where Cosmos General.png carries a small sparkle
+# artifact baked into the wood grain (looks like a watermark, not food) that
+# additional photo.png does not have. That is a meaningful difference on a
+# product photo, so the clean one wins.
+GENERAL_SRC="$SRC/LORENA UPDATE 2026-09-02/additional photo.png"
 if [ ! -f "$GENERAL_SRC" ]; then
-  echo "  ERROR: photo source not found: PHOTOS/Cosmos General.png" >&2
+  echo "  ERROR: photo source not found: LORENA UPDATE 2026-09-02/additional photo.png" >&2
   exit 1
 fi
 cp "$GENERAL_SRC" "$TMP/spread.png"
@@ -159,6 +168,86 @@ for i in 1 2 3 4 5 6; do
   trim_png "$src" "$PUB/menu/plates/$i.png"
   echo "  menu/plates/$i.png"
 done
+
+echo "==> menu items (Kazim, 2026-09-02: old-site product shots, one per menuPopup item)"
+# Source: Cosmos Assets/OLD SITE MENU/<category>__<Item-Name>.webp|png, white-background
+# product shots ~1000px wide, captured from burgerscosmos.com 2026-09-02. slug =
+# lowercase of the <Item-Name> part (hyphens kept as the filename already words them),
+# e.g. "burgers__BBQ-Burger.webp" -> "bbq-burger.webp". 640w q82, PNG sources go through
+# sips first (same pattern as the pattern.png step below), webp sources are decoded with
+# dwebp first since cwebp's own encoder does not read webp back in.
+ITEMS_SRC="$SRC/OLD SITE MENU"
+if [ ! -d "$ITEMS_SRC" ]; then
+  echo "  ERROR: menu item source not found: OLD SITE MENU/" >&2
+  exit 1
+fi
+command -v dwebp >/dev/null || { echo "ERROR: dwebp not found. brew install webp"; exit 1; }
+ITEM_COUNT=0
+for src in "$ITEMS_SRC"/*; do
+  [ -f "$src" ] || continue
+  base="$(basename "$src")"
+  ext="${base##*.}"
+  ext_lower="$(echo "$ext" | tr '[:upper:]' '[:lower:]')"
+  slug="$(echo "${base#*__}" | sed -E "s/\.[^.]+$//" | tr '[:upper:]' '[:lower:]')"
+
+  work="$TMP/item.png"
+  if [ "$ext_lower" = "png" ]; then
+    cp "$src" "$work"
+  else
+    dwebp -quiet "$src" -o "$work"
+  fi
+  sips -Z 640 "$work" >/dev/null
+  cwebp -q 82 -quiet "$work" -o "$PUB/menu/items/$slug.webp"
+  rm -f "$work"
+  ITEM_COUNT=$((ITEM_COUNT + 1))
+  echo "  menu/items/$slug.webp"
+done
+echo "  ($ITEM_COUNT item photos)"
+
+echo "==> BBQ Burger photo (Lorena, BBQ UPDATED.png, 2026-09-02, replaces menu/items/bbq-burger.webp)"
+# Trim to the alpha bbox first (a real cutout would have transparent padding
+# to drop; this source's alpha channel is fully opaque edge to edge, so this
+# is a documented no-op, not a skipped step) then flatten onto white to match
+# every other item shot in menu/items, which are white-background product
+# photos, not cutouts.
+BBQ_SRC="$SRC/LORENA UPDATE 2026-09-02/BBQ UPDATED.png"
+if [ ! -f "$BBQ_SRC" ]; then
+  echo "  ERROR: photo source not found: LORENA UPDATE 2026-09-02/BBQ UPDATED.png" >&2
+  exit 1
+fi
+python3 - "$BBQ_SRC" "$TMP/bbq.png" <<'PY'
+import sys
+from PIL import Image
+src, out = sys.argv[1], sys.argv[2]
+im = Image.open(src).convert("RGBA")
+bbox = im.getchannel("A").getbbox()
+if bbox is None:
+    raise SystemExit(f"ERROR: {src} has no visible alpha content")
+im = im.crop(bbox)
+bg = Image.new("RGB", im.size, (255, 255, 255))
+bg.paste(im, mask=im.getchannel("A"))
+bg.save(out)
+PY
+sips -Z 640 "$TMP/bbq.png" >/dev/null
+cwebp -q 82 -quiet "$TMP/bbq.png" -o "$PUB/menu/items/bbq-burger.webp"
+echo "  menu/items/bbq-burger.webp"
+
+echo "==> printed menu (Lorena, COSMOS MENU.png, 2026-09-02, 2000w)"
+# The menu pop-up's "View the printed menu" link opens this PNG in a new tab
+# to be read or printed, so PNG is the actual link target (universal
+# right-click save/print support). A webp copy sits alongside for a future
+# inline thumbnail; nothing links to it today.
+MENU_IMG_SRC="$SRC/LORENA UPDATE 2026-09-02/COSMOS MENU.png"
+if [ ! -f "$MENU_IMG_SRC" ]; then
+  echo "  ERROR: photo source not found: LORENA UPDATE 2026-09-02/COSMOS MENU.png" >&2
+  exit 1
+fi
+cp "$MENU_IMG_SRC" "$TMP/menu.png"
+sips -Z 2000 "$TMP/menu.png" >/dev/null
+cp "$TMP/menu.png" "$PUB/menu/cosmos-menu.png"
+cwebp -q 86 -m 6 -quiet "$TMP/menu.png" -o "$PUB/menu/cosmos-menu.webp"
+echo "  menu/cosmos-menu.png"
+echo "  menu/cosmos-menu.webp"
 
 echo "==> brand"
 LOGO_SRC="$SRC/LOGO & BRAND IDENTITY/COSMOS BURGER LOGO.svg"

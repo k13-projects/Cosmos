@@ -36,7 +36,8 @@ Source of truth for scope: `PROJECT_BRIEF.md`, `SCOPE.md`,
 - [x] REVIEWS (cream): 4 quotes, tan cards, 5-star
 - [x] Photo band: phone
 - [x] Footer (`#contact`, purple + pattern): logo, FOLLOW US, CONTACT INFO
-- [x] Menu pop-up: category grid, no prices, live-site item list
+- [x] Menu pop-up: category grid, live-site item list (superseded 2026-09-02 by the real, priced
+      menu, see the P1-P4 review below)
 - [x] Order-online pop-up: Toast/DoorDash per hall, "coming soon" where no URL
 - [x] Fill `lib/content.ts` completely (about, values, bestSellers, menu, catering, locations,
       reviews, footer, menuPopup, orderPopup) with provenance comments
@@ -77,11 +78,15 @@ Source of truth for scope: `PROJECT_BRIEF.md`, `SCOPE.md`,
       (report-writer) running in parallel, not this handoff's job.
 
 ## Blocked on client (Lorena, batched — see `SCOPE.md` "Open questions")
-- [ ] Menu content: descriptions + prices for the menu pop-up
-- [ ] Ordering URLs: Toast + DoorDash for San Clemente, Little Italy, UCSD Campus
+- [x] Menu content: real menu with descriptions + prices, from `COSMOS MENU.png` (Lorena,
+      2026-09-02); see the P1-P4 review below
+- [ ] Ordering URLs: Toast + DoorDash per food hall (Carlsbad DoorDash and Oceanside DoorDash are
+      already public)
 - [ ] Contact info for the footer (address/phone/email)
-- [ ] Oceanside: confirm it's order-pop-up-only, or should get a Locations card
-- [ ] Fonts: does THG have Adobe Fonts for Horizon, or does the Archivo stand-in ship permanently
+- [ ] Plate names: confirm the six wheel-plate names, matched by photo (one-glance, not client-
+      confirmed)
+- [ ] Chicken sandwich photo: the original, wider photo used in the PDF band, if Lorena still has
+      it (the file we hold can't reproduce the blueprint's exact crop)
 
 ---
 
@@ -108,6 +113,65 @@ plate, not the sandwich. Its alt text was wrong and the photo was on the Chicken
 Moved to Chicken Tenders; the sandwich row now has no photo, which is correct.
 
 **Still open** (P5, and the client asks in `SCOPE.md`): `fitcheck` across the nine viewports, the
-ADA/508 pass, the security-header audit, and the progress report. Ordering URLs, menu prices and
-footer contact details all remain gaps on the client, and every one of them degrades to an honest
-"coming soon" rather than a dead control.
+ADA/508 pass, the security-header audit, and the progress report. Ordering URLs and footer contact
+details remain gaps on the client, and every one of them degrades to an honest "coming soon"
+rather than a dead control. Menu prices closed 2026-09-02, see below.
+
+---
+
+## Review — real menu rebuild (Natalia, 2026-09-02)
+
+**What changed.** Lorena sent the real menu (`COSMOS MENU.png`) with prices, descriptions,
+spicy/vegetarian marks, the combo offer and the allergen line. Rebuilt `menuPopup` in
+`lib/content.ts` from it, item by item, transcribed and cross-checked against the image:
+- Every `MenuItem` now carries `price` (printed verbatim, e.g. "$7.5", not "$7.50") and an
+  optional `description`, `tags` (`spicy` | `vegetarian`), and `note` (the "swap for tots" upsell
+  on the three loaded-fries sides).
+- `MenuCategory` dropped the `kind: "tiles" | "list"` union: every category is a tile grid now, so
+  `ListMenuCategory`, `MenuItemGroup` and the whole Drinks category (no menu, invented for the
+  old-site build) are gone, and `MenuPanel.tsx`'s `DrinkGroups` component with them.
+- Kids Burger, Tiramisu and Bundle for 4 are removed (not on the real menu); Cauliflower Bites
+  moved out of the deleted "More" category into Sides, where the real menu has it, alongside the
+  new Frings item.
+- `MenuPanel.tsx`: price sits right-aligned to the name in the display font; description renders
+  at 14px Poppins, `text-purple/75`; spicy (chilli) and vegetarian ("V" disc) glyphs are new inline
+  SVGs in `components/Icons.tsx`, coloured from new tokens in `app/globals.css`
+  (`--color-chilli*`, `--color-veg`) sampled off the client's own PNG, not hardcoded hex; a category
+  `note` renders italic under the header (the "served with signature Cosmos sauce and pickles"
+  line on both chicken categories); the combo card is a `bg-magenta-deep` card with a yellow
+  `.display` heading at the bottom of Sides; the footer note is now the allergen line, with a
+  spicy/vegetarian legend and a "View the printed menu" link to `/menu/cosmos-menu.png` above it.
+- `scripts/build-assets.sh`: swapped the BBQ Burger photo for Lorena's `BBQ UPDATED.png` (its alpha
+  channel is fully opaque edge to edge, so the trim step is a documented no-op, then flattened onto
+  white to match the other item shots); swapped the table-spread source from `Cosmos General.png`
+  to Lorena's `additional photo.png`, same cutout, same alpha bbox, differing only in a 470x230px
+  patch where the old file carried a sparkle artifact baked into the wood grain, the new file does
+  not; added the `cosmos-menu.png` (2000w, the link target) / `cosmos-menu.webp` (kept for a future
+  thumbnail, unused today) export of the printed menu itself.
+- `app/layout.tsx`: added `Menu`/`MenuSection`/`MenuItem` JSON-LD with real prices, built by
+  `menuStructuredData()` in `lib/content.ts` from the same `menuPopup` data the pop-up renders, one
+  shared object with a stable `@id` that every Restaurant's `hasMenu` now points at. Per the
+  James/Lorena meeting 2026-09-02: the menu is website content for SEO, not only a PDF, so it stays
+  in the DOM (it already was, inside the modal) and now also in structured data.
+
+**Verification.** `npx tsc --noEmit` clean. `scripts/check-menu-photos.mjs` (new, read-only, no
+deps) parses every `image.src` and `printedMenuHref` out of the `menuPopup` block in
+`lib/content.ts` and confirms the file exists under `public/`: 28 paths checked, 0 missing.
+Grepped every changed file for em/en dashes: none. Not run: `next build`/`next dev` (a demo server
+is on :9157 for the client; out of bounds for this pass).
+
+**Decisions made, not asked:**
+1. Prices render exactly as printed ("$7.5", "$9.5"), not normalised to "$7.50".
+2. The "swap for tots +$1" note renders as "Swap for tots, add $1", the house no-em/en-dash rule
+   applied to what would otherwise read as a dash-flavoured aside; the plus signs in the combo copy
+   ("+$8", "regular fries + your choice of soda") are arithmetic, not dashes, and stay as printed.
+3. BBQ UPDATED.png's "trim to alpha bbox" step is a no-op (verified: alpha is 255 everywhere), kept
+   in the script anyway since a future re-export of that asset might not be.
+4. `additional photo.png` replaces `Cosmos General.png` as the spread source: the only difference
+   is the sparkle artifact, which has no business on a product photo.
+5. `/menu/cosmos-menu.png` (not `.webp`) is the "View the printed menu" link target: opened in a
+   new tab to be read or printed, PNG has the broadest right-click save/print support. The webp
+   export is kept for a future inline thumbnail; nothing links to it yet.
+
+**Untouched, on purpose:** `public/locations/`, `docs/handoffs/design_*`, `next.config.mjs`,
+security headers, motion layer, every non-menu section. No new dependency added.

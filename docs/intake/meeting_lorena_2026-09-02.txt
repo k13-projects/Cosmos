@@ -1,0 +1,978 @@
+NOTE (James, 2026-09-02): the auto-transcription misspells names. "Anna" = Lorena (THG), "Aaron" and "Erin" = Eren (THG principal). Read every occurrence accordingly.
+
+COSMOS WEBSITE CONTENT AND ANIMATION DECISIONS
+──────────────────────────────────────────────────
+Date: 9/2/2026, 12:02:40 PM
+Duration: 28m 23s
+Platform: desktop
+Messages: 309  |  AI Responses: 0
+
+SUMMARY
+──────────────────────────────────────────────────
+James and Lorena met to review Lobster Lab open items and define the Cosmos website content, design direction, and remaining dependencies. For Lobster Lab, the only current website update is the latest Skydeck menu, while DoorDash, GrubHub, licensing, and other outstanding information remain pending. For Cosmos, the menu should be presented as website content rather than only a PDF to support SEO, using content from the existing WordPress site where possible. Anna will confirm missing ordering links, footer contact information, menu parity, assets, and other pending details on 2026-09-02. Oceanside will receive a location card, and the site will use free fonts because Tiger Hospitality does not have the required Adobe Fonts license. James will continue refining the visual design and animation, but the more ambitious burger-drop hero animation depends on professional food video assets or a viable AI alternative.
+
+LOBSTER LAB AND SKYDECK WEBSITE UPDATES
+  • [00:02:15] The latest Skydeck menu, updated the previous week, is the only current content update needed on the website.
+  • [00:03:57] The overall Lobster Lab website look was considered acceptable, with no additional touch-ups identified.
+  • [00:01:31] DoorDash does not currently have an active link for the relevant site, and Group Hub does not have its link yet; Anna will request updates.
+  • [00:02:03] Anna confirmed the final icon files had already been sent, while Erin is expected to provide the licensing document.
+
+COSMOS MENU AND ORDERING CONTENT
+  • [00:07:06] Cosmos has one menu across all locations rather than separate location-specific menus.
+  • [00:07:28] Decision: the menu should be built into the website instead of being offered only as a PDF, because website content is better for SEO.
+  • [00:08:14] James can use the existing WordPress Cosmos site to obtain menu items instead of rebuilding the menu content from scratch; Anna will provide access.
+  • [00:08:44] Catering already has an ordering link, so a separate catering menu does not need to be created.
+  • [00:12:42] Anna must confirm whether the Cosmos PDF and existing website menu are identical before James finalizes the content source.
+
+COSMOS LOCATIONS AND ORDERING LINKS
+  • [00:13:05] Carlsbad and Oceanside DoorDash ordering links are already live and working.
+  • [00:13:23] Miramar and Global Fork ordering links still require confirmation; Station 8 was also included in the ordering-link review.
+  • [00:14:36] Decision: Oceanside should have a location card in the Cosmos locations section, rather than appearing only in the ordering pop-up list.
+  • [00:13:31] The Cosmos footer contact details remain unresolved; Anna will confirm which phone number and email address should be displayed.
+
+COSMOS BRAND COLORS, FONTS, AND PRODUCT LABELS
+  • [00:09:44] The proposed transparent purple treatment did not match the established brand identity and was considered visually weak.
+  • [00:10:28] James is open to a lighter purple, but the final color must be supplied or approved by the Cosmos team as a specific brand color code.
+  • [00:16:59] Decision: James will use free fonts because Anna could not confirm that Tiger Hospitality has an Adobe Fonts license for Horizon.
+  • [00:14:58] James will verify product names against the official menu rather than retaining generic labels such as chicken sandwich, smash burger, and crispy chicken.
+
+COSMOS HERO ANIMATION AND MEDIA DEPENDENCIES
+  • [00:06:00] The current Cosmos concept includes rotating elements during scrolling, arrow-based bestseller navigation, and review navigation.
+  • [00:23:48] Anna liked the existing element animation but requested a more attention-grabbing treatment for the cover area.
+  • [00:24:00] James proposed a burger-building animation using buns and patties dropping, colliding, and assembling in slow motion.
+  • [00:25:21] The ambitious animation is blocked by the lack of original professional food-filming assets; James may test AI, but original source material is still preferred.
+  • [00:25:37] Anna will check with Aaron because a professional photo shoot was planned for September 2026; if video cannot be produced, James will continue with the existing image.
+
+COSMOS PREVIEW REVIEW AND CHANGE CONTROL
+  • [00:21:28] James showed an early Cosmos build and stated that substantial fine-tuning remains, although the site was already in a usable shape.
+  • [00:26:31] The preview was available at cosmos@k13, and Anna asked whether Erin could review it; James said it could be available within about one hour on 2026-09-02.
+  • [00:27:16] James requested that future visual changes be documented item by item in email with screenshots and grouped into blocks of change requests.
+
+TRANSCRIPT
+──────────────────────────────────────────────────
+[12:02:48 PM] user:
+Hello, Anna.
+
+[12:02:48 PM] participant:
+Hi James, how are you today?
+
+[12:02:50 PM] user:
+I'm doing good, how about you?
+
+[12:02:53 PM] participant:
+I'm doing well, thanks for asking.
+
+[12:02:55 PM] user:
+Long time no see.
+
+[12:03:00 PM] participant:
+Yeah, long time no see you. So how have you been?
+
+[12:03:02 PM] user:
+I've been good, working hard.
+
+[12:03:06 PM] user:
+Things have been super busy for— on my end. I have a lot going on.
+
+[12:03:08 PM] participant:
+Great.
+
+[12:03:10 PM] user:
+But it's going, it's going well, you know. How about you?
+
+[12:03:11 PM] participant:
+Thanks.
+
+[12:03:22 PM] participant:
+A lot of things are happening in Tiger Hospitality because it has been long months with a lot of things to do because there are a lot of projects running now.
+
+[12:03:24 PM] participant:
+But it's okay by now.
+
+[12:03:27 PM] user:
+That's good, that's good, that's good business.
+
+[12:03:28 PM] participant:
+Oh.
+
+[12:03:33 PM] participant:
+Okay, now our next project is Cosmos.
+
+[12:03:41 PM] participant:
+I'm not sure if you already checked the folder I sent to you yesterday.
+
+[12:03:44 PM] participant:
+Wait.
+
+[12:03:45 PM] user:
+Yes, I did actually, and
+
+[12:04:00 PM] user:
+Yeah, go on. Uh, let's just, uh, first go over the, uh, open items for Lobster Lab if you want, because I have like something building up right now that while we are talking about that, I can show you later on for Cosmos. Okay.
+
+[12:04:01 PM] participant:
+Great.
+
+[12:04:05 PM] participant:
+Yes, I, I sent to you through the email.
+
+[12:04:08 PM] participant:
+my answer to the pending things.
+
+[12:04:10 PM] participant:
+Let me check.
+
+[12:04:11 PM] participant:
+Ready.
+
+[12:04:14 PM] participant:
+Yeah.
+
+[12:04:20 PM] participant:
+According with, uh, Durdash, we don't have the link active now.
+
+[12:04:23 PM] participant:
+Yet, but I will let you know as well, and also for our group hub.
+
+[12:04:26 PM] participant:
+They can't— they don't have it yet.
+
+[12:04:27 PM] user:
+Okay.
+
+[12:04:28 PM] participant:
+But I will ask.
+
+[12:04:38 PM] participant:
+to update this as soon as possible. Also, for the license, I already asked to Erin the document to forward it to you.
+
+[12:04:43 PM] participant:
+Because he said, yes, we have the license, but I don't have the, the document.
+
+[12:04:44 PM] user:
+Okay, no problem.
+
+[12:04:51 PM] participant:
+Yeah, and also for the icons, yes, there, there are the icons I sent to you last time.
+
+[12:04:54 PM] participant:
+There are the, the final ones.
+
+[12:04:55 PM] user:
+Sounds good.
+
+[12:05:03 PM] participant:
+And, um, I just sent to you the, the most updated menu.
+
+[12:05:04 PM] participant:
+For Skydeck.
+
+[12:05:16 PM] participant:
+For the— yes, the location of the Skydeck, because we updated this version last week. So if we can update this one on website, it will be great.
+
+[12:05:20 PM] user:
+Sounds good. I'm taking notes. Just give me a second.
+
+[12:05:22 PM] participant:
+No worries.
+
+[12:06:34 PM] user:
+All right, sounds good. Sorry about that.
+
+[12:06:45 PM] participant:
+No worries, perfect. So yeah, I just sent you the, the new menu, and this is the only thing by now that we need to update in that website.
+
+[12:06:49 PM] user:
+Okay, and we are happy with the overall look and everything?
+
+[12:06:52 PM] user:
+No need for like any other touch-ups?
+
+[12:06:53 PM] user:
+I agree.
+
+[12:06:55 PM] participant:
+Right.
+
+[12:06:57 PM] user:
+Okay, sounds good.
+
+[12:06:58 PM] user:
+I did.
+
+[12:07:04 PM] user:
+Take those notes. Let me see.
+
+[12:07:14 PM] participant:
+Yeah.
+
+[12:07:17 PM] user:
+Um, about the cosmos, um, you have some references as usual, but I didn't exactly get what exactly you want from these references.
+
+[12:07:22 PM] user:
+So it would be nice to just like kind of walk through a little bit for me to grab a few.
+
+[12:07:29 PM] user:
+Okay.
+
+[12:07:33 PM] participant:
+I only took one part of that website as a reference, because the other one, it's just an idea, no more, but let me show you, so if you want, I could share my screen.
+
+[12:07:34 PM] user:
+Yeah, go ahead.
+
+[12:07:35 PM] participant:
+Here.
+
+[12:07:39 PM] participant:
+Okay, here it is.
+
+[12:07:42 PM] participant:
+So
+
+[12:07:58 PM] participant:
+I'm not sure if you have a better idea of how to show this, this part that is the, the main part of the website, because it's only a picture. Just, I'm not sure if we can make any motion or anything like that.
+
+[12:08:03 PM] user:
+We can have some stuff. I have an idea, like I actually had a few ideas, but
+
+[12:08:20 PM] participant:
+Yeah, to explain the idea.
+
+[12:08:24 PM] participant:
+Oh.
+
+[12:08:25 PM] user:
+I wanted to see what you have first and I build on it and then bring my ideas on top of your design, you know, like I— that's what I want to do. But let's see, I have some ideas. they're really hard, so I'm gonna put the effort— I'm gonna put the effort once we have something that you guys like. I'm gonna put the effort in time.
+
+[12:08:29 PM] user:
+and get like additional changes later on, okay?
+
+[12:08:31 PM] participant:
+Got it. Perfect.
+
+[12:08:45 PM] user:
+We are on the same.
+
+[12:08:46 PM] user:
+Same idea, yeah.
+
+[12:08:48 PM] participant:
+So, okay, here is the about the, the brand, and I would like, meanwhile the user is scrolling down or scrolling up, the elements are rotating.
+
+[12:08:49 PM] participant:
+Maybe.
+
+[12:08:50 PM] user:
+Okay.
+
+[12:08:55 PM] participant:
+Um, And here for our bestsellers.
+
+[12:08:58 PM] participant:
+I was thinking, let me show you.
+
+[12:09:00 PM] participant:
+It's simple.
+
+[12:09:03 PM] participant:
+Sorry.
+
+[12:09:09 PM] participant:
+This reference or
+
+[12:09:17 PM] participant:
+This one.
+
+[12:09:21 PM] participant:
+Simple, just the arrows.
+
+[12:09:26 PM] participant:
+And we are showing the bestsellers. I already added to the folder.
+
+[12:09:30 PM] participant:
+Bestsellers folder with the pictures.
+
+[12:09:32 PM] participant:
+And also with them.
+
+[12:09:37 PM] participant:
+With the names of each product.
+
+[12:09:39 PM] user:
+Mm-hmm.
+
+[12:09:43 PM] participant:
+Explore our menu.
+
+[12:09:54 PM] participant:
+So we only have one menu. We don't have different menus according with the different locations. So it's easier probably.
+
+[12:10:16 PM] participant:
+In PDF, I'm not sure because we're in, in our current website, we have a website with the menu, so with all the products, but I'm not sure if we can do this in this website or just upload the The menu.
+
+[12:10:37 PM] user:
+No, it will be better, it will be better to have it in the website for SEO. Do you guys have the code? Do you own the code of this website as well, like Lobster? you guys didn't own the code, I had to like go in last night and like the last night before you guys lose access and to scrape everything from them.
+
+[12:10:38 PM] participant:
+Okay.
+
+[12:10:41 PM] user:
+In order to save the site. But what is the situation with this?
+
+[12:10:43 PM] user:
+Cosmos, do you have any idea?
+
+[12:10:48 PM] participant:
+Yes, I, I have, uh, the access of that website.
+
+[12:10:50 PM] participant:
+Let me check.
+
+[12:10:53 PM] participant:
+Lobster Cosmos.
+
+[12:10:57 PM] participant:
+Is this one, but I'm not sure.
+
+[12:11:02 PM] participant:
+Which platform is it? Ah yes, it's WordPress.
+
+[12:11:04 PM] user:
+Yeah, it's WordPress. Okay.
+
+[12:11:09 PM] participant:
+Yeah, so if you want, I could send to you the, the login information.
+
+[12:11:14 PM] participant:
+Okay.
+
+[12:11:17 PM] user:
+Yeah, please, please do, uh, as an email. That would be like, maybe I could just directly take the menu items from there.
+
+[12:11:19 PM] participant:
+Okay.
+
+[12:11:20 PM] participant:
+Yes, it is.
+
+[12:11:20 PM] user:
+So that I don't have to build from scratch, you know.
+
+[12:11:22 PM] participant:
+Yeah.
+
+[12:11:23 PM] participant:
+Okay.
+
+[12:11:32 PM] participant:
+And for order online, I already added some links to the Word document.
+
+[12:11:33 PM] user:
+Mm-hmm.
+
+[12:11:34 PM] participant:
+But it's missing some.
+
+[12:11:38 PM] participant:
+So I will try to update them this week.
+
+[12:11:39 PM] user:
+Okay.
+
+[12:11:40 PM] participant:
+Okay, Jane.
+
+[12:11:43 PM] participant:
+We already have a link.
+
+[12:11:47 PM] participant:
+for catering, so we don't need to create a menu.
+
+[12:11:49 PM] participant:
+For this.
+
+[12:12:01 PM] participant:
+For locations, I like it how you designed the locations for Lobster Lab website. I'm not sure we can apply the colors of the brand here and just that.
+
+[12:12:05 PM] participant:
+Or if you have any other idea, it would be great as well.
+
+[12:12:16 PM] participant:
+For reviews, I think that we could add just an arrow here and people can check all the reviews.
+
+[12:12:17 PM] participant:
+clicking on the arrow.
+
+[12:12:18 PM] participant:
+Just that.
+
+[12:12:20 PM] user:
+Sounds good.
+
+[12:12:21 PM] participant:
+Yeah, it is.
+
+[12:12:32 PM] participant:
+This is the idea, the general idea. And I was talking with Aaron because he wanted, um, this purple color in transparent.
+
+[12:12:40 PM] participant:
+And transparency, but I was checking on that and I don't like how it looks because, uh, let me show you.
+
+[12:12:42 PM] participant:
+No, it's not here.
+
+[12:12:59 PM] participant:
+But it doesn't look good because it's not the color of the brand identity like this. So he said that he will talk with you about what kind of options we can do with the color or with the transparency.
+
+[12:13:15 PM] participant:
+Mm-hmm.
+
+[12:13:16 PM] user:
+Okay, yeah, I mean, I'm open to go with lighter purple. Like, I personally like light purple, but the colors, brand colors, like you said It's been this popping, this heavy purple.
+
+[12:13:16 PM] participant:
+Yeah.
+
+[12:13:27 PM] participant:
+Okay.
+
+[12:13:27 PM] user:
+And it's all up to you guys, so whichever's given to me as a code, what, what color code is requested, I can take care of it, no problem.
+
+[12:13:29 PM] user:
+Yeah.
+
+[12:13:31 PM] participant:
+I think that this idea will be good option.
+
+[12:13:33 PM] participant:
+With this color.
+
+[12:13:37 PM] participant:
+identity, but let me check with him as well.
+
+[12:13:44 PM] user:
+No problem, sounds good. And I had a few questions. Let me find my notebook real quick.
+
+[12:14:35 PM] user:
+Burger Cosmos.
+
+[12:14:36 PM] user:
+Cosmos.
+
+[12:15:11 PM] user:
+Okay, so the questions I had
+
+[12:15:30 PM] user:
+We talked about that I can take it from the old site, but you are going to give me the PDF. Does the PDF and the website have any differences?
+
+[12:15:35 PM] user:
+Same manner. Perfect.
+
+[12:15:37 PM] participant:
+No, it's the same. So, and we could use the same of the website.
+
+[12:15:41 PM] participant:
+But I could take a look today and confirm you this one.
+
+[12:15:43 PM] participant:
+Yes.
+
+[12:15:44 PM] user:
+Okay, yeah, please do so. Let's get your confirmation on that.
+
+[12:15:53 PM] user:
+And the ordering links, Toast pickup delivery and DoorDash links are for Miramar.
+
+[12:15:57 PM] user:
+Global Fork and Station 8.
+
+[12:15:57 PM] participant:
+Uh, Yeah.
+
+[12:16:00 PM] user:
+Carlsbad and Oceanside, DoorDash.
+
+[12:16:02 PM] user:
+are already live.
+
+[12:16:03 PM] user:
+It's working.
+
+[12:16:11 PM] participant:
+Yeah, I already have Carlsbad and Oceanside, so I have to confirm Miramar and Global Fork links.
+
+[12:16:14 PM] user:
+And you have Station 8.
+
+[12:16:15 PM] participant:
+If
+
+[12:16:19 PM] user:
+And the contact info in the footer.
+
+[12:16:21 PM] participant:
+Okay.
+
+[12:16:23 PM] user:
+Should it show phone, email address, what do you want there?
+
+[12:16:27 PM] participant:
+I will confirm you this today.
+
+[12:16:31 PM] user:
+Okay, and Oceanside.
+
+[12:16:35 PM] user:
+It's in the ordering pop-up list but not in the location section.
+
+[12:16:40 PM] user:
+Intentional, or does Oceanside get a card? Do you want a card for Oceanside? Yeah, no.
+
+[12:16:43 PM] participant:
+No, let me check.
+
+[12:16:47 PM] participant:
+Are you checking on the current website or
+
+[12:16:49 PM] user:
+No, no, I'm checking from your notes.
+
+[12:16:52 PM] participant:
+Okay.
+
+[12:16:55 PM] participant:
+Let me check.
+
+[12:16:59 PM] user:
+In the locations, I didn't see it.
+
+[12:17:05 PM] participant:
+Location section, let me check.
+
+[12:17:24 PM] participant:
+Yes, I think that it would be good to have a card for Oceanside as well.
+
+[12:17:28 PM] participant:
+But Yeah.
+
+[12:17:31 PM] user:
+Oceanside.
+
+[12:17:46 PM] user:
+And I have to check the menu for the plate names because some of them I just named them chicken sandwich, smash burger, crispy chicken, but they're like— I can take them from the menu.
+
+[12:17:47 PM] participant:
+Okay.
+
+[12:17:51 PM] user:
+And 6.
+
+[12:17:52 PM] user:
+Review.
+
+[12:17:55 PM] user:
+For the item names.
+
+[12:18:14 PM] user:
+Okay, and let's go over again so I take my notes on my end as well. So the first one was menu, take it from Cosmos.
+
+[12:18:18 PM] user:
+The site is cosmosburger.com, right?
+
+[12:18:19 PM] participant:
+Yeah.
+
+[12:18:32 PM] user:
+And you also sent me the Menu, right? Or was it lobster? It was lobster.
+
+[12:18:38 PM] user:
+I should have the— I don't have the menu PDF on Cosmos yet then, right, from you?
+
+[12:18:38 PM] participant:
+No kids.
+
+[12:18:39 PM] user:
+Okay.
+
+[12:18:44 PM] participant:
+Yeah, but if you want, I could add it on, on our folder as well.
+
+[12:18:46 PM] user:
+Yeah, that would be great.
+
+[12:18:48 PM] participant:
+But I think that it's very— only great from website.
+
+[12:18:51 PM] user:
+No, you can send me in the, uh, like, up to you, you can do both.
+
+[12:18:52 PM] participant:
+Perfect.
+
+[12:18:53 PM] user:
+Send me email, put it there, all good.
+
+[12:18:55 PM] participant:
+Okay.
+
+[12:19:03 PM] user:
+I don't have it. We are going to get it soon from Lorena.
+
+[12:19:06 PM] user:
+And then number 2.
+
+[12:19:08 PM] user:
+Ordering links.
+
+[12:19:10 PM] user:
+Correct.
+
+[12:19:15 PM] user:
+3, contact info.
+
+[12:19:18 PM] user:
+You are going to get back to me on the contact info, right?
+
+[12:19:23 PM] participant:
+Yeah, I will confirm this with the team as well.
+
+[12:19:47 PM] user:
+Okay, number 3, number 4, Oceanside location. We just answered that. Add the card for Oceanside. The 5th— oh yeah, font. So So does Tiger Hospitality have the Adobe Fonts license for Horizon? Do you know, like, do we have any licenses for the fonts?
+
+[12:19:50 PM] participant:
+No, I don't.
+
+[12:19:50 PM] user:
+Okay, so I'm gonna go with the free.
+
+[12:19:55 PM] user:
+Go with the free.
+
+[12:19:57 PM] participant:
+Thanks. Yes, because I don't have that license.
+
+[12:21:17 PM] user:
+Okay, I'm just doing a deployment so I can see if I can show you this, what I built so far.
+
+[12:21:20 PM] participant:
+Perfect.
+
+[12:23:40 PM] user:
+Okay, while this is doing, uh, let me just share it and show it on my end, okay?
+
+[12:23:43 PM] participant:
+Yeah, no worries.
+
+[12:24:07 PM] user:
+All right, can you see it?
+
+[12:24:08 PM] participant:
+Yeah.
+
+[12:24:10 PM] participant:
+I can see it.
+
+[12:24:16 PM] user:
+Okay, so of course there's gonna be a lot of fine-tuning, but right now, after— like, I saw your message last night.
+
+[12:24:18 PM] user:
+Started building some stuff.
+
+[12:24:21 PM] participant:
+So fast.
+
+[12:24:25 PM] participant:
+Great. Yeah, that was the idea. Great. Yeah.
+
+[12:24:30 PM] participant:
+Zoom.
+
+[12:24:37 PM] participant:
+Yeah.
+
+[12:24:43 PM] participant:
+Zoom.
+
+[12:24:45 PM] user:
+We can add some sort of movement here so that like it will be with the effect, but for now We have the bestsellers.
+
+[12:24:55 PM] user:
+Yes.
+
+[12:25:00 PM] participant:
+I need to change that picture, because I need to read that one and this, the line between the table. Yeah.
+
+[12:25:02 PM] participant:
+I need to do that.
+
+[12:25:03 PM] participant:
+I will send you it today.
+
+[12:25:05 PM] user:
+Okay, no problem.
+
+[12:25:06 PM] participant:
+Sweet.
+
+[12:25:07 PM] participant:
+image.
+
+[12:25:10 PM] participant:
+Okay.
+
+[12:25:11 PM] participant:
+Mm-hmm.
+
+[12:25:26 PM] user:
+Maybe we can some sort of— if these each have the logos of windmill or like a photo of the outside, some kind of graphic. that we can use right here. This right bottom is empty.
+
+[12:25:28 PM] participant:
+Okay.
+
+[12:25:32 PM] user:
+It could like help people understand the difference. They all look very similar right now.
+
+[12:25:34 PM] user:
+So
+
+[12:25:39 PM] participant:
+Yeah, okay, I will, I will send you some images of the fake cakes. It could work.
+
+[12:25:47 PM] user:
+Okay, I'm just like trying to come up with an idea. If you have any other ideas, let me know.
+
+[12:25:48 PM] participant:
+Mm-hmm.
+
+[12:25:50 PM] user:
+And here's the reviews.
+
+[12:25:53 PM] participant:
+Mm-hmm.
+
+[12:25:58 PM] user:
+And there we go.
+
+[12:26:00 PM] participant:
+Great.
+
+[12:26:01 PM] participant:
+Okay.
+
+[12:26:09 PM] user:
+There's need to be a lot of fine-tuning needs to be done.
+
+[12:26:13 PM] participant:
+Mm-hmm.
+
+[12:26:14 PM] user:
+But so far This is where we are, okay?
+
+[12:26:36 PM] participant:
+Yes, I like that. I love that. And I love this part of the elements, the animation that you made. But yes, I don't know if we can add something. More catchy to, to this part of the cover. Sure, yeah.
+
+[12:26:40 PM] user:
+Yeah, I'm going to work on it. I'm going to zoom out a little bit.
+
+[12:26:41 PM] participant:
+Yeah.
+
+[12:26:48 PM] user:
+And then I have an idea, like we could use some sort of a video where these just like drop from the top.
+
+[12:26:49 PM] participant:
+Mm-hmm.
+
+[12:27:00 PM] participant:
+Okay.
+
+[12:27:00 PM] participant:
+Sounds good.
+
+[12:27:03 PM] participant:
+Yeah.
+
+[12:27:06 PM] user:
+Piece by piece and like shake, and it will be like coming down a bit like patties and buns, and it's like raining down and then like coming together and shaking like that. Something Something like that. I have it in my mind, but I don't know if I have the skills to
+
+[12:27:10 PM] participant:
+But I understand. Yeah, I like that.
+
+[12:27:19 PM] participant:
+Mm-hmm.
+
+[12:27:22 PM] user:
+turn it into— if you could like actually do like a photo shoot in 8K or like a special, you know, like they do these lenses very Very zooming in, but it's like the top quality video.
+
+[12:27:25 PM] user:
+And in slow motion, if I can.
+
+[12:27:26 PM] user:
+Get these.
+
+[12:27:39 PM] user:
+Buns like going from piece by piece, a short video of couple burgers being dropped from the top and just like hitting on each other and becoming the burger.
+
+[12:27:50 PM] user:
+If you can get me a video like that in a professional food filming way, you know, in a real photo shoot.
+
+[12:27:52 PM] user:
+It is.
+
+[12:27:57 PM] participant:
+And is it possible with AI? Because I can't do it because I'm Yeah.
+
+[12:28:05 PM] participant:
+Yeah.
+
+[12:28:09 PM] user:
+It is, but I still need the originals, you know. Like, I mean, it could be so much easier if you're just like— if you guys are doing this kind of photo shoots at any of these places, always have the this kind of a video in your mind because I could use it and it would pop so well.
+
+[12:28:14 PM] user:
+I'm going to try with AI, of course, but Let's see.
+
+[12:28:17 PM] participant:
+Yeah, let me tell you.
+
+[12:28:18 PM] participant:
+Aaron?
+
+[12:28:19 PM] user:
+I just don't want to hold on for this. This is gonna take a long time.
+
+[12:28:25 PM] participant:
+Then let me talk with Aaron because they were planning a photo shoot this month.
+
+[12:28:35 PM] participant:
+So if it will be possible, it will be great, but I will let you know if it's possible. If not, just, just let's try to do something with this picture.
+
+[12:28:41 PM] participant:
+Great.
+
+[12:28:45 PM] user:
+Yeah, I'm gonna work on it. I'm just saying, like, anything comes up, you have this idea for any of the brands, that kind of video I could use and make people do like, wow, you know.
+
+[12:28:46 PM] participant:
+Okay.
+
+[12:28:48 PM] user:
+But I need that kind of material.
+
+[12:28:51 PM] participant:
+Yeah, I know. Thank you so much.
+
+[12:28:52 PM] user:
+No problem.
+
+[12:28:56 PM] participant:
+So I will work on the pending information.
+
+[12:29:00 PM] participant:
+for you today. I will— I hope to send you it today.
+
+[12:29:01 PM] user:
+Okay.
+
+[12:29:05 PM] participant:
+And just that, yeah, I think that I can do it.
+
+[12:29:06 PM] participant:
+Okay.
+
+[12:29:08 PM] participant:
+Nice.
+
+[12:29:14 PM] participant:
+Sorry.
+
+[12:29:16 PM] user:
+Yeah, sounds good. I mean, we are in a good shape. As you can see, we can deploy today and it will still be a good website, you know. So, but we are gonna work, huh?
+
+[12:29:19 PM] participant:
+Great. Can Erin have this preview?
+
+[12:29:23 PM] participant:
+Check this preview if he has any, any
+
+[12:29:27 PM] user:
+Maybe in an hour, because right now it's in my local branch, uh, the old one.
+
+[12:29:29 PM] user:
+The actual one.
+
+[12:29:35 PM] participant:
+Yeah.
+
+[12:29:38 PM] user:
+Is cosmos@k13, is my preview site, but it's not the final version. Oh, it's actually right now the final version. Okay.
+
+[12:29:40 PM] participant:
+Okay, great. Perfect. Yes.
+
+[12:29:41 PM] user:
+Yeah, and I can see it now.
+
+[12:29:46 PM] participant:
+Perfect. I will let you know when I update all the pending pictures.
+
+[12:29:47 PM] user:
+Okay.
+
+[12:29:47 PM] participant:
+As well.
+
+[12:29:50 PM] participant:
+And I would
+
+[12:30:04 PM] user:
+And again, if you want to go and like go item by item screenshot and write down, hey, like if you can make this square, the more round, less round, all kinds of detailed fixes you would like.
+
+[12:30:13 PM] user:
+Always name them on email, add screenshots, and just send it to me. Okay, you can do like in blocks of change requests.
+
+[12:30:14 PM] user:
+And I will see.
+
+[12:30:21 PM] user:
+fast I can take care of them. If I can't, I will let you know. You can always like write me these kind of small fixes, okay?
+
+[12:30:24 PM] participant:
+Great, perfect. Thank you so much.
+
+[12:30:26 PM] user:
+Sounds good.
+
+[12:30:30 PM] participant:
+Great, so that's all by now. Yeah.
+
+[12:30:30 PM] user:
+Mm-hmm.
+
+[12:30:31 PM] user:
+No, that's it.
+
+[12:30:33 PM] participant:
+Okay.
+
+[12:30:38 PM] participant:
+Okay.
+
+[12:30:38 PM] user:
+If you have any other open items from other projects or anything, let me know.
+
+[12:30:41 PM] participant:
+Perfect. Thank you so much for your time.
+
+[12:30:42 PM] user:
+No problem, take care.
+
+[12:30:44 PM] participant:
+Okay, bye-bye. Have a nice day.
+
+[12:30:46 PM] user:
+You too, bye.
+
+[12:30:47 PM] participant:
+Bye.

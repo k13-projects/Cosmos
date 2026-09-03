@@ -16,8 +16,9 @@
 - **Shortcode:** `cosmos`   ·   **Deploy:** Vercel, project `cosmos` (team katalizor-kazims-projects), auto-deploys `main`   ·   **Repo:** https://github.com/k13-projects/Cosmos.git
 - **Sibling:** `LobsterLab` is the nearest sibling (same client, same designer Lorena, same
   one-pager-with-pop-ups shape) — read its `CLAUDE.md` before building. Cosmos Burger has its
-  **own** brand: magenta `#CD1AE0` / yellow `#FAF00C` / purple `#751080`, Horizon (stand-in
-  Archivo) + Poppins. Never Tiger's black/gold Bebas Neue identity, never Lobster Lab's
+  **own** brand: magenta `#CD1AE0` / yellow `#FAF00C` / purple `#751080`, Archivo (the guide's
+  face is Horizon, an Adobe Font; Archivo ships permanently, Kazim 2026-09-02) + Poppins. Never
+  Tiger's black/gold Bebas Neue identity, never Lobster Lab's
   navy/orange Sofia Pro Narrow.
 
 ## Stakeholder preview

@@ -87,6 +87,57 @@ export function MenuPlaceholderIcon({ className = "" }: IconProps) {
   return <BurgerIcon className={className} />;
 }
 
+/**
+ * Menu glyphs: the small chilli and "V" disc the printed menu (Lorena,
+ * COSMOS MENU.png, 2026-09-02) marks spicy and vegetarian items with. Colours
+ * are sampled from that image and live as tokens in `app/globals.css`
+ * (`--color-chilli*`, `--color-veg`), not hardcoded here.
+ */
+function SpicyIcon({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className={className}>
+      <circle cx="12" cy="12" r="12" fill="var(--color-chilli-bg)" />
+      <path
+        d="M12.6 8.6c-.7-1-.2-2 .7-2.4"
+        stroke="var(--color-chilli-stem)"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M8.3 9.2c-2.3 1.9-2.6 5.1-.7 7 2 2 5.6 1.7 7.9-.5 1.9-1.9 2.3-4.6.9-6.3-1.5-1.8-4.7-1.9-7.1-.5-1 .6-1.8 1.3-2.2 1.9-1 1.4-.6 3.3.8 4.5"
+        fill="var(--color-chilli)"
+      />
+    </svg>
+  );
+}
+
+/**
+ * The checkmark takes its colour from `currentColor` (`text-cream` in
+ * practice) rather than a fixed white token, same convention as the burger /
+ * vibes / fresh icons above.
+ */
+function VegetarianIcon({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className={className}>
+      <circle cx="12" cy="12" r="12" fill="var(--color-veg)" />
+      <path
+        d="M8.4 8.4 12 15.6l3.6-7.2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+export const menuTagIcons: Record<"spicy" | "vegetarian", (p: IconProps) => React.ReactElement> = {
+  spicy: SpicyIcon,
+  vegetarian: VegetarianIcon,
+};
+
 /* -------------------------------------------------------------------------- */
 /* Socials                                                                     */
 /* -------------------------------------------------------------------------- */

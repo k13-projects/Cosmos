@@ -14,7 +14,7 @@ shape, its own brand).
 
 ## Success criteria
 - The full blueprint renders section-by-section in code: hero, About, Values, Best Sellers
-  carousel, Menu CTA band, Catering, Locations (4 food halls), Reviews, footer, plus the two
+  carousel, Menu CTA band, Catering, Locations (5 locations (4 food halls plus Oceanside)), Reviews, footer, plus the two
   pop-ups (menu, order online).
 - Cosmos Burger's own brand ships (magenta `#CD1AE0` / yellow `#FAF00C` / purple `#751080` /
   cream `#FFF2E1`, Horizon-style display via the Archivo stand-in, Poppins body) — never THG's

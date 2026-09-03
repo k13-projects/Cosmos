@@ -3,13 +3,13 @@ import { Poppins, Archivo } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import { LogoSprite } from "@/components/CosmosLogo";
-import { isProduction, locations, site } from "@/lib/content";
+import { isProduction, locations, menuStructuredData, site } from "@/lib/content";
 
 /**
- * Brand face is Horizon (Adobe Font, not free) for display, Poppins for body,
- * buttons and nav (guide + mockup, facts SS3). Archivo at its widest width axis,
- * weight 900, is the free stand-in for Horizon, closest wide-geometric match.
- * The swap point is isolated to --font-display in globals.css, see facts SS6.5.
+ * Poppins for body, buttons and nav (guide + mockup, facts SS3). Display face
+ * ships as Archivo at its widest width axis, weight 900, permanently (Kazim,
+ * 2026-09-02): the guide itself was set in Horizon (Adobe Font, not free),
+ * Archivo is the wide-geometric match K13 chose in its place. See facts SS6.5.
  */
 const body = Poppins({
   subsets: ["latin"],
@@ -70,26 +70,39 @@ export const viewport: Viewport = {
  * Restaurant schema, one entry per hall, so each counter can rank locally.
  * Station 8 is included with its Coming Soon status carried as `openingHours`
  * omitted rather than a fabricated opening time.
+ *
+ * One shared `Menu` object (built from the same `menuPopup` data the pop-up
+ * renders, see `lib/content.ts`) carries the real prices; every Restaurant's
+ * `hasMenu` points at it by `@id` rather than repeating the whole menu five
+ * times. Decided at the James/Lorena meeting 2026-09-02: the menu is website
+ * content, not only a PDF, for SEO.
  */
 function structuredData() {
+  const menuId = `${site.url}/#menu`;
+  const menu = menuStructuredData(menuId);
+
   return {
     "@context": "https://schema.org",
-    "@graph": locations.map((l) => ({
-      "@type": "Restaurant",
-      name: `${site.name}, ${l.name}`,
-      servesCuisine: ["American", "Burgers"],
-      priceRange: "$$",
-      url: site.url,
-      image: `${site.url}/opengraph-image`,
-      sameAs: [site.instagram, site.facebook, site.tiktok],
-      address: { "@type": "PostalAddress", streetAddress: l.address },
-      ...(l.status ? {} : { openingHours: "Mo-Su 11:00-21:00" }),
-      parentOrganization: {
-        "@type": "Organization",
-        name: site.operator,
-        url: site.operatorUrl,
-      },
-    })),
+    "@graph": [
+      menu,
+      ...locations.map((l) => ({
+        "@type": "Restaurant",
+        name: `${site.name}, ${l.name}`,
+        servesCuisine: ["American", "Burgers"],
+        priceRange: "$$",
+        url: site.url,
+        image: `${site.url}/opengraph-image`,
+        sameAs: [site.instagram, site.facebook, site.tiktok],
+        address: { "@type": "PostalAddress", streetAddress: l.address },
+        ...(l.status ? {} : { openingHours: "Mo-Su 11:00-21:00" }),
+        hasMenu: { "@id": menuId },
+        parentOrganization: {
+          "@type": "Organization",
+          name: site.operator,
+          url: site.operatorUrl,
+        },
+      })),
+    ],
   };
 }
 

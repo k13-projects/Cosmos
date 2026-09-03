@@ -10,7 +10,11 @@
  *                 read into docs/intake/BLUEPRINT_FACTS_2026-09-02.md SS4
  *   socials    -> the live site burgerscosmos.com (facts SS1); the docx left
  *                 FOLLOW US blank
- *   menu items -> the live site's item list (facts SS5). No menu file supplied.
+ *   menu items -> Lorena, COSMOS MENU.png, 2026-09-02 (Cosmos Assets/LORENA
+ *                 UPDATE 2026-09-02/), transcribed directly from the image:
+ *                 names, prices, descriptions, spicy/vegetarian marks, the
+ *                 combo offer and the allergen line. Supersedes the old
+ *                 site's item list this build shipped with first.
  *   reviews    -> the docx, verbatim, attribution deliberately non-identifying
  *
  * HOUSE COPY RULES APPLIED (facts SS6.6)
@@ -141,25 +145,22 @@ export const about = {
    * seam into the values band. The client folder is literally named "Burgers
    * circle". components/PlateWheel.tsx rebuilds that geometry.
    *
-   * NAMES. Three plates are pixel-identical to a named best-seller cutout in
-   * `Cosmos Assets/PHOTOS/Best Sellers/` (RGB RMSE after alpha-bbox crop and
-   * resize: plate 1 -> blue-cheese 50.5, plate 4 -> cosmos-burger 53.0, plate 5
-   * -> spicy-jam 49.4, each a clear win over its runner-up). The other three
-   * match nothing we hold a name for, so they carry an honest generic label
-   * rather than an invented menu name.
+   * NAMES. Matched by photo against the old site's item shots (James,
+   * 2026-09-02, `Cosmos Assets/OLD SITE MENU/`), one glance per plate rather
+   * than pixel RMSE: plate 1 -> Blue cheese, plate 2 -> BBQ chicken sandwich,
+   * plate 3 -> Better Mac burger, plate 4 -> Cosmos burger, plate 5 -> Spicy
+   * jam, plate 6 -> Hot Chicks sandwich. `.display` already renders names in
+   * caps, so these stay natural case here.
    *
-   * TODO(client, Lorena): confirm the three generic labels, marked below.
+   * TODO(client, Lorena): confirm all six against the real menu.
    */
   plates: [
     { src: "/menu/plates/1.png", width: 845, height: 507, name: "Blue cheese" },
-    // generic: crispy chicken sandwich, red glaze and slaw. Likely "Hot Chicks".
-    { src: "/menu/plates/2.png", width: 1003, height: 700, name: "Chicken sandwich" },
-    // generic: double smash, cheese, shredded lettuce. Likely "The Basic".
-    { src: "/menu/plates/3.png", width: 1083, height: 632, name: "Smash burger" },
+    { src: "/menu/plates/2.png", width: 1003, height: 700, name: "BBQ chicken sandwich" },
+    { src: "/menu/plates/3.png", width: 1083, height: 632, name: "Better Mac burger" },
     { src: "/menu/plates/4.png", width: 1178, height: 684, name: "Cosmos burger" },
     { src: "/menu/plates/5.png", width: 1200, height: 663, name: "Spicy jam" },
-    // generic: crispy chicken with purple slaw. Likely "Truffle Honey".
-    { src: "/menu/plates/6.png", width: 1020, height: 646, name: "Crispy chicken" },
+    { src: "/menu/plates/6.png", width: 1020, height: 646, name: "Hot Chicks sandwich" },
   ],
   /** Helper text under the wheel's first plate, for keyboard and screen reader. */
   platesHint: "Open the full menu",
@@ -300,12 +301,14 @@ export const hero = {
 /* -------------------------------------------------------------------------- */
 /* Locations                                                                   */
 /*                                                                             */
-/* Four food halls, exactly as the docx and the blueprint list them. Oceanside  */
-/* is deliberately NOT here: the docx puts it in the ORDER ONLINE pop-up only,  */
-/* not in the LOCATIONS section, even though the current live site treats it as */
-/* a flagship. Followed literally per facts SS6.1 and flagged for Lorena.       */
+/* Five food halls. The docx and blueprint list four; Oceanside was docx-only, */
+/* order-pop-up-only, even though the current live site treats it as a         */
+/* flagship. Kazim decided (2026-09-02) it gets a full Locations card too, so   */
+/* it is now in this array like every other hall, placed right after Carlsbad. */
 /*                                                                             */
-/* Hours are the docx's single 11:00 AM to 9:00 PM for all four (facts SS6.9).  */
+/* Hours are the docx's single 11:00 AM to 9:00 PM for the original four       */
+/* (facts SS6.9); Oceanside's own hours and phone are the live site's           */
+/* (burgerscosmos.com, captured 2026-09-02), since the docx never covered it.   */
 /* Station 8's address follows the docx, which disagrees with THG-Website       */
 /* (9145 Scholars Drive South); the docx is newer and the client's own          */
 /* (facts SS6.7).                                                              */
@@ -321,17 +324,21 @@ export type Location = {
   mapsQuery: string;
   /** Set only when the location is NOT simply trading, so it stays meaningful. */
   status?: "Coming Soon";
+  /**
+   * Public phone number, display format. Rendered with `telHref` below.
+   * Confirmed for Oceanside only (live site); the other four have none
+   * confirmed yet, so the field stays optional rather than guessed.
+   */
+  phone?: string;
   /** Storefronts for THIS location. Empty string = not connected yet. */
   ordering: OrderLinks;
 };
 
 /**
- * `(760) 607-9227` -> `+17606079227`, for a `tel:` href.
+ * `(760) 607-7083` -> `+17606077083`, for a `tel:` href.
  *
  * Kept as a helper rather than a second field per location so the display
- * string and the dial string can never drift. Unused today because no phone
- * number is confirmed for the halls (see `contact` below), and kept because the
- * moment the client supplies one it is the only correct way to render it.
+ * string and the dial string can never drift.
  */
 export function telHref(phone: string): string {
   return `tel:+1${phone.replace(/\D/g, "")}`;
@@ -350,6 +357,26 @@ export const locations: Location[] = [
       toastDelivery: "",
       // Public on burgerscosmos.com; the locale prefix has been stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-carlsbad-26018232/29386346/",
+    },
+  },
+  {
+    // Oceanside (Kazim, 2026-09-02): promoted from the order-pop-up-only row
+    // it used to be to a full Locations card, placed right after Carlsbad.
+    // Address, hours and phone are the live site's (burgerscosmos.com,
+    // captured 2026-09-02); the docx never covered this hall at all.
+    id: "oceanside",
+    area: "Oceanside",
+    name: "Cosmos Burger Oceanside",
+    address: "208 N Coast Hwy, Oceanside, CA 92054",
+    hours: "Mon to Thu 11:00 AM to 8:45 PM, Fri and Sat to 9:45 PM, Sun to 8:45 PM",
+    mapsQuery: "Cosmos Burger, 208 N Coast Hwy, Oceanside, CA 92054",
+    phone: "(760) 607-7083",
+    ordering: {
+      toastPickup: "",
+      toastDelivery: "",
+      // Public on burgerscosmos.com; the locale prefix has been stripped.
+      doordash:
+        "https://www.doordash.com/store/cosmos-burger-oceanside-oceanside-25982698/51403146/",
     },
   },
   {
@@ -385,34 +412,14 @@ export const locations: Location[] = [
 ];
 
 /**
- * The ORDER ONLINE pop-up's own list. It is NOT `locations`: the docx lists
- * five rows here and only four cards in the Locations section, the extra row
- * being Oceanside (facts SS5, SS6.1). Kept as a separate list so the pop-up can
- * carry Oceanside without inventing a location card for it.
+ * The ORDER ONLINE pop-up's own list. Used to diverge from `locations`
+ * (Oceanside was a pop-up-only row, invented nowhere else); now that
+ * Oceanside has a real Locations card too, every hall has exactly one row in
+ * each place, from the same object, so the pop-up is simply the same list.
+ * Kept as its own export, rather than importing `locations` directly at every
+ * call site, so a future divergence has one place to happen again.
  */
-export const orderRows: Location[] = [
-  locations[0],
-  {
-    id: "oceanside",
-    area: "Oceanside",
-    // The docx says only "Oceanside". The street address below is from the
-    // current live site and is shown in the pop-up for recognition only.
-    name: "208 N Coast Hwy",
-    address: "208 N Coast Hwy, Oceanside, CA 92054",
-    hours: "11:00 AM to 9:00 PM",
-    mapsQuery: "Cosmos Burger, 208 N Coast Hwy, Oceanside, CA 92054",
-    ordering: {
-      toastPickup: "",
-      toastDelivery: "",
-      // Public on burgerscosmos.com; the locale prefix has been stripped.
-      doordash:
-        "https://www.doordash.com/store/cosmos-burger-oceanside-oceanside-25982698/51403146/",
-    },
-  },
-  locations[1],
-  locations[2],
-  locations[3],
-];
+export const orderRows: Location[] = locations;
 
 export const orderPopup = {
   title: "Order Online",
@@ -428,132 +435,335 @@ export const orderPopup = {
 /* -------------------------------------------------------------------------- */
 /* Menu pop-up                                                                 */
 /*                                                                             */
-/* TODO(client, Lorena): no menu file was supplied. Categories and item names   */
-/* below come from the current live site (facts SS5). There are NO prices       */
-/* anywhere, by decision, because none were supplied and an invented price is   */
-/* worse than none. Descriptions exist only for the five signature items and    */
-/* every one of them is drawn from the client's own docx wording, nothing is    */
-/* written for them here.                                                      */
+/* Lorena, COSMOS MENU.png, 2026-09-02. Transcribed directly from the image     */
+/* (Cosmos Assets/LORENA UPDATE 2026-09-02/), cross-checked item by item:       */
+/* every name, price, description, spicy/vegetarian mark, the combo offer and   */
+/* the allergen footer line are the client's own printed menu, verbatim.        */
 /*                                                                             */
-/* Photos: the five best-seller cutouts are the only item photography we have.  */
-/* The six plate cutouts are NOT reused for other items: their dishes cannot be */
-/* matched to a menu name with confidence, and a burger photographed under the  */
-/* wrong name is a promise the kitchen cannot keep. Everything else gets the    */
-/* branded placeholder tile.                                                   */
+/* Kids Burger, Tiramisu, Bundle for 4, Drinks and a standalone "More" category  */
+/* existed in the old-site-derived build; none are on the real menu, so all     */
+/* five are gone. Cauliflower Bites moved into Sides, where the real menu puts  */
+/* it. "Chicks Fries" and "Frings" keep the menu's own spelling.                */
+/*                                                                             */
+/* Photos: unchanged from the old-site pass except BBQ (Lorena sent an updated  */
+/* shot, `BBQ UPDATED.png`, replacing `menu/items/bbq-burger.webp`). Frings and */
+/* Cauliflower Bites have no photo on file, so both render the branded          */
+/* placeholder tile, same as any item with no photo.                           */
 /* -------------------------------------------------------------------------- */
 
 export type MenuItem = {
   name: string;
-  /** Only where the client's own copy supports one. */
+  /** Printed exactly as the menu shows it, e.g. "$13", "$7.5" (not "$7.50"). */
+  price: string;
+  /** Only where the printed menu carries one (the sides below $7.5 do not). */
   description?: string;
   /** Only where we hold real photography of this exact item. */
   image?: { src: string; alt: string };
+  tags?: ("spicy" | "vegetarian")[];
+  /** e.g. "Swap for tots, add $1" (Monkey/Chicks/Cosmos Fries). */
+  note?: string;
 };
 
-export type MenuCategory = { id: string; title: string; items: MenuItem[] };
+export type MenuCategory = {
+  id: string;
+  title: string;
+  /** The italic line under a header, e.g. "Served with signature Cosmos sauce and pickles". */
+  note?: string;
+  items: MenuItem[];
+};
+
+/** Order + label for the spicy/vegetarian legend at the foot of the panel. */
+export const menuTagLabels: Record<"spicy" | "vegetarian", string> = {
+  spicy: "Spicy",
+  vegetarian: "Vegetarian",
+};
+export const menuTagOrder: ("spicy" | "vegetarian")[] = ["spicy", "vegetarian"];
 
 export const menuPopup = {
   title: "Our Menu",
-  subtitle: "Everything we serve, across all four food halls.",
+  subtitle: "Everything we serve, across all five locations.",
   orderCta: "Order",
-  /** The honest gap, stated on the page rather than hidden. */
-  note: "Full menu with prices coming soon.",
+  /** Opens the exported source PNG in a new tab. */
+  printedMenuHref: "/menu/cosmos-menu.png",
+  printedMenuLabel: "View the printed menu",
+  /** The combo card at the bottom of Sides, printed menu, verbatim. */
+  combo: {
+    heading: "Upgrade your favorite item into a combo!",
+    body: "Just +$8 for fries and a can of soda. Enjoy regular fries + your choice of soda (Diet Coke, Coca-Cola, Sprite, or Dr. Pepper). No substitutions available.",
+  },
+  /** The allergen footer line, printed menu, verbatim. */
+  note: "May contain allergens. Inform us of any allergies.",
   categories: [
     {
       id: "burgers",
       title: "Burgers",
       items: [
-        { name: "BBQ" },
-        { name: "Better Mac" },
         {
-          name: "Blue Cheese",
-          description: "A favorite in our guest reviews.",
-          image: {
-            src: "/menu/best-sellers/blue-cheese.png",
-            alt: "The Blue Cheese smash burger with crumbled blue cheese, lettuce and caramelised onion",
-          },
+          name: "The Basic",
+          price: "$13",
+          description: "Ketchup, mustard, onion, pickles, cheddar cheese, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/the-basic-burger.webp", alt: "The Basic Burger" },
         },
         {
           name: "Cosmos",
-          description: "Our signature Cosmos Burger.",
+          price: "$13",
+          description:
+            "Cosmos sauce, caramelized onion, cheddar cheese, pickles, 6oz Cosmos patty with brioche bun",
           image: {
-            src: "/menu/best-sellers/cosmos-burger.png",
+            src: "/menu/items/cosmos-burger.webp",
             alt: "The Cosmos Burger, a double smash burger with cheese and pickles",
           },
         },
         {
+          name: "Truffle",
+          price: "$15",
+          description:
+            "Truffle aioli, caramelized onion, cheddar cheese, pickles, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/truffle-burger.webp", alt: "Truffle Burger" },
+        },
+        {
+          name: "Better Mac",
+          price: "$15",
+          description:
+            "Better mac sauce, onion, lettuce, cheddar cheese, pickles, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/better-mac-burger.webp", alt: "Better Mac Burger" },
+        },
+        {
           name: "Spicy Jam",
-          description: "Our signature Spicy Jam Burger.",
+          price: "$15",
+          tags: ["spicy"],
+          description:
+            "Herb aioli, onion, serrano jam, cheddar cheese, pickles, lettuce, 6oz Cosmos patty with brioche bun",
           image: {
-            src: "/menu/best-sellers/spicy-jam.png",
+            src: "/menu/items/spicy-jam-burger.webp",
             alt: "The Spicy Jam smash burger on a white plate",
           },
         },
-        { name: "The Basic" },
-        { name: "Truffle" },
-        { name: "Vegetarian" },
+        {
+          name: "BBQ",
+          price: "$15",
+          description:
+            "House made BBQ, crunchy onion, apple wood bacon, cheddar cheese, 6oz Cosmos patty with brioche bun",
+          image: { src: "/menu/items/bbq-burger.webp", alt: "BBQ Burger" },
+        },
+        {
+          name: "Blue Cheese",
+          price: "$16",
+          description:
+            "Herb aioli, caramelized onion, arugula, blue cheese, pickles, 6oz Cosmos patty with brioche bun",
+          image: {
+            src: "/menu/items/blue-cheese-burger.webp",
+            alt: "The Blue Cheese smash burger with crumbled blue cheese, lettuce and caramelised onion",
+          },
+        },
+        {
+          name: "Vegetarian",
+          price: "$15",
+          tags: ["vegetarian"],
+          description:
+            "Herb aioli, cheddar cheese, pickled onions, pickles, lettuce, cauliflower fried patty with brioche bun",
+          image: { src: "/menu/items/vegetarian-burger.webp", alt: "Vegetarian Burger" },
+        },
       ],
     },
     {
       id: "chicken-sandwiches",
       title: "Chicken Sandwiches",
+      note: "Served with signature Cosmos sauce and pickles",
       items: [
-        { name: "BBQ" },
-        { name: "Garlic Parm" },
-        { name: "Hot Chicks" },
-        // No photo: the client's "THE CHICKS" cutout is the tenders plate, and
-        // it is used on the Chicken Tenders row below. A tenders photo under a
-        // sandwich name would misdescribe the dish.
-        { name: "The Chicks" },
-        { name: "Truffle Honey" },
+        {
+          name: "The Chicks",
+          price: "$14",
+          description: "Herb aioli, pickles, lettuce, cheddar cheese, 2 piece tenders with brioche bun",
+          image: { src: "/menu/items/the-chicks-sandwich.webp", alt: "The Chicks Sandwich" },
+        },
+        {
+          name: "Hot Chicks",
+          price: "$14",
+          tags: ["spicy"],
+          description:
+            "Herb aioli, pickles, coleslaw, cheddar cheese, 2 piece spicy tenders with brioche bun",
+          image: { src: "/menu/items/hot-chicks-sandwich.webp", alt: "Hot Chicks Sandwich" },
+        },
+        {
+          name: "Truffle Honey",
+          price: "$15",
+          description: "Herb aioli, pickles, lettuce, 2 piece truffle honey tenders with brioche bun",
+          image: { src: "/menu/items/truffle-honey-sandwich.webp", alt: "Truffle Honey Sandwich" },
+        },
+        {
+          name: "Garlic Parm",
+          price: "$15",
+          description: "Herb aioli, pickles, lettuce, 2 piece garlic parm tenders with brioche bun",
+          image: { src: "/menu/items/garlic-parm-sandwich.webp", alt: "Garlic Parm Sandwich" },
+        },
+        {
+          name: "BBQ Chicken",
+          price: "$15",
+          description: "Herb aioli, coleslaw, 2 piece bbq tenders, pickles with brioche bun",
+          image: { src: "/menu/items/bbq-chicken-sandwich.webp", alt: "BBQ Chicken Sandwich" },
+        },
+      ],
+    },
+    {
+      id: "chicken-tenders",
+      title: "Chicken Tenders",
+      note: "Served with signature Cosmos sauce and pickles",
+      items: [
+        {
+          name: "The Chicks",
+          price: "$14",
+          description: "3 piece tenders",
+          image: {
+            src: "/menu/items/the-chicks-tender.webp",
+            alt: "The Chicks chicken tenders with a pot of dipping sauce and pickles",
+          },
+        },
+        {
+          name: "Hot Chicks",
+          price: "$14",
+          tags: ["spicy"],
+          description: "3 piece spicy tenders",
+          image: { src: "/menu/items/hot-chicks-tender.webp", alt: "Hot Chicks Tenders" },
+        },
+        {
+          name: "Truffle Honey",
+          price: "$15",
+          description: "3 piece truffle honey tenders",
+          image: { src: "/menu/items/truffle-honey-tender.webp", alt: "Truffle Honey Tenders" },
+        },
+        {
+          name: "Garlic Parm",
+          price: "$15",
+          description: "3 piece garlic parm tenders",
+          image: { src: "/menu/items/garlic-parm-tender.webp", alt: "Garlic Parm Tenders" },
+        },
+        {
+          name: "BBQ Chicken",
+          price: "$15",
+          description: "3 piece bbq chicken tenders",
+          image: { src: "/menu/items/bbq-chicken-tenders.webp", alt: "BBQ Chicken Tenders" },
+        },
       ],
     },
     {
       id: "artisan-hot-dog",
       title: "Artisan Hot Dog",
-      items: [{ name: "The OG" }],
-    },
-    {
-      id: "chicken-tenders",
-      title: "Chicken Tenders",
       items: [
-        { name: "BBQ" },
-        { name: "Garlic Parm" },
-        { name: "Hot Chicks" },
         {
-          name: "The Chicks",
-          description: "One of our best sellers.",
-          image: {
-            src: "/menu/best-sellers/the-chicks.png",
-            alt: "The Chicks chicken tenders with a pot of dipping sauce and pickles",
-          },
+          name: "The OG",
+          price: "$12",
+          description:
+            "Herb aioli, ketchup, honey mustard, pickles, caramelized onions, beef frank with brioche bun",
+          image: { src: "/menu/items/the-og-hot-dog.webp", alt: "The OG Hot Dog" },
         },
-        { name: "Truffle Honey" },
       ],
     },
     {
       id: "sides",
       title: "Sides",
       items: [
-        { name: "Chick Fries" },
-        { name: "Cosmos Fries" },
         {
           name: "Monkey Fries",
-          description: "Our iconic loaded fries.",
+          price: "$11",
+          note: "Swap for tots, add $1",
+          description: "Cosmos sauce, cheese sauce, pickle mix, caramelized onion, bacon",
           image: {
-            src: "/menu/best-sellers/monkey-fries.png",
+            src: "/menu/items/monkey-fries.webp",
             alt: "A bowl of Monkey Fries loaded with sauce, chives and pickled onion",
           },
         },
-        { name: "Regular Fries" },
-        { name: "Tater Tots" },
-        { name: "Truffle Fries" },
-        { name: "Onion Rings" },
-        { name: "Coleslaw" },
+        {
+          name: "Chicks Fries",
+          price: "$12",
+          note: "Swap for tots, add $1",
+          description: "Cosmos sauce, cheese sauce, pickle mix, caramelized onion, chicken tenders",
+          image: { src: "/menu/items/chick-fries.webp", alt: "Chicks Fries" },
+        },
+        {
+          name: "Cosmos Fries",
+          price: "$12",
+          note: "Swap for tots, add $1",
+          description: "Cosmos sauce, cheese sauce, pickle mix, caramelized onion, 3oz Cosmos patty",
+          image: { src: "/menu/items/cosmos-fries.webp", alt: "Cosmos Fries" },
+        },
+        {
+          name: "Tater Tots",
+          price: "$7.5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/tater-tots.webp", alt: "Tater Tots" },
+        },
+        {
+          name: "Truffle Fries",
+          price: "$9.5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/truffle-fries.webp", alt: "Truffle Fries" },
+        },
+        {
+          name: "Onion Rings",
+          price: "$7.5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/onion-rings.webp", alt: "Onion Rings" },
+        },
+        {
+          name: "Cauliflower Bites",
+          price: "$9",
+          tags: ["vegetarian"],
+          // No photo on file: branded placeholder tile, same as Frings.
+        },
+        {
+          name: "Frings",
+          price: "$9",
+          tags: ["vegetarian"],
+          // No photo on file: branded placeholder tile, same as Cauliflower Bites.
+        },
+        {
+          name: "Regular Fries",
+          price: "$7",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/regular-fries.webp", alt: "Regular Fries" },
+        },
+        {
+          name: "Coleslaw",
+          price: "$5",
+          tags: ["vegetarian"],
+          image: { src: "/menu/items/coleslaw.webp", alt: "Coleslaw" },
+        },
       ],
     },
   ] satisfies MenuCategory[],
 } as const;
+
+/**
+ * `Menu` / `MenuSection` / `MenuItem` JSON-LD (schema.org), built from
+ * `menuPopup` so the structured data can never drift from what the pop-up
+ * shows. One shared object; `app/layout.tsx` gives it a stable `@id` and
+ * points every Restaurant's `hasMenu` at it rather than repeating the whole
+ * menu five times. Decided at the James/Lorena meeting 2026-09-02: the menu
+ * is website content, not only a PDF, for SEO.
+ */
+export function menuStructuredData(id: string) {
+  return {
+    "@type": "Menu",
+    "@id": id,
+    name: `${site.name} Menu`,
+    hasMenuSection: menuPopup.categories.map((category) => ({
+      "@type": "MenuSection",
+      name: category.title,
+      ...(category.note ? { description: category.note } : {}),
+      hasMenuItem: category.items.map((item) => ({
+        "@type": "MenuItem",
+        name: item.name,
+        ...(item.description ? { description: item.description } : {}),
+        offers: {
+          "@type": "Offer",
+          price: item.price.replace(/^\$/, ""),
+          priceCurrency: "USD",
+        },
+      })),
+    })),
+  };
+}
 
 /* -------------------------------------------------------------------------- */
 /* Reviews, verbatim quotes from the client docx                              */
@@ -613,8 +823,9 @@ export const reviews: Review[] = [
 /**
  * CONTACT INFO is blank in the docx (facts SS6.4). The live WordPress site
  * carries two hall phone numbers and a third unattributed one, and no email
- * anywhere, so nothing here is confirmed for the four food halls this site
- * covers. Rather than publish a number that may ring the wrong counter, the
+ * anywhere, so nothing here is confirmed for the five food halls this site
+ * covers (Oceanside's own confirmed number lives on its Locations card, not
+ * here). Rather than publish a number that may ring the wrong counter, the
  * footer offers the one channel that is definitely monitored, Instagram DMs,
  * and lists the halls.
  *
