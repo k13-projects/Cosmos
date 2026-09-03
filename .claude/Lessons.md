@@ -123,3 +123,10 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
     wheel; make drag-to-spin a real gesture (pointer capture, velocity, momentum decaying back
     to the ambient speed, click-vs-drag threshold so a drag never opens the menu pop-up), and
     have QA test the gesture matrix (mouse, trackpad, touch, keyboard, reduced motion).
+27. **`motion` opacity tweens flash on cancel.** A lone opacity animation is handed to the
+    browser's animation engine, and cancelling it (rapid clicks, interrupted exit) paints one
+    frame at the element's base value: a leaving plate flashed back to 100%. Keep transform in
+    `motion`, move opacity to CSS transitions. Found on the Best Sellers carousel, 2026-09-02.
+28. **Travel and wobble are two different springs.** A single physical spring cannot arrive
+    from 60% away with a 5% overshoot and still show a visible settle; decouple them (arrival
+    envelope, then a small damped settle) when a client asks for "a little shake, but smooth".

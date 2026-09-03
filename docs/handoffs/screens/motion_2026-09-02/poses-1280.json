@@ -1,0 +1,125 @@
+{
+ "W": 892,
+ "poses": [
+  {
+   "label": 0,
+   "t": 4,
+   "outX": 0,
+   "outO": 1,
+   "outY": 0,
+   "outNO": 1,
+   "inX": 0,
+   "inO": 0,
+   "inY": 0,
+   "inNO": 0
+  },
+  {
+   "label": 100,
+   "t": 96,
+   "outX": 3.518,
+   "outO": 0.745,
+   "outY": -1.88,
+   "outNO": 0.542,
+   "inX": -60,
+   "inO": 0,
+   "inY": 18,
+   "inNO": 0
+  },
+  {
+   "label": 180,
+   "t": 178,
+   "outX": 11.551,
+   "outO": 0.517,
+   "outY": -5.89,
+   "outNO": 0.131,
+   "inX": -29.152,
+   "inO": 0.307,
+   "inY": 18,
+   "inNO": 0
+  },
+  {
+   "label": 270,
+   "t": 271,
+   "outX": 24.469,
+   "outO": 0.259,
+   "outY": -12,
+   "outNO": 0,
+   "inX": -1.425,
+   "inO": 0.694,
+   "inY": 12.29,
+   "inNO": 0.064
+  },
+  {
+   "label": 378,
+   "t": 379,
+   "outX": 43.426,
+   "outO": 0,
+   "outY": -12,
+   "outNO": 0,
+   "inX": 6.637,
+   "inO": 1,
+   "inY": 3.63,
+   "inNO": 0.765
+  },
+  {
+   "label": 460,
+   "t": 463,
+   "outX": 60,
+   "outO": 0,
+   "outY": -12,
+   "outNO": 0,
+   "inX": 4.477,
+   "inO": 1,
+   "inY": 1.27,
+   "inNO": 0.935
+  },
+  {
+   "label": 578,
+   "t": 579,
+   "outX": 60,
+   "outO": 0,
+   "outY": -12,
+   "outNO": 0,
+   "inX": -2.153,
+   "inO": 1,
+   "inY": 0.21,
+   "inNO": 0.993
+  },
+  {
+   "label": 728,
+   "t": 729,
+   "outX": 60,
+   "outO": 0,
+   "outY": -12,
+   "outNO": 0,
+   "inX": 0.905,
+   "inO": 1,
+   "inY": 0,
+   "inNO": 1
+  },
+  {
+   "label": 900,
+   "t": 904,
+   "outX": 60,
+   "outO": 0,
+   "outY": -12,
+   "outNO": 0,
+   "inX": -0.3,
+   "inO": 1,
+   "inY": 0,
+   "inNO": 1
+  },
+  {
+   "label": 1150,
+   "t": 1146,
+   "outX": 60,
+   "outO": 0,
+   "outY": -12,
+   "outNO": 0,
+   "inX": -0.048,
+   "inO": 1,
+   "inY": 0,
+   "inNO": 1
+  }
+ ]
+}

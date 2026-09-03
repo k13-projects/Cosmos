@@ -440,6 +440,15 @@ html.lenis body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* ...with one exception. The best-seller carousel keeps its 0.25s opacity
+     cross-fade here. Under reduced motion the plate does not travel, does not
+     overshoot and does not wobble (components/BestSellers.tsx drops the whole
+     keyframe track); all that is left is one picture replacing another, and the
+     blanket reset above turns that into a hard cut mid-scroll. A fade moves
+     nothing across the screen, which is what 2.3.3 is about, so it stays. */
+  .carousel-xfade {
+    transition-duration: 250ms !important;
+  }
 }
 
 /* --- location-card text halo ------------------------------------------- */
