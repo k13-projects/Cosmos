@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useId, useRef } from "react";
 import { about } from "@/lib/content";
+import { scrollPageTo } from "@/lib/scroller";
 import { useModals } from "./ModalProvider";
 
 /* -------------------------------------------------------------------------- *
@@ -52,16 +53,41 @@ const SPOKE_COUNT = 24;
 const AMBIENT_DEG_PER_S = 15 / 7;
 /** Extra degrees the wheel turns per pixel of scroll, on top of ambient. */
 const SCROLL_DEG_PER_PX = 0.05;
-/** e-folding time for the scroll boost to fall back to the ambient speed. */
+/** e-folding time for a scroll or drag boost to fall back to the ambient speed. */
 const BOOST_DECAY_S = 0.45;
 const MAX_BOOST_DEG_PER_S = 150;
 /** Exponential approach rate when a keyboard focus pulls a plate into view. */
 const FOCUS_EASE_PER_S = 7;
 
+/* --- the grab gesture ----------------------------------------------------- */
+
+/** A press that stays inside this radius and this long is a click, not a drag. */
+const CLICK_SLOP_PX = 6;
+// No time limit on a click: a slow, deliberate press that does not move is still a click
+// (James, 2026-09-02). Only distance separates a click from a drag.
+/** Weight of the newest sample in the drag's smoothed angular velocity. */
+const DRAG_VEL_SMOOTHING = 0.3;
+/** A hand already at rest for this long before letting go throws nothing. */
+const DRAG_STALE_MS = 80;
+
 const angleFor = (i: number): number => FIRST_ANGLE_DEG + i * SPOKE_STEP_DEG;
 
 /** The angle, in the visible window, that a focused plate is brought to. */
 const VIEW_ANGLE_DEG = 180;
+/**
+ * How much clear room a keyboard-focused plate needs above and below the hub
+ * before the band is scrolled to it. A plate is about 190px wide and roughly
+ * half that tall, so this leaves the whole ring and its focus ring inside the
+ * viewport rather than flush against an edge.
+ */
+const FOCUS_EDGE_MARGIN_PX = 140;
+/**
+ * How long to wait after a keyboard focus before correcting the page's scroll.
+ * Long enough for the browser's own scroll-into-view (and Lenis's easing of it)
+ * to have landed, so the correction is measured against where the page actually
+ * ended up rather than where it was on the way there.
+ */
+const FOCUS_SCROLL_SETTLE_MS = 500;
 
 /**
  * The blueprint's plate wheel (facts SS4.2, Lessons 16), turning endlessly.
@@ -72,10 +98,31 @@ const VIEW_ANGLE_DEG = 180;
  * from one rAF loop, with scroll injecting velocity on top that eases back to
  * ambient. Each plate counter-rotates by the same amount so it stays upright.
  *
+ * IT CAN ALSO BE GRABBED (Lessons 26). A press on a plate captures the pointer
+ * and the wheel follows the hand 1:1, by the angle of the pointer round the
+ * hub rather than by a scaled vertical delta: the hub is a real point on the
+ * page, so the plate that was grabbed stays under the finger for the whole
+ * gesture, which a scaled delta cannot promise. Letting go hands the measured
+ * angular velocity back to the same boost that scroll uses, so the throw decays
+ * into the ambient turn and the wheel never stops. A press that moves under
+ * 6px is a click, however long it is held, and opens the menu pop-up as
+ * before; anything else is a drag and the click is swallowed.
+ *
+ * Touch is deliberately left out of this: on the visible arc the drag is a
+ * vertical gesture, which is also the page scroll, and a wheel that eats the
+ * scroll on a touchscreen is a trap. `touch-action: pan-y` gives that gesture
+ * to the browser, and a tap still opens the pop-up.
+ *
  * It stops turning when there is nobody to see it (the band out of view, or the
  * tab hidden) and while a plate is hovered or focused, so its name can be read
- * off a still plate. Under reduced motion the loop never starts and the ring is
- * a static arc in the blueprint's own pose.
+ * off a still plate. Those two pauses are re-read from the DOM on every frame
+ * (`:hover`, `:focus-visible`) rather than tracked from events, because an
+ * event that never arrives leaves the wheel frozen for good (Lessons 25): that
+ * is exactly what the browser's native image drag did to it.
+ *
+ * Under reduced motion the loop never starts and the ring is a static arc in
+ * the blueprint's own pose. The grab still works there, because it is the
+ * visitor's own hand and not motion, but it is thrown with no momentum.
  *
  * Hover or focus names the dish on an instant yellow pill. The plates are real
  * buttons rather than decoration because a focusable control that does nothing
@@ -101,6 +148,9 @@ export default function PlateWheel({
     if (!hub || !section) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const root = document.documentElement;
+    const FOCUS_VISIBLE_OK =
+      typeof CSS !== "undefined" && CSS.supports("selector(:focus-visible)");
 
     let frame = 0;
     let running = false;
@@ -108,13 +158,51 @@ export default function PlateWheel({
     let boost = 0;
     let lastFrameMs = 0;
     let lastScrollY = window.scrollY;
-    let hovered = false;
-    let focused = false;
     let onScreen = true;
     let focusTarget: number | null = null;
+    let focusScrollTimer = 0;
+
+    // The grab gesture.
+    let pointerId: number | null = null;
+    let grabbed: HTMLElement | null = null;
+    let dragAngle = 0; // the pointer's angle round the hub at the last move
+    let dragVel = 0; // smoothed, degrees per second
+    let dragVelSeen = false;
+    let dragMovedPx = 0;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragLastMs = 0;
+    let dragged = false; // this press has passed the click threshold
+    let suppressClick = false;
+    /**
+     * A drag ends with the grabbed plate still under the pointer, so the hover
+     * pause would swallow the throw the moment the hand let go. Hover is
+     * ignored until the hand moves again of its own accord. The same flag
+     * covers a stale `:hover` left behind by a blur or a hidden tab.
+     */
+    let hoverBlocked = false;
 
     const write = (): void => {
       hub.style.setProperty("--wheel-rot", `${rot.toFixed(2)}deg`);
+    };
+
+    const matchesSafe = (el: Element, selector: string): boolean => {
+      try {
+        return el.matches(selector);
+      } catch {
+        return false;
+      }
+    };
+
+    /** True while the pointer rests on a plate and has not just thrown the wheel. */
+    const hoverPaused = (): boolean =>
+      !hoverBlocked && hub.querySelector("[data-spoke]:hover") !== null;
+
+    /** True while a plate inside the wheel holds a visible keyboard focus ring. */
+    const focusPaused = (): boolean => {
+      const el = document.activeElement;
+      if (!(el instanceof Element) || !hub.contains(el)) return false;
+      return FOCUS_VISIBLE_OK ? matchesSafe(el, ":focus-visible") : true;
     };
 
     const tick = (now: number): void => {
@@ -130,8 +218,12 @@ export default function PlateWheel({
         }
       } else {
         // A plate under the pointer or holding focus stands still so its name
-        // can be read off it.
-        if (!hovered && !focused) rot += (AMBIENT_DEG_PER_S + boost) * dt;
+        // can be read off it, and a plate under the hand is driven by the hand.
+        // Both are read back from the DOM here rather than trusted from an
+        // event that may never arrive (Lessons 25).
+        if (pointerId === null && !hoverPaused() && !focusPaused()) {
+          rot += (AMBIENT_DEG_PER_S + boost) * dt;
+        }
         if (rot > 360 || rot < -360) rot %= 360;
       }
       boost *= Math.exp(-dt / BOOST_DECAY_S);
@@ -156,7 +248,7 @@ export default function PlateWheel({
       const y = window.scrollY;
       const delta = y - lastScrollY;
       lastScrollY = y;
-      if (!running) return;
+      if (!running || pointerId !== null) return;
       const next = boost + (delta * SCROLL_DEG_PER_PX) / BOOST_DECAY_S;
       boost = Math.max(-MAX_BOOST_DEG_PER_S, Math.min(MAX_BOOST_DEG_PER_S, next));
     };
@@ -168,20 +260,244 @@ export default function PlateWheel({
       return button ? Number(button.dataset.spoke) : -1;
     };
 
-    // pointerover / pointerout bubble, so one pair on the hub covers all
-    // twenty-four plates, and relatedTarget keeps the flag true when the
-    // pointer slides straight from one overlapping plate onto the next.
-    const onPointerOver = (event: Event): void => {
-      hovered = spokeOf(event.target) >= 0;
+    /* --- the grab gesture ------------------------------------------------- */
+
+    /** The pointer's angle round the hub, in the spokes' own CSS convention. */
+    const angleOf = (event: PointerEvent): number => {
+      const box = hub.getBoundingClientRect(); // the hub is a 0x0 anchor
+      return (Math.atan2(event.clientY - box.top, event.clientX - box.left) * 180) / Math.PI;
     };
-    const onPointerOut = (event: Event): void => {
-      hovered = spokeOf((event as PointerEvent).relatedTarget) >= 0;
+
+    /** The short way round, so the +/-180 seam the plates sit on never jumps. */
+    const shortest = (deg: number): number => {
+      let d = deg % 360;
+      if (d > 180) d -= 360;
+      if (d < -180) d += 360;
+      return d;
     };
+
+    /** Tooltips are hidden while the wheel is being thrown; see globals.css. */
+    const syncDragFlag = (): void => {
+      if (dragged || hoverBlocked) hub.setAttribute("data-drag", "");
+      else hub.removeAttribute("data-drag");
+    };
+
+    const onIdleMove = (): void => {
+      hoverBlocked = false;
+      syncDragFlag();
+      window.removeEventListener("pointermove", onIdleMove);
+    };
+
+    /**
+     * Ignore hover until the hand moves again, so nothing can strand the wheel.
+     *
+     * `onIdleMove` above is the ONLY thing allowed to lift this, because a real
+     * `pointermove` is the only proof the hand moved. It used to be lifted by
+     * `pointerleave` on the hub as well, and that was wrong in the one case it
+     * mattered: during a throw the plates slide out from under a motionless
+     * pointer, which fires `pointerleave` on the hub with no hand movement at
+     * all. The suspension lifted, the next plate arrived under the same still
+     * pointer, and the hover pause swallowed the throw. Measured at the QA gate,
+     * 1440x900, a 250px throw released with the hand held still: 2.62 seconds of
+     * dead standstill, and it stayed stopped until the hand moved. Intermittent,
+     * because it depends on a plate leaving the pointer before the next arrives,
+     * which is why it never showed at 1280.
+     *
+     * Leaving this flag set can never freeze the wheel (it only suppresses the
+     * pause), so there is no Lessons 25 hazard in having one fewer way to clear
+     * it. The hazard is all on the other side.
+     */
+    const suspendHover = (): void => {
+      hoverBlocked = true;
+      syncDragFlag();
+      window.removeEventListener("pointermove", onIdleMove);
+      window.addEventListener("pointermove", onIdleMove);
+    };
+
+    const endDrag = (event?: PointerEvent): void => {
+      if (pointerId === null) return;
+      if (event && event.pointerId !== pointerId) return;
+
+      // A press that barely moved and was let go quickly is a click. Anything
+      // else is a drag, and a drag must never open the menu pop-up.
+      const isClick = !dragged && dragMovedPx <= CLICK_SLOP_PX;
+      suppressClick = !isClick;
+
+      if (grabbed && event) {
+        try {
+          grabbed.releasePointerCapture(event.pointerId);
+        } catch {
+          // Already released; the capture is gone either way.
+        }
+      }
+      pointerId = null;
+      grabbed = null;
+      root.classList.remove("wheel-grabbing");
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerCancel);
+
+      const threw = dragged;
+      dragged = false;
+      if (threw) suspendHover();
+      else syncDragFlag();
+
+      // Hand the wheel back to the ambient loop at the speed it had. `boost` is
+      // the amount ABOVE ambient and decays with the same e-fold the scroll
+      // throw uses, so the wheel eases back to ambient and never stops.
+      //
+      // A hand that had already come to rest, and reduced motion, have no throw
+      // to give. That is NOT the same as throwing zero: carrying a released
+      // speed of zero means subtracting ambient here, which sets the wheel's
+      // speed to exactly nothing at the moment of release and then creeps it
+      // back up over about a second and a half. Measured at the QA gate: five
+      // frames, 42.5ms, of dead standstill after a slow drag, and 0.00 deg/s
+      // still at +50ms. The wheel is never allowed to stand still (Lessons 25,
+      // 26), so a throwless release hands it straight back to the ambient turn.
+      const stale = !event || event.timeStamp - dragLastMs > DRAG_STALE_MS;
+      const noThrow = reduced.matches || stale || !dragVelSeen;
+      boost = noThrow
+        ? 0
+        : Math.max(
+            -MAX_BOOST_DEG_PER_S,
+            Math.min(MAX_BOOST_DEG_PER_S, dragVel - AMBIENT_DEG_PER_S),
+          );
+      dragVel = 0;
+      dragVelSeen = false;
+      start();
+    };
+
+    const onPointerMove = (event: PointerEvent): void => {
+      if (pointerId === null || event.pointerId !== pointerId) return;
+
+      const angle = angleOf(event);
+      const delta = shortest(angle - dragAngle);
+      dragAngle = angle;
+      rot += delta;
+      if (rot > 360 || rot < -360) rot %= 360;
+
+      const dt = (event.timeStamp - dragLastMs) / 1000;
+      dragLastMs = event.timeStamp;
+      if (dt > 0 && dt < 0.1) {
+        const instant = delta / dt;
+        dragVel = dragVelSeen ? dragVel + (instant - dragVel) * DRAG_VEL_SMOOTHING : instant;
+        dragVelSeen = true;
+      }
+
+      dragMovedPx = Math.max(
+        dragMovedPx,
+        Math.hypot(event.clientX - dragStartX, event.clientY - dragStartY),
+      );
+      if (!dragged && dragMovedPx > CLICK_SLOP_PX) {
+        dragged = true;
+        syncDragFlag();
+      }
+
+      // The rAF loop is not running under reduced motion, and the wheel still
+      // has to follow the hand there.
+      write();
+    };
+
+    const onPointerUp = (event: PointerEvent): void => endDrag(event);
+    const onPointerCancel = (event: PointerEvent): void => endDrag(event);
+
+    const onPointerDown = (event: PointerEvent): void => {
+      if (event.pointerType === "touch" || !event.isPrimary || event.button !== 0) return;
+      const plate =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>("[data-spoke]")
+          : null;
+      if (!plate) return;
+
+      pointerId = event.pointerId;
+      grabbed = plate;
+      dragAngle = angleOf(event);
+      dragVel = 0;
+      dragVelSeen = false;
+      dragMovedPx = 0;
+      dragStartX = event.clientX;
+      dragStartY = event.clientY;
+      dragLastMs = event.timeStamp;
+      dragged = false;
+      suppressClick = false;
+      hoverBlocked = false;
+      boost = 0; // a scroll throw does not survive being grabbed
+      focusTarget = null;
+      syncDragFlag();
+      root.classList.add("wheel-grabbing");
+
+      try {
+        // Captured on the plate, not on the hub, so the click that follows a
+        // press still targets the button and still opens the menu pop-up.
+        plate.setPointerCapture(event.pointerId);
+      } catch {
+        // Capture is a nicety; the window-level up and cancel still end it.
+      }
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerCancel);
+      // No preventDefault here: it would kill the focus and the click that a
+      // plain press still owes the visitor. The native image drag is stopped in
+      // the markup and in globals.css instead.
+    };
+
+    /**
+     * The bug Kazim found (Lessons 24): the browser's own image drag took the
+     * gesture, the ghost image followed the pointer, dropping it opened the
+     * file, and `pointerout` never fired, so the hover-paused wheel stayed
+     * frozen. Belt and braces on top of `draggable={false}`.
+     */
+    const onDragStart = (event: Event): void => {
+      event.preventDefault();
+      endDrag();
+      suspendHover();
+    };
+
+    /** Swallows the click that ends a drag, before React's own handler sees it. */
+    const onClickCapture = (event: MouseEvent): void => {
+      if (!suppressClick) return;
+      suppressClick = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    const onWindowBlur = (): void => {
+      endDrag();
+      suspendHover();
+    };
+
+    /* --- keyboard ---------------------------------------------------------- */
+
+    /**
+     * Bring the hub within the viewport, which is where a focused plate comes to
+     * rest (VIEW_ANGLE_DEG is 180, so the plate ends up level with the hub).
+     *
+     * Through `scrollPageTo`, never natively: Lenis owns this page's scroll, and
+     * a native call made while Lenis has an animation in flight settles between
+     * the two rather than winning. See lib/scroller.ts.
+     */
+    const centreHub = (): void => {
+      if (pointerId !== null) return; // a hand is on the wheel; leave the page alone
+      const hubTop = hub.getBoundingClientRect().top;
+      if (hubTop < FOCUS_EDGE_MARGIN_PX || hubTop > window.innerHeight - FOCUS_EDGE_MARGIN_PX) {
+        scrollPageTo(window.scrollY + hubTop - window.innerHeight / 2);
+      }
+    };
+
 
     const onFocusIn = (event: Event): void => {
       const spoke = spokeOf(event.target);
       if (spoke < 0) return;
-      focused = true;
+      // A plate focused by a mouse press is not a keyboard visit; pulling the
+      // wheel round under the hand would fight the grab.
+      if (pointerId !== null) return;
+      if (
+        FOCUS_VISIBLE_OK &&
+        event.target instanceof Element &&
+        !matchesSafe(event.target, ":focus-visible")
+      ) {
+        return;
+      }
       // Turn the shortest way round until this plate sits in the visible window.
       const wanted = VIEW_ANGLE_DEG - angleFor(spoke);
       let target = wanted;
@@ -189,13 +505,33 @@ export default function PlateWheel({
       while (target - rot < -180) target += 360;
       focusTarget = target;
       if (!running) write();
+
+      // And put the band where that plate is GOING, which the browser gets
+      // wrong on its own. Chrome scrolls a newly focused element into view by
+      // the smallest amount that reveals it WHERE IT IS, and the wheel is about
+      // to move that plate to the hub's own level, up to a full diameter away.
+      // The two disagree and the focus ring lands off screen. Measured at the
+      // QA gate, 1280x900, a visitor already looking at the About band tabbing
+      // forward into the wheel: the ring settled at top 916 in a 900px
+      // viewport, three runs out of three, and stayed there.
+      //
+      // The correction cannot be made here. Chrome's scroll runs AFTER focusin
+      // (measured: hub at 403 when this fires, at 967 half a second later), so
+      // a check now reads a page that is about to move and correctly decides to
+      // do nothing. It has to run once that scroll has landed.
+      window.clearTimeout(focusScrollTimer);
+      focusScrollTimer = window.setTimeout(centreHub, FOCUS_SCROLL_SETTLE_MS);
     };
 
-    const onFocusOut = (event: Event): void => {
-      focused = spokeOf((event as FocusEvent).relatedTarget) >= 0;
+    const onVisibility = (): void => {
+      if (document.hidden) {
+        endDrag();
+        suspendHover();
+        stop();
+      } else {
+        start();
+      }
     };
-
-    const onVisibility = (): void => (document.hidden ? stop() : start());
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -207,6 +543,7 @@ export default function PlateWheel({
     );
 
     const apply = (): void => {
+      endDrag();
       stop();
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onVisibility);
@@ -224,20 +561,28 @@ export default function PlateWheel({
       start();
     };
 
-    hub.addEventListener("pointerover", onPointerOver);
-    hub.addEventListener("pointerout", onPointerOut);
+    hub.addEventListener("pointerdown", onPointerDown);
+    hub.addEventListener("dragstart", onDragStart);
+    hub.addEventListener("click", onClickCapture, true);
     hub.addEventListener("focusin", onFocusIn);
-    hub.addEventListener("focusout", onFocusOut);
+    window.addEventListener("blur", onWindowBlur);
 
     apply();
     reduced.addEventListener("change", apply);
 
     return () => {
       reduced.removeEventListener("change", apply);
-      hub.removeEventListener("pointerover", onPointerOver);
-      hub.removeEventListener("pointerout", onPointerOut);
+      hub.removeEventListener("pointerdown", onPointerDown);
+      hub.removeEventListener("dragstart", onDragStart);
+      hub.removeEventListener("click", onClickCapture, true);
       hub.removeEventListener("focusin", onFocusIn);
-      hub.removeEventListener("focusout", onFocusOut);
+      window.removeEventListener("blur", onWindowBlur);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerCancel);
+      window.removeEventListener("pointermove", onIdleMove);
+      window.clearTimeout(focusScrollTimer);
+      root.classList.remove("wheel-grabbing");
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onVisibility);
@@ -280,7 +625,8 @@ export default function PlateWheel({
                   primary={isPrimary}
                   placement="left"
                   // Undo the spoke's angle and the hub's live rotation, so the
-                  // plate hangs upright at every position on the wheel.
+                  // plate hangs upright at every position on the wheel, while
+                  // it is being dragged as much as while it turns on its own.
                   style={{
                     transform: `rotate(calc(${-angleFor(spoke)}deg - var(--wheel-rot, 0deg)))`,
                   }}
@@ -297,7 +643,8 @@ export default function PlateWheel({
 /**
  * The three-plate row below 1024px. Same plates, no wheel: a six-plate arc
  * squeezed into a phone's right edge leaves the paragraphs about 28 characters
- * wide, and any overlap at all fails the fitcheck measure.
+ * wide, and any overlap at all fails the fitcheck measure. No drag either: the
+ * wheel it would turn is not on screen.
  *
  * The names are ALWAYS on here, never hover-revealed. This row only renders on
  * widths that are overwhelmingly touchscreens, and a touchscreen has no hover:
@@ -324,7 +671,7 @@ type PlateData = (typeof about.plates)[number];
 
 interface PlateProps {
   plate: PlateData;
-  /** Position on the ring, used by the wheel's hover and focus handling. */
+  /** Position on the ring, used by the wheel's hover, focus and drag handling. */
   spoke?: number;
   /** Index within the six-plate set, for the float animation's offset. */
   index: number;
@@ -345,24 +692,39 @@ interface PlateProps {
  * the same frame as the pointer, has no timer to cancel and cannot be stranded
  * open by a lost event. On the wheel it opens to the LEFT: the arc lives on the
  * right edge, so a right-hand tooltip would be off-screen.
+ *
+ * `draggable={false}` and `onDragStart` are not belt and braces, they are the
+ * fix (Lessons 24): a photo inside a control is a drag source to the browser,
+ * and its native drag hijacks the gesture, offers the file for download on
+ * drop, and swallows the pointer events the wheel needs to un-pause itself.
  */
 function Plate({ plate, spoke, index, primary, placement, style }: PlateProps) {
   const { openMenu } = useModals();
   const tipId = `${useId()}plate-tip`;
+  const onWheel = placement === "left";
 
   return (
     <button
       type="button"
       onClick={openMenu}
+      onDragStart={(event) => event.preventDefault()}
       data-spoke={spoke}
       tabIndex={primary ? undefined : -1}
       aria-hidden={primary ? undefined : true}
       // Only the wheel's pill is a tooltip. The row's pill is a permanently
       // visible label whose text is already in the button's accessible name, so
       // pointing at it here would make a screen reader say the dish twice.
-      aria-describedby={placement === "left" && primary ? tipId : undefined}
+      aria-describedby={onWheel && primary ? tipId : undefined}
       style={style}
-      className="group pointer-events-auto relative block w-full rounded-[999px] focus-visible:outline-offset-8"
+      className={[
+        "group plate-btn pointer-events-auto relative block w-full select-none",
+        "rounded-[999px] focus-visible:outline-offset-8",
+        onWheel
+          ? // Grab to spin. `touch-pan-y` keeps the page's own vertical scroll
+            // on a touchscreen, where the drag would be the same gesture.
+            "cursor-grab touch-pan-y"
+          : "touch-manipulation",
+      ].join(" ")}
     >
       {/* The visible label is the tooltip, which is hover-only. The button still
           needs a name of its own, and it should say what pressing it does. */}
@@ -376,6 +738,7 @@ function Plate({ plate, spoke, index, primary, placement, style }: PlateProps) {
         width={plate.width}
         height={plate.height}
         sizes="(max-width: 1023px) 33vw, 320px"
+        draggable={false}
         // The ring's far side is clipped off the right edge, so a lazy plate
         // would never intersect anything and would pop in as it rotated round.
         // Eager, but explicitly low priority: twenty-four elements share six
@@ -388,12 +751,12 @@ function Plate({ plate, spoke, index, primary, placement, style }: PlateProps) {
 
       <span
         id={tipId}
-        role={placement === "left" ? "tooltip" : undefined}
-        aria-hidden={placement === "left" && primary ? undefined : true}
+        role={onWheel ? "tooltip" : undefined}
+        aria-hidden={onWheel && primary ? undefined : true}
         className={[
           "plate-tip pointer-events-none absolute z-10 rounded-[999px] bg-yellow px-3 py-1.5",
           "text-[13px] leading-tight text-purple shadow-[0_8px_20px_rgba(43,3,48,0.35)] sm:px-4 sm:py-2",
-          placement === "left"
+          onWheel
             ? // The wheel: hover or keyboard focus, on the same frame as the
               // pointer. Opens LEFT because the arc lives on the right edge.
               "right-[84%] top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 transition-opacity" +
