@@ -74,7 +74,7 @@ export default function Locations() {
               key={l.id}
               className="flex w-[78vw] shrink-0 snap-start sm:w-[60vw] lg:w-[min(33.3vw,480px)] lg:min-h-[calc(min(33.3vw,480px)*289/443)]"
             >
-              <div className="relative flex w-full flex-col rounded-[40px] bg-cream p-7 lg:p-8">
+              <div className="relative flex w-full flex-col overflow-hidden rounded-[40px] bg-cream p-7 lg:p-8">
                 {/* Corner watermark, design_2026-09-02_v2.md row C ("detailed
                     trace"), Kazim's pick. `position:absolute` paints above
                     static in-flow content in the same stacking contex
@@ -100,8 +100,11 @@ export default function Locations() {
                   width={l.mark.width}
                   height={l.mark.height}
                   aria-hidden="true"
-                  sizes="(min-width: 1024px) 7vw, (min-width: 640px) 13vw, 16vw"
-                  className="pointer-events-none absolute bottom-[88px] right-4 z-0 aspect-square h-auto w-[21%] object-contain object-right-bottom opacity-[var(--mark-opacity)] sm:bottom-4 lg:bottom-5 lg:right-5"
+                  sizes="(min-width: 1024px) 18vw, (min-width: 640px) 32vw, 42vw"
+                  /* Kazim, 2026-09-02: glued into the bottom-right corner, about two and a half
+                     times the first size, and allowed to run into the card's rounded corner (the
+                     card clips it). Text and controls sit above it in z-order. */
+                  className="pointer-events-none absolute -bottom-[6%] -right-[6%] z-0 aspect-square h-auto w-[52%] object-contain object-right-bottom opacity-[var(--mark-opacity)]"
                 />
                 <div className="relative z-10 flex w-full flex-1 flex-col">
                   <div className="flex items-start justify-between gap-3">
