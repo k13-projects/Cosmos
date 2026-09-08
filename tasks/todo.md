@@ -86,7 +86,22 @@ Source of truth for scope: `PROJECT_BRIEF.md`, `SCOPE.md`,
 - [ ] Plate names: confirm the six wheel-plate names, matched by photo (one-glance, not client-
       confirmed)
 - [ ] Chicken sandwich photo: the original, wider photo used in the PDF band, if Lorena still has
-      it (the file we hold can't reproduce the blueprint's exact crop)
+      it (the file we hold can't reproduce the blueprint's exact crop). 2026-09-08: she sent two
+      Drive options, see below.
+
+## Round 2: Lorena's feedback on the preview (2026-09-08, deferred, not started)
+Source: `docs/intake/client_email_2026-09-08.md`. Ship as one `cosmos_sep<DD>_v<N>` round, then
+reply to her on the Station8 thread.
+- [ ] Menu pop-up: she cannot scroll to the bottom of the menu. Reproduce first (Mac Chrome +
+      phone), then fix. Defect, highest priority in this round.
+- [ ] BBQ Burger photo: make it read consistent with the other item shots
+- [ ] Values band ("Bold Flavors, Real Vibes, Fresh Always"): move higher on the page, center it
+- [ ] "OUR BEST SELLERS" title: smaller
+- [ ] Plate wheel (About cascade): wider, takes more of the screen. Names confirmed correct.
+- [ ] Order pop-up: add DoorDash Little Italy + DoorDash San Clemente (URLs in the intake note)
+- [ ] Chicken sandwich band: pull one of her two Drive photos into `Cosmos Assets/`, rebuild the band
+- [ ] Location drawings: hold; she is sending her own. Ours stay until then.
+- [ ] Reply to Lorena once the round is live
 
 ---
 
