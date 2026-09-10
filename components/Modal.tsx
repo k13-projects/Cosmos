@@ -110,6 +110,20 @@ export default function Modal({ open, onClose, title, subtitle, children, size =
   return createPortal(
     <div
       ref={scrollRef}
+      /*
+        data-lenis-prevent is the fix for "the menu does not scroll" (Lorena,
+        2026-09-08). Lenis owns the page's wheel: it listens on the window,
+        cancels every wheel event and moves the document itself. With the page
+        locked behind this dialog that meant the wheel over the pop-up was
+        swallowed and nothing moved: measured 3433px of menu in a 720px window,
+        wheel defaultPrevented, scrollTop 0 before and after. The attribute
+        tells Lenis to leave every wheel and touch event inside this element
+        to the browser, so the dialog scrolls natively like any other box.
+        `lenis.stop()` is NOT the answer: a stopped Lenis still cancels the
+        wheel everywhere (its own source, onVirtualScroll), which is the exact
+        symptom again.
+      */
+      data-lenis-prevent
       className="fixed inset-0 z-[90] overflow-y-auto overscroll-contain"
       role="presentation"
     >

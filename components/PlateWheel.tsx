@@ -33,13 +33,19 @@ import { useModals } from "./ModalProvider";
  *
  *   horizontally  no plate centre is ever further left than hub - R, which is
  *                 (right edge - 0.324 R). The About copy and the values band's
- *                 third column both live well left of that line.
- *   vertically    the envelope is hub_y +/- 0.737 R. A closed ring reaches
- *                 0.103 R deeper than the old 32-degree sweep did, so the hub
- *                 is raised to 61% of the band (was 67%) and R is trimmed, to
- *                 put the floor back where the values band's clear lane is.
+ *                 columns both live left of that line (Values.tsx shifts its
+ *                 grid left of centre, per the blueprint, precisely so a
+ *                 bigger R still clears them).
+ *   vertically    the envelope is hub_y +/- 0.737 R.
  *
- * Measured clearances across a full revolution are in the handoff.
+ * 2026-09-08 (Lorena's round 2, client email SS4): "make the wheel wider so it
+ * takes up more space on the screen." R moved from 0.355vw to 0.44vw and the
+ * plates from 0.135vw to 0.20vw (app/globals.css), back toward the blueprint's
+ * own 0.49vw. The hub moved from 61% to 58% of the band: a bigger R pushes the
+ * envelope's floor (hub_y + 0.737 R) deeper in absolute px even at the same
+ * percentage, and Values.tsx's shorter clear lane (its lg:pt dropped alongside
+ * this) meant the old 61% no longer left room. Measured clearances across a
+ * full revolution at 1024/1280/1440/1920 are in the handoff.
  * -------------------------------------------------------------------------- */
 
 /** Hub distance beyond the container's right edge, in units of R. */
@@ -600,7 +606,7 @@ export default function PlateWheel({
     <div className="plate-wheel pointer-events-none absolute inset-0 hidden overflow-x-clip overflow-y-visible lg:block">
       <div
         ref={hubRef}
-        className="wheel-hub absolute top-[61%] h-0 w-0"
+        className="wheel-hub absolute top-[58%] h-0 w-0"
         style={{ left: `calc(100% + var(--wheel-r) * ${HUB_OFFSET_RATIO})` }}
       >
         {Array.from({ length: SPOKE_COUNT }, (_, spoke) => {

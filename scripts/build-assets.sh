@@ -205,11 +205,16 @@ done
 echo "  ($ITEM_COUNT item photos)"
 
 echo "==> BBQ Burger photo (Lorena, BBQ UPDATED.png, 2026-09-02, replaces menu/items/bbq-burger.webp)"
-# Trim to the alpha bbox first (a real cutout would have transparent padding
-# to drop; this source's alpha channel is fully opaque edge to edge, so this
-# is a documented no-op, not a skipped step) then flatten onto white to match
-# every other item shot in menu/items, which are white-background product
-# photos, not cutouts.
+# Every other item shot is a 4:3 landscape product photo with the burger
+# filling the frame edge to edge. Lorena's source is a 1750x2432 portrait with
+# the burger in its lower half, and shipping it whole (2026-09-02) put a small
+# burger in a tall white box: in the menu tile it read at about half the size
+# of its neighbours. Lorena, 2026-09-08: "the BBQ Burger photo, so it looks
+# consistent with the others." So this is now a crop, not a flatten: flatten
+# onto white (the alpha channel is fully opaque edge to edge, so the old trim
+# step was a no-op and is gone), then cut a full-width 4:3 box centred on the
+# burger and its plate (crown at y~570, plate rim at y~1824, measured on the
+# source), which leaves the same ~3% breathing room the sibling shots have.
 BBQ_SRC="$SRC/LORENA UPDATE 2026-09-02/BBQ UPDATED.png"
 if [ ! -f "$BBQ_SRC" ]; then
   echo "  ERROR: photo source not found: LORENA UPDATE 2026-09-02/BBQ UPDATED.png" >&2
@@ -220,13 +225,14 @@ import sys
 from PIL import Image
 src, out = sys.argv[1], sys.argv[2]
 im = Image.open(src).convert("RGBA")
-bbox = im.getchannel("A").getbbox()
-if bbox is None:
-    raise SystemExit(f"ERROR: {src} has no visible alpha content")
-im = im.crop(bbox)
 bg = Image.new("RGB", im.size, (255, 255, 255))
 bg.paste(im, mask=im.getchannel("A"))
-bg.save(out)
+w, h = bg.size
+box_h = round(w * 3 / 4)
+centre = (570 + 1824) // 2
+top = max(0, min(h - box_h, centre - box_h // 2))
+bg.crop((0, top, w, top + box_h)).save(out)
+print(f"    crop {w}x{box_h} at y={top} (4:3, like the other item shots)")
 PY
 sips -Z 640 "$TMP/bbq.png" >/dev/null
 cwebp -q 82 -quiet "$TMP/bbq.png" -o "$PUB/menu/items/bbq-burger.webp"

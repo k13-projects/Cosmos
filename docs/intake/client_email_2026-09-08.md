@@ -3,7 +3,7 @@
 Her reply to James's round-up of the same day (Station8 parking removed, Sky Deck menu live,
 Cosmos preview with the four open asks). She had just opened https://cosmos.k13projects.com.
 Thread: "Re: Station8 Website – Remove Parking Info". Captured by James the same afternoon;
-work is deferred, nothing below has been built yet.
+built 2026-09-09 as round 2 (`tasks/todo.md`), which also records each decision.
 
 ## Adjustments she wants on the preview
 
@@ -30,10 +30,17 @@ work is deferred, nothing below has been built yet.
    (Carlsbad and Oceanside DoorDash were already live. Toast links: still none sent.)
 2. **Footer contact info**: still waiting on confirmation from her team.
 3. **Wheel plate names**: confirmed correct as they are.
-4. **Chicken sandwich photo**: two Drive files offered, neither yet pulled into `Cosmos Assets/`:
-   - https://drive.google.com/file/d/1amWF4_ORHqDMyBZLXiSu4nC0t6DcYldK/view
-   - https://drive.google.com/file/d/1LQHbXNquAdKhmCb1i7AR0dvT-70Y9AzM/view
-   Pick whichever reproduces the blueprint's band crop; she is fine with either.
+4. **Chicken sandwich photo**: two Drive files offered, both pulled into
+   `Cosmos Assets/LORENA UPDATE 2026-09-08/` on 2026-09-09:
+   - https://drive.google.com/file/d/1amWF4_ORHqDMyBZLXiSu4nC0t6DcYldK/view is `cosmos 2-121.jpg`,
+     byte-identical to the file the band is already cut from. The wider original the blueprint
+     used does not exist on her side either.
+   - https://drive.google.com/file/d/1LQHbXNquAdKhmCb1i7AR0dvT-70Y9AzM/view is `cosmos 2-003.jpg`
+     (2251x1502, landscape): a different sandwich, shot top-down on a yellow chair, cheddar and
+     lettuce. Not the blueprint's picture.
+   Decision (James, 2026-09-09): the band stays as built; it already reproduces the blueprint's
+   framing at its exact aspect from the blueprint's own photo. `cosmos 2-003.jpg` is on file for a
+   future use. Tell Lorena plainly rather than swapping in a different sandwich.
 
 ## Still open after this email
 
