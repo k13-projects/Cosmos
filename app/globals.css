@@ -221,18 +221,30 @@ html.lenis body {
 
   /* ---------- the plate wheel (About band) ---------- */
   /* Geometry and the reasoning behind these numbers: components/PlateWheel.tsx.
-     The blueprint's R is 0.49 of the viewport, on a taller About band than this
-     copy produces, so R is scaled back and the plates with it.
+     The blueprint's R is 0.49 of the viewport; the previous pass trimmed R to
+     0.355vw (plates to 13.5vw) to fit a closed ring inside the values band's
+     clear lane at lg:pt-36. Lorena's 2026-09-08 round asked for the wheel wider
+     "so it takes up more space on the screen" (client email SS4).
 
-     The wheel is now a closed ring turning endlessly rather than a 32 degree
-     sweep, so the arc reaches 0.103 R deeper than it used to at some phase of
-     every revolution. R is trimmed from 0.394vw to 0.355vw and the hub raised
-     to 61% of the band (PlateWheel.tsx) to put that floor back inside the
-     values band's clear lane, at every width from 1024 up and at every phase.
-     Clamped so the arc neither collapses at 1024 nor swings off a wide monitor. */
+     R moved to 0.47vw (was 0.355vw) and the plates to 0.23vw (was 0.135vw),
+     back toward the blueprint's own 0.49vw and 0.22 to 0.25vw plates (James
+     measured the top plate at 25% of the 1332px slice; a first pass at 0.20vw
+     still read visibly smaller than the blueprint side by side). Room for the extra reach comes from
+     Values.tsx shifting its columns left of centre (as the blueprint itself
+     draws them) rather than from more empty space above the icons, so the
+     "wider wheel" and "values higher up" asks solve each other: less vertical
+     clear lane is needed because the horizontal one grew.
+
+     Min clamp = the value the fluid formula already produces at 1024 (this
+     wheel's own floor width, hidden below lg), so it is a safety rail, not an
+     active shrink: the ring never gets smaller at 1024 than it naturally is.
+     Max clamp caps the ring at 1440 and holds flat above it, so a wide monitor
+     gets a bigger wheel than before (620 vs 505) without it swinging further
+     out than the values text can spare. Measured clearances across a full
+     revolution at 1024/1280/1440/1920 are in the handoff. */
   .plate-wheel {
-    --wheel-r: clamp(390px, 35.5vw, 505px);
-    --plate-w: clamp(150px, 13.5vw, 190px);
+    --wheel-r: clamp(480px, 47vw, 660px);
+    --plate-w: clamp(215px, 23vw, 300px);
   }
   .wheel-hub {
     transform: rotate(var(--wheel-rot, 0deg));

@@ -130,3 +130,17 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
 28. **Travel and wobble are two different springs.** A single physical spring cannot arrive
     from 60% away with a 5% overshoot and still show a visible settle; decouple them (arrival
     envelope, then a small damped settle) when a client asks for "a little shake, but smooth".
+
+### Scroll ownership, found by Lorena 2026-09-08 (menu pop-up would not scroll)
+29. **Any scrollable box inside a Lenis page needs `data-lenis-prevent`.** Lenis listens for
+    the wheel on the window, cancels the event and moves the document itself, so a dialog with
+    its own `overflow-y: auto` gets the scrollbar but no scroll: 3433px of menu in a 720px
+    window, wheel `defaultPrevented`, scrollTop 0 before and after. Do not reach for
+    `lenis.stop()` while the dialog is open: a stopped Lenis still cancels every wheel event
+    (its own `onVirtualScroll`), which is the same bug wearing a different hat. The same
+    applies to any future drawer, rail-in-a-modal or in-page scroller.
+30. **QA the production build, never `next dev`.** The dev bundle does not hydrate under
+    this site's static CSP (no `'unsafe-eval'`), silently: no console error, the page renders
+    from the server, and every click and every reveal does nothing. A whole round of "the
+    pop-up does not open" was that. `npm run build && npx next start -p 9157` is the only
+    server that measures anything real here (CLAUDE.md already says how to kill it).

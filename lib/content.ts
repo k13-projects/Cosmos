@@ -79,14 +79,14 @@ export const nav = [
  * instead of a dead link, so a half-wired site never sends a guest to a
  * storefront that is not there.
  *
- * WHAT IS KNOWN TODAY (facts SS5). Every URL field in the docx is blank.
- * The two DoorDash links below are public on the current live site. Toast
- * storefronts for the food halls are not public. So three of five rows ship
- * with nothing connected, which is a gap on the client, not a mistake here.
+ * WHAT IS KNOWN TODAY. Every URL field in the docx was blank (facts SS5).
+ * Carlsbad and Oceanside DoorDash are public on the current live site;
+ * San Clemente and Little Italy DoorDash came from Lorena on 2026-09-08.
+ * Toast storefronts for the food halls are still not public, and Station 8
+ * has not opened, so its row stays "coming soon" on purpose.
  *
- * TODO(client, Lorena): Toast pickup + Toast delivery + DoorDash for San
- * Clemente (Miramar), Little Italy (Global Fork) and UCSD Campus (Station 8),
- * and the Toast links for Carlsbad and Oceanside. Same ask as Lobster Lab.
+ * TODO(client, Lorena): Toast pickup + Toast delivery for every hall, and
+ * DoorDash for UCSD Campus (Station 8) once it opens. Same ask as Lobster Lab.
  *
  * Grubhub and Uber Eats exist on the current live site but are not in Lorena's
  * brief, so they are deliberately absent here rather than half-supported.
@@ -400,7 +400,14 @@ export const locations: Location[] = [
     address: "1720 North El Camino Real, San Clemente, CA 92672",
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 1720 N El Camino Real, San Clemente, CA 92672",
-    ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
+    ordering: {
+      toastPickup: "",
+      toastDelivery: "",
+      // Lorena, 2026-09-08 (docs/intake/client_email_2026-09-08.md); tracking
+      // query stripped, like the two live-site links above.
+      doordash:
+        "https://www.doordash.com/store/cosmos-burger-san-clemente-48099431/113394124/",
+    },
     mark: { src: "/locations/trace/miramar.png", width: 800, height: 776, alt: "" },
   },
   {
@@ -410,7 +417,12 @@ export const locations: Location[] = [
     address: "550 W Date St Suite B, San Diego, CA 92101",
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 550 W Date St, San Diego, CA 92101",
-    ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
+    ordering: {
+      toastPickup: "",
+      toastDelivery: "",
+      // Lorena, 2026-09-08; tracking query stripped.
+      doordash: "https://www.doordash.com/store/cosmos-burger-san-diego-48099429/115426349/",
+    },
     mark: { src: "/locations/trace/global-fork.png", width: 450, height: 800, alt: "" },
   },
   {

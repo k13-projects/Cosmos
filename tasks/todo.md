@@ -86,7 +86,43 @@ Source of truth for scope: `PROJECT_BRIEF.md`, `SCOPE.md`,
 - [ ] Plate names: confirm the six wheel-plate names, matched by photo (one-glance, not client-
       confirmed)
 - [ ] Chicken sandwich photo: the original, wider photo used in the PDF band, if Lorena still has
-      it (the file we hold can't reproduce the blueprint's exact crop)
+      it (the file we hold can't reproduce the blueprint's exact crop). 2026-09-08: she sent two
+      Drive options, see below.
+
+## Round 2: Lorena's feedback on the preview (2026-09-08; built 2026-09-09)
+Source: `docs/intake/client_email_2026-09-08.md`. Shipped as one `cosmos_sep09_v1` round, then
+reply to her on the Station8 thread.
+- [x] Menu pop-up: she cannot scroll to the bottom of the menu. Reproduced on the production
+      build (3433px of menu in a 720px window, wheel `defaultPrevented`, scrollTop 0 before and
+      after): Lenis cancels every wheel event on the window and moves the locked page instead.
+      Fix: `data-lenis-prevent` on the dialog's scroll container (`components/Modal.tsx`), so
+      the browser scrolls the dialog natively. `lenis.stop()` was rejected: a stopped Lenis
+      still cancels the wheel everywhere (its own `onVirtualScroll`).
+- [x] BBQ Burger photo: now a full-width 4:3 crop around the burger and plate, like every
+      other item shot, instead of the whole portrait source in a tall white box
+      (`scripts/build-assets.sh`, `public/menu/items/bbq-burger.webp`)
+- [x] Values band ("Bold Flavors, Real Vibes, Fresh Always"): top lane lg:pt-36 -> lg:pt-16,
+      columns left of centre in a 780px grid (the blueprint spans ~58% of the page) at
+      32px/16px type at lg. The blueprint draws the columns left, not centred: the plates
+      hang over the right edge and must never cover "Fresh always" (Lesson 16).
+- [x] "OUR BEST SELLERS" title: one size down at every breakpoint (5.4vw/4xl/5xl ->
+      4.4vw/3xl/4xl); pill ends at 61px and 314px inside a 375px viewport.
+- [x] Plate wheel (About cascade): wider and bigger plates, closer to the blueprint's
+      proportions: R 0.355vw -> 0.47vw (clamp 480 to 660px), plates 13.5vw -> 23vw (clamp
+      215 to 300px), hub 61% -> 58% of the band. Natalia's first pass (0.44vw / 20vw) still
+      read smaller than the blueprint side by side, so James pushed it. Min clearance to the
+      values text across a full revolution: 56px at 1024, 185 at 1280, 294 at 1440, 512 at
+      1920; to the About paragraphs 62 / 250 / 368 / 608. No horizontal leak 375 to 1920.
+      Names confirmed correct, untouched.
+- [x] Order pop-up: DoorDash Little Italy + DoorDash San Clemente wired (`lib/content.ts`).
+      DoorDash serves a bot challenge to headless browsers, so the two URLs are verified by
+      their slugs and shape only; click them once in a real browser.
+- [x] Chicken sandwich band: **kept as is.** Her first Drive file is byte-identical to the
+      `cosmos 2-121.jpg` the band is already cut from (so the wider original does not exist);
+      her second, `cosmos 2-003.jpg`, is a different, top-down sandwich on a yellow chair, not
+      the blueprint's shot. Both saved under `Cosmos Assets/LORENA UPDATE 2026-09-08/`.
+- [ ] Location drawings: hold; she is sending her own. Ours stay until then.
+- [ ] Reply to Lorena once the round is live (draft in Gmail, Kazim sends)
 
 ---
 

@@ -212,8 +212,12 @@ export default function BestSellers() {
         /* The mobile size is deliberately below the vw curve the other
            headlines follow. At 7vw the pill measured wider than a 375px
            viewport, so both its rounded ends were cut off and the seam tab read
-           as a plain full-width magenta bar. */
-        className="reveal display absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[999px] bg-magenta px-5 py-3.5 text-[5.4vw] text-yellow shadow-[var(--shadow-soft)] sm:px-12 sm:py-5 sm:text-4xl lg:text-5xl"
+           as a plain full-width magenta bar.
+           2026-09-08 (Lorena's round 2, client email SS2): "make it smaller."
+           One Tailwind step down at sm/lg (text-4xl -> 3xl, text-5xl -> 4xl)
+           and the same proportion off the mobile vw value (5.4vw -> 4.4vw),
+           keeping it well clear of the 375px pill-cutoff bug above. */
+        className="reveal display absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[999px] bg-magenta px-5 py-3.5 text-[4.4vw] text-yellow shadow-[var(--shadow-soft)] sm:px-10 sm:py-4 sm:text-3xl lg:px-12 lg:py-5 lg:text-4xl"
       >
         {HEADING}
       </h2>
