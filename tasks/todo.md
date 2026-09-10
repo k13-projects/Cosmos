@@ -122,7 +122,7 @@ reply to her on the Station8 thread.
       her second, `cosmos 2-003.jpg`, is a different, top-down sandwich on a yellow chair, not
       the blueprint's shot. Both saved under `Cosmos Assets/LORENA UPDATE 2026-09-08/`.
 - [ ] Location drawings: hold; she is sending her own. Ours stay until then.
-- [ ] Reply to Lorena once the round is live (draft in Gmail, Kazim sends)
+- [x] Reply to Lorena once the round is live: sent by Kazim 2026-09-10 on the Station8 thread, cc Eren
 
 ---
 
