@@ -1,0 +1,64 @@
+{
+  "project": "Cosmos Burger",
+  "round": 3,
+  "date": "2026-09-15",
+  "tester": "Olga (qa-test-engineer)",
+  "gate": "two-agent Chrome QA gate",
+  "build": {
+    "method": "npm run build && npx next start -p 9157",
+    "dev_server_used": false,
+    "image_cache_cleared": true
+  },
+  "packages_tested": [
+    "docs/handoffs/engineering_2026-09-15_v2.md",
+    "docs/handoffs/engineering_2026-09-15_v3.md"
+  ],
+  "verdict": "PASS",
+  "fix_applied": {
+    "file": "components/PlateWheel.tsx",
+    "what": "Mobile plate wheel caption visibility changed from always-on-for-primaries to focus-visible-only, matching the desktop ring's hover/focus model. Fixes overlapping and belt-clip-sliced captions James flagged before the run started.",
+    "verified_after_fix": true
+  },
+  "client_items": [
+    { "id": 1, "text": "About text wider, gap to wheel closed (desktop)", "status": "PASS", "evidence": "clearance to wheel 37px at 1024 (independently re-measured)" },
+    { "id": 2, "text": "Values centered; plates never cover Fresh always through full revolution", "status": "PASS", "evidence": "independent 30-sample 360deg sweep at 1024 and 1280, min clearance 186px, zero overlaps; blueprint's left-alignment intentionally overridden by client's own round-3 instruction" },
+    { "id": 3, "text": "Her three icons, not cut off (desktop)", "status": "PASS", "evidence": "verified at 1280/1024, mask icons render full size, aria-hidden" },
+    { "id": 4, "text": "Frings shows a photo, not placeholder", "status": "PASS", "evidence": "confirmed live in the menu pop-up, Cauliflower Bites placeholder correctly unchanged" },
+    { "id": 5, "text": "Wheel works on a phone, shows all six dishes", "status": "PASS_AFTER_FIX", "evidence": "caption overlap/slice bug found and fixed; touch drag+momentum, click-opens-menu, drag-does-not, keyboard reach, all verified live post-fix" },
+    { "id": 6, "text": "Her three icons, not cut off (mobile)", "status": "PASS", "evidence": "verified at 375/320" },
+    { "id": 7, "text": "Locations title not clipped on mobile", "status": "PASS", "evidence": "scrollWidth==clientWidth at 390 and 320" },
+    { "id": 8, "text": "Directions button does not cover the drawing on mobile", "status": "PASS", "evidence": "16px clearance at 320 despite confirmed two-line control wrap" }
+  ],
+  "viewports_swept": [320, 375, 390, 768, 1024, 1280, 1440, 1920],
+  "console_errors": 0,
+  "horizontal_leak": false,
+  "fidelity_gate": {
+    "bands": ["About", "Values"],
+    "widths": [1280, 375],
+    "verdict": "PASS",
+    "documented_deviation": "Values column centered vs blueprint's left-align, per Lorena's explicit round-3 instruction"
+  },
+  "menu_popup": {
+    "lenis_prevent_present": true,
+    "scroll_works": true,
+    "open_close_works": true
+  },
+  "error_boundaries": {
+    "app/error.tsx": "compiled, chunk served 200, read in full",
+    "app/global-error.tsx": "compiled, chunk served 200, read in full",
+    "live_throw_tested": false,
+    "note": "reasoned from build inclusion + code read per task's own allowance"
+  },
+  "accessibility_spot_checks": {
+    "mask_icons_aria_hidden": true,
+    "wheel_plate_tap_targets_min_px": "113x62",
+    "locations_controls_tap_targets_min_px": "94x47.5"
+  },
+  "open_residuals": [
+    "Empty purple band under mobile wheel: 200px / 24.6% of 375px viewport, not a client item, flagged for a follow-up round",
+    "prefers-reduced-motion not re-driven live this round (unaffected code path, trusted from engineering's own numbers)",
+    "Desktop mouse hover not re-driven live this round (tooling limitation, non-functional code change only)"
+  ],
+  "not_committed": true,
+  "server_left_running": "localhost:9157"
+}

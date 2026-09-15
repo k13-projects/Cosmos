@@ -26,7 +26,8 @@ command -v cwebp >/dev/null || { echo "ERROR: cwebp not found. brew install webp
 command -v sips >/dev/null || { echo "ERROR: sips not found (macOS only)."; exit 1; }
 python3 -c "import PIL" 2>/dev/null || { echo "ERROR: python3 Pillow not found. pip3 install Pillow"; exit 1; }
 
-mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/menu/items" "$PUB/brand"
+mkdir -p "$PUB/photos" "$PUB/menu/best-sellers" "$PUB/menu/plates" "$PUB/menu/items" "$PUB/brand" \
+  "$PUB/icons/values" "$PUB/locations/trace"
 
 # --------------------------------------------------------------------------- #
 # BAND CROPS (Lessons 19: "photo bands are crops, not slots")
@@ -254,6 +255,114 @@ cp "$TMP/menu.png" "$PUB/menu/cosmos-menu.png"
 cwebp -q 86 -m 6 -quiet "$TMP/menu.png" -o "$PUB/menu/cosmos-menu.webp"
 echo "  menu/cosmos-menu.png"
 echo "  menu/cosmos-menu.webp"
+
+echo "==> Frings (Lorena, 2026-09-10, the one Sides item that had no photo)"
+# She spotted the branded placeholder tile on Frings and sent the product shot.
+# Her file is 2304x1537 (3:2) on white, bowl centred; every other item shot is
+# 4:3, so this is cut to 4:3 the same way the BBQ crop is, centred on the bowl,
+# rather than shipped at a foreign aspect next to its neighbours.
+FRINGS_SRC="$SRC/LORENA UPDATE 2026-09-10/frings.jpg"
+if [ ! -f "$FRINGS_SRC" ]; then
+  echo "  ERROR: photo source not found: LORENA UPDATE 2026-09-10/frings.jpg" >&2
+  exit 1
+fi
+python3 - "$FRINGS_SRC" "$TMP/frings.png" <<'PY'
+import sys
+from PIL import Image
+src, out = sys.argv[1], sys.argv[2]
+im = Image.open(src).convert("RGB")
+w, h = im.size
+box_w = min(w, round(h * 4 / 3))
+left = (w - box_w) // 2
+im.crop((left, 0, left + box_w, h)).save(out)
+print(f"    crop {box_w}x{h} at x={left} (4:3, like the other item shots)")
+PY
+sips -Z 640 "$TMP/frings.png" >/dev/null
+cwebp -q 82 -quiet "$TMP/frings.png" -o "$PUB/menu/items/frings.webp"
+echo "  menu/items/frings.webp"
+
+echo "==> value icons (Lorena, 2026-09-10, her own icon art)"
+# Lorena, 2026-09-10: "the three icons look cut off", with her files attached.
+# They are the client's real brand icons, 500x500 yellow line art WITH ALPHA,
+# the same three shapes components/Icons.tsx used to redraw by hand as inline
+# SVG (facts SS3: the brand library only ships them as raster inside a PDF).
+#
+# Each source is about 60% empty margin, which is half of why they read small
+# and clipped beside their headings, so they are trimmed to the drawn ink with
+# the usual 4% breathing room. The colour is not used: the component paints the
+# glyph with `currentColor` through a CSS mask (globals.css, `.value-icon`), so
+# these still inherit the yellow token exactly as the hand-drawn SVGs did, and
+# a future recolour of the band cannot strand three yellow PNGs on it.
+ICONS_SRC="$SRC/LORENA UPDATE 2026-09-10"
+declare -a ICONS=(
+  "icon-carlsbad.webp:burger"
+  "icon-oceanside.webp:vibes"
+  "icon-sandiego.webp:fresh"
+)
+for pair in "${ICONS[@]}"; do
+  f="${pair%%:*}"; out="${pair##*:}"
+  src="$ICONS_SRC/$f"
+  if [ ! -f "$src" ]; then
+    echo "  ERROR: icon source not found: LORENA UPDATE 2026-09-10/$f" >&2
+    exit 1
+  fi
+  dwebp -quiet "$src" -o "$TMP/icon.png"
+  trim_png "$TMP/icon.png" "$PUB/icons/values/$out.png" 512
+  rm -f "$TMP/icon.png"
+  echo "  icons/values/$out.png ($(sips -g pixelWidth -g pixelHeight "$PUB/icons/values/$out.png" | tail -2 | tr -s ' \n' ' '))"
+done
+
+echo "==> location marks (Lorena, 2026-09-10, her own drawings)"
+# Round 2 she said ours were "not very clear or the borders are very straight"
+# and promised her own; these are them. Four of the five halls: Miramar is
+# deliberately absent because she prefers the one already on the site, so
+# miramar.png is NOT regenerated here and stays the Canny trace.
+#
+# Her files are 4560x2565 PNGs, purple line art on transparent paper with very
+# wide empty margins, so they are trimmed to the ink first: the card would
+# otherwise size a mostly-empty box and show a tiny drawing in the middle of
+# it, which is the "small and floating" read.
+#
+# Then capped at 1000w and quantised to 128 colours. Both numbers are about
+# weight, and the weight is real: trimmed at 1400w in full colour these are
+# 1.0 to 1.6 MB EACH, against the 100 to 150 KB traces they replace, and
+# public/ is committed. The art is essentially one purple hue on transparency,
+# which is exactly what a palette compresses well: 1556 KB -> 189 KB for the
+# heaviest of the four, with no visible loss in the line work at twice the
+# size the card ever renders (checked side by side at 2x on the cream ground).
+# 1000w is still about three times the mark's largest rendered width.
+MARKS_SRC="$SRC/LORENA UPDATE 2026-09-10"
+declare -a MARKS=(
+  "loc-windmill.png:windmill"
+  "loc-oceanside.png:oceanside"
+  "loc-globalfork.png:global-fork"
+  "loc-station8.png:station-8"
+)
+for pair in "${MARKS[@]}"; do
+  f="${pair%%:*}"; out="${pair##*:}"
+  src="$MARKS_SRC/$f"
+  if [ ! -f "$src" ]; then
+    echo "  ERROR: location drawing not found: LORENA UPDATE 2026-09-10/$f" >&2
+    exit 1
+  fi
+  python3 - "$src" "$PUB/locations/trace/$out.png" <<'PY'
+import sys
+from PIL import Image
+src, out = sys.argv[1], sys.argv[2]
+im = Image.open(src).convert("RGBA")
+bbox = im.getchannel("A").getbbox()
+if bbox is None:
+    raise SystemExit(f"ERROR: {src} has no visible alpha content")
+l, t, r, b = bbox
+pad = round(max(r - l, b - t) * 0.02)
+im = im.crop((max(0, l - pad), max(0, t - pad), min(im.width, r + pad), min(im.height, b + pad)))
+if im.width > 1000:
+    im = im.resize((1000, round(im.height * 1000 / im.width)), Image.LANCZOS)
+im.quantize(colors=128, method=Image.FASTOCTREE).save(out, optimize=True)
+print(f"    {out.split('/')[-1]} {im.width}x{im.height}")
+PY
+  echo "  locations/trace/$out.png ($(du -h "$PUB/locations/trace/$out.png" | cut -f1 | tr -d ' '))"
+done
 
 echo "==> brand"
 LOGO_SRC="$SRC/LOGO & BRAND IDENTITY/COSMOS BURGER LOGO.svg"

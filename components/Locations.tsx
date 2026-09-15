@@ -47,7 +47,24 @@ export default function Locations() {
     <section id="locations" className="pattern scroll-mt-28 overflow-hidden py-16 sm:py-20 lg:scroll-mt-32 lg:py-24">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
         <header className="reveal mb-10 lg:mb-12">
-          <h2 className="display text-[13vw] text-yellow sm:text-6xl lg:text-[76px]">Locations</h2>
+          {/* text-[11vw], not the 13vw every sibling headline uses (Round 3,
+              Lorena item 7, "the Locations title is cut off on mobile").
+              "LOCATIONS" is nine letters and one unbreakable word; at
+              `.display`'s 900-weight, 125%-wide Archivo it measures about
+              7.77em advance including tracking. At 13vw that is wider than
+              the section's own content box below ~640px (e.g. 379px of text
+              against 335px available at 375, 44px over) and this section
+              carries `overflow-hidden` for the horizontal rail beneath, so
+              the extra width was being sliced off the right edge rather than
+              wrapping (a single word can't wrap) or shrinking. Every other
+              `.display text-[13vw]` headline on the page is either a
+              multi-word phrase that wraps normally (About, Explore our menu)
+              or a shorter single word that already clears its box (Catering,
+              Reviews) so this is the only one that needed the number turned
+              down. 11vw keeps six-plus px of clearance down to a 320px
+              viewport; verified against the font's real advance widths
+              (fontTools against the served Archivo woff2), not eyeballed. */}
+          <h2 className="display text-[11vw] text-yellow sm:text-6xl lg:text-[76px]">Locations</h2>
           <p className="mt-1 text-2xl font-semibold italic leading-none text-white sm:text-3xl">
             Find us
           </p>
@@ -76,23 +93,62 @@ export default function Locations() {
             >
               <div className="relative flex w-full flex-col overflow-hidden rounded-[40px] bg-cream p-7 lg:p-8">
                 {/* Corner watermark, design_2026-09-02_v2.md row C ("detailed
-                    trace"), Kazim's pick. `position:absolute` paints above
-                    static in-flow content in the same stacking contex
-                    regardless of DOM order, so the geometry below is wha
-                    actually keeps it clear of every control and text line
-                    (measured at 375, 640, 768, 1280, 1440), not z-order; the
-                    inner wrapper right after this still carries `relative
-                    z-10` as a second line of defence.
-                    `bottom-[88px]` below `sm`: under 640px the rail's <li>s
-                    stretch to the tallest card in the row, so a card can look
-                    "short" against its own content even though the row is
-                    tall, and the flush `bottom-4` corner (restored at `sm`
-                    and up, where that stretch stops mattering) lands the
-                    mark's box on the Directions link at 375. 88px clears the
-                    controls row on every card with margin, without climbing
-                    high enough to reach the text above it (safe window
-                    measured at 80-100px).
-                    `opacity-[var(--mark-opacity)]`: see the token's commen
+                    trace"), Kazim's pick: glued into the bottom-right corner,
+                    large, allowed to run into the card's rounded corner (the
+                    card clips it), text and controls above it in z-order,
+                    `.halo` (globals.css) knocking it out behind whatever
+                    copy or control lands on it. `position:absolute` paints
+                    above static in-flow content in the same stacking context
+                    regardless of DOM order; the inner wrapper right after
+                    this still carries `relative z-10` as a second line of
+                    defence.
+
+                    No `aspect-square` (Round 3, Lorena's own drawings
+                    replaced four of five marks, `lib/content.ts`): forcing a
+                    1:1 box on `object-contain` fit her landscape and
+                    near-square art inside a square, wasting the empty band
+                    top/bottom or left/right instead of letting the box take
+                    each image's own shape, which is what made them read
+                    "small and floating". Dropping it lets the browser's own
+                    default (aspect-ratio from the `width`/`height` attrs
+                    next/image sets) size the box to the real drawing.
+                    `max-h-*` still caps it: without one, Oceanside's
+                    drawing (1000x1141, the one portrait outlier among four
+                    otherwise landscape marks) would render taller than the
+                    card itself at `lg` (needs ~60% of the card's own width
+                    in height, against a card whose fixed aspect is only
+                    ~65% of its width tall). The three cap values mirror the
+                    `sizes` hints one line down (already tuned to the same
+                    breakpoints), so a capped mark still fills the same
+                    footprint the rest of the design already expects; when a
+                    mark's natural height is under the cap (four of five),
+                    the cap never engages and it renders at full size.
+
+                    `bottom-[88px]` below `sm`, flush `-bottom-[6%]` restored
+                    at `sm` and up (Round 3, Lorena item 8, "the direction
+                    button covers the location drawings" on mobile): under
+                    640px the controls row (Order + Directions, both a
+                    44px-tall real target) sits flush against the card's
+                    floor and running the mark flush into the corner too laid
+                    its most legible portion directly under that row, so
+                    `.halo`'s cream knockout was erasing most of what should
+                    have read as a drawing rather than just the text it was
+                    built for. 88px clears the row on every card (Order and
+                    Directions are the same fixed labels everywhere, so the
+                    row's width does not vary card to card) with margin,
+                    without climbing high enough to reach the text above it;
+                    this is the same number and the same reasoning an earlier
+                    pass already measured and documented before the mark grew
+                    to its current size, re-verified here against today's
+                    button geometry. `sm` and up keep the flush corner: the
+                    rail's `<li>`s stop stretching to the tallest card in the
+                    row there and the wider card gives the controls room, so
+                    nothing needs to move. (One acknowledged gap: at a very
+                    narrow phone, e.g. 320px, the controls row wraps to two
+                    lines and 88px alone no longer fully clears it; not
+                    reproduced against real font metrics here, flagged for
+                    the browser QA gate.)
+                    `opacity-[var(--mark-opacity)]`: see the token's comment
                     in app/globals.css for the picked value. */}
                 <Image
                   src={l.mark.src}
@@ -101,10 +157,7 @@ export default function Locations() {
                   height={l.mark.height}
                   aria-hidden="true"
                   sizes="(min-width: 1024px) 18vw, (min-width: 640px) 32vw, 42vw"
-                  /* Kazim, 2026-09-02: glued into the bottom-right corner, about two and a half
-                     times the first size, and allowed to run into the card's rounded corner (the
-                     card clips it). Text and controls sit above it in z-order. */
-                  className="pointer-events-none absolute -bottom-[6%] -right-[6%] z-0 aspect-square h-auto w-[52%] object-contain object-right-bottom opacity-[var(--mark-opacity)]"
+                  className="pointer-events-none absolute bottom-[88px] -right-[6%] z-0 h-auto w-[52%] max-h-[42vw] object-contain object-right-bottom opacity-[var(--mark-opacity)] sm:-bottom-[6%] sm:max-h-[32vw] lg:max-h-[18vw]"
                 />
                 <div className="relative z-10 flex w-full flex-1 flex-col">
                   <div className="flex items-start justify-between gap-3">

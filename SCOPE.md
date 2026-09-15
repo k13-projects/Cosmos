@@ -32,14 +32,24 @@
   Lorena to confirm against the real menu.
 
 ## Open questions for Lorena (batched, do not drip)
-1. Ordering URLs: Toast + DoorDash links per food hall. Carlsbad DoorDash and Oceanside DoorDash
-   are already public; everything else, including both Toast links for every hall, is open.
-2. Contact info: what should the footer's CONTACT INFO show (address, phone, email)?
-3. Plate names: the six wheel plates are named by matching them against the old site's item
-   shots, one glance per plate, not a client-confirmed list. Can you confirm the six names?
-4. Chicken sandwich photo: the photo band above Reviews is cropped from a narrower file than the
-   blueprint used, so it can't reproduce the blueprint's exact crop (see `build-assets.sh`). If
-   you still have the original, wider chicken-sandwich photo used in the PDF, that would let the
-   band match the blueprint's own framing exactly.
+Two of the original four closed on 2026-09-08 and are kept here as a record rather than deleted,
+so a later reader does not re-ask them:
+
+1. **Ordering URLs: still open.** Toast pickup and Toast delivery are missing for every hall.
+   DoorDash is now wired for four of the five (Carlsbad and Oceanside were already public;
+   Little Italy and San Clemente came from Lorena on 2026-09-08). Station 8 has not opened, so
+   its row stays "coming soon" on purpose.
+2. **Contact info: still open.** The footer ships with socials only until she supplies an
+   address, phone and email for CONTACT INFO. Her team had not confirmed as of 2026-09-08.
+3. ~~Plate names~~ **closed 2026-09-08**: Lorena confirmed all six wheel plates are named
+   correctly as they are.
+4. ~~Chicken sandwich photo~~ **closed 2026-09-09**: she sent two Drive files. The first is
+   byte-identical to the file the band is already cut from, so the wider original the blueprint
+   used does not exist on her side either; the second is a different sandwich. The band stays as
+   built and `cosmos 2-003.jpg` is on file for a future use.
+
+Also closed since: the **location drawings** (2026-09-10, hers now ship for four of the five
+halls, Miramar stays ours at her request) and the **Frings photo** (2026-09-10, the last menu
+item that rendered a placeholder tile).
 
 Menu content (prices + descriptions) is DONE, closed 2026-09-02 (`COSMOS MENU.png`).

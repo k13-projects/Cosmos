@@ -144,3 +144,42 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
     from the server, and every click and every reveal does nothing. A whole round of "the
     pop-up does not open" was that. `npm run build && npx next start -p 9157` is the only
     server that measures anything real here (CLAUDE.md already says how to kill it).
+
+### Collision measurement, corrected by Natalia 2026-09-15 (mobile plate wheel)
+31. **`getBoundingClientRect()` ignores an ancestor's `overflow: hidden`.** A script sweeping
+    the mobile plate wheel's full rotation for text collisions read minus 60 to 90px against the
+    values band on first pass, a false alarm: the wheel's belt clips everything to a small box,
+    but the rect the script was comparing was the plate's full, unclipped layout position, most
+    of it never actually painted. Fixed by intersecting each element with its clipping
+    ancestor's own rect first, and only comparing what survives that intersection. Any script
+    that judges visual collision from raw `getBoundingClientRect()` values, not just this
+    project's wheel, needs the same clip step whenever the element sits inside an
+    `overflow: hidden`/`clip` box.
+32. **A CSS-only per-element tooltip that is "always on" does not scale to a dense repeating
+    ring.** The mobile wheel's 24 spokes (6 dishes x 4 repeats) can put ten-plus captions on
+    screen at once inside a 90 to 100 degree arc; showing a name under every visible plate
+    crowded them into unreadable overlap. Gate the always-on caption to the PRIMARY instances
+    only (here: `primary` from `about.plates`) — the ring keeps turning, so a repeat's own named
+    instance comes back into view on its own, and nothing is permanently unlabeled.
+    **Superseded by Lesson 33's fix, same day (Olga, QA gate):** cutting to six was not enough.
+    Six always-on captions can still land inside the same 90 to 100 degree visible arc at once
+    (they are not evenly spaced within the belt's own view window, only around the full circle),
+    and because the belt clips vertically while the ring never stops turning, any always-on
+    caption's own position sweeps across the clip edge every rotation and gets sliced mid-word.
+    "Fewer captions" was the wrong axis; "not always on" was the fix. See Lesson 33.
+
+### Caption visibility on a moving, clipped ring, corrected by Olga 2026-09-15 (QA gate)
+33. **On a ring that never stops turning inside a clipped belt, no always-on caption is safe,
+    no matter how few.** James caught this from the built screenshots before the QA pass even
+    started: several of the mobile wheel's six "primary" captions (Lesson 32) were stacked into
+    overlapping pills, and the same captions were sliced mid-word ("EN", "E" with no plate under
+    them) by the belt's own `overflow-hidden` edge. Root cause: an always-on element's position is
+    exactly as moving as the plate it labels, so it inevitably sweeps through the clip boundary
+    on every revolution — there is no caption count low enough to make "always visible" safe
+    inside a clipping, continuously-rotating container. Fixed by dropping "always on" entirely and
+    matching the desktop ring's own model: hidden by default, revealed only on `:focus-visible`
+    (keyboard/screen-reader), the same class on both rings. Touch has no hover to lose, and a tap
+    already opens the menu and names the dish there. **The general rule:** inside any
+    continuously-animated, clipped container, a label's visibility must be tied to a discrete,
+    non-animating trigger (focus, hover, a click-to-reveal state) — never "on by default while
+    true," even for a subset of elements, even if the subset is small.
