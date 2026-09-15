@@ -33,3 +33,9 @@ yarn-error.log*
 .gstack/
 tsconfig.tsbuildinfo
 .vercel
+
+# iCloud duplicate artifacts. Syncing this folder leaves byte-identical copies
+# named "<name> 2.<ext>" beside the original; 22 of them (21 menu photos and a
+# whole script) had been committed and were shipping in the deploy, referenced
+# by nothing. Ignored so they cannot come back the same way.
+* 2.*

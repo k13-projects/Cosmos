@@ -334,10 +334,17 @@ export type Location = {
   ordering: OrderLinks;
   /**
    * The corner watermark (design_2026-09-02_v2.md, row C: "detailed trace").
-   * Purple (`#751080`) Canny line art, `public/locations/trace/*.png`, decorative
+   * Purple (`#751080`) line art, `public/locations/trace/*.png`, decorative
    * only, so `alt` stays empty and the component adds `aria-hidden`. `width`/
    * `height` are the source PNG's real pixel size (intrinsic, for next/image),
    * not the rendered size, which is set in CSS.
+   *
+   * Round 3 (Lorena, docs/intake/client_email_2026-09-10.md): windmill,
+   * oceanside, global-fork and station-8 are now HER OWN ink drawings
+   * (`Cosmos Assets/LORENA UPDATE 2026-09-10/`), landscape and considerably
+   * more detailed than the Canny traces they replace, hence the mixed
+   * intrinsic sizes below. Miramar is deliberately untouched, K13's own Canny
+   * trace, because she said she prefers the one already on the site.
    */
   mark: { src: string; width: number; height: number; alt: string };
 };
@@ -366,7 +373,7 @@ export const locations: Location[] = [
       // Public on burgerscosmos.com; the locale prefix has been stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-carlsbad-26018232/29386346/",
     },
-    mark: { src: "/locations/trace/windmill.png", width: 613, height: 800, alt: "" },
+    mark: { src: "/locations/trace/windmill.png", width: 1000, height: 964, alt: "" },
   },
   {
     // Oceanside (Kazim, 2026-09-02): promoted from the order-pop-up-only row
@@ -387,11 +394,11 @@ export const locations: Location[] = [
       doordash:
         "https://www.doordash.com/store/cosmos-burger-oceanside-oceanside-25982698/51403146/",
     },
-    // PROVISIONAL (design_2026-09-02_v2.md Risks): drawn from an old-site
-    // archive photo, not Lorena's current storefront shot, which has not
-    // landed yet. Re-check the mark against her photo when it arrives; swap
-    // this src if the awning/trellis silhouette does not match.
-    mark: { src: "/locations/trace/oceanside.png", width: 800, height: 704, alt: "" },
+    // Her real drawing landed 2026-09-10 (Round 3), replacing the provisional
+    // archive-photo trace this card shipped with. Portrait, the one outlier
+    // among the four new marks: see the sizing comment on Locations.tsx's
+    // corner-mark Image for how the layout keeps it from overrunning the card.
+    mark: { src: "/locations/trace/oceanside.png", width: 1000, height: 1141, alt: "" },
   },
   {
     id: "san-clemente",
@@ -423,7 +430,7 @@ export const locations: Location[] = [
       // Lorena, 2026-09-08; tracking query stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-san-diego-48099429/115426349/",
     },
-    mark: { src: "/locations/trace/global-fork.png", width: 450, height: 800, alt: "" },
+    mark: { src: "/locations/trace/global-fork.png", width: 1000, height: 621, alt: "" },
   },
   {
     id: "ucsd",
@@ -436,7 +443,7 @@ export const locations: Location[] = [
     mapsQuery: "Station 8 Public Market, 9165 Theatre District Dr, La Jolla, CA 92037",
     status: "Coming Soon",
     ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
-    mark: { src: "/locations/trace/station-8.png", width: 800, height: 466, alt: "" },
+    mark: { src: "/locations/trace/station-8.png", width: 1000, height: 579, alt: "" },
   },
 ];
 
@@ -475,9 +482,11 @@ export const orderPopup = {
 /* it. "Chicks Fries" and "Frings" keep the menu's own spelling.                */
 /*                                                                             */
 /* Photos: unchanged from the old-site pass except BBQ (Lorena sent an updated  */
-/* shot, `BBQ UPDATED.png`, replacing `menu/items/bbq-burger.webp`). Frings and */
-/* Cauliflower Bites have no photo on file, so both render the branded          */
-/* placeholder tile, same as any item with no photo.                           */
+/* shot, `BBQ UPDATED.png`, replacing `menu/items/bbq-burger.webp`) and Frings  */
+/* (Round 3, docs/intake/client_email_2026-09-10.md: her photo cut to 4:3 like  */
+/* every other item shot, `menu/items/frings.webp`). Cauliflower Bites still    */
+/* has no photo on file, so it renders the branded placeholder tile, same as    */
+/* any item with no photo.                                                     */
 /* -------------------------------------------------------------------------- */
 
 export type MenuItem = {
@@ -738,13 +747,14 @@ export const menuPopup = {
           name: "Cauliflower Bites",
           price: "$9",
           tags: ["vegetarian"],
-          // No photo on file: branded placeholder tile, same as Frings.
+          // No photo on file: branded placeholder tile.
         },
         {
           name: "Frings",
           price: "$9",
           tags: ["vegetarian"],
-          // No photo on file: branded placeholder tile, same as Cauliflower Bites.
+          // Lorena, Round 3 (docs/intake/client_email_2026-09-10.md).
+          image: { src: "/menu/items/frings.webp", alt: "Frings" },
         },
         {
           name: "Regular Fries",

@@ -1,13 +1,8 @@
 import type { ValueIconName, SocialId } from "@/lib/content";
 
 /**
- * Every icon on the page, drawn inline.
- *
- * The client's brand library ships 12 yellow line icons as raster inside a PDF
- * (facts SS3), not as vectors, so the three the values band needs are redrawn
- * here to match the blueprint's outline style: burger, sound-wave heart, leaf.
- * Inline rather than files because each is well under a kilobyte and they must
- * inherit their colour from a token.
+ * Every icon on the page, drawn inline (or, for the values band, masked from
+ * a client-supplied silhouette).
  *
  * All are decorative: each one sits directly above its own text label, so an
  * accessible name would be read out twice.
@@ -22,7 +17,9 @@ const base = {
   focusable: "false",
 } as const;
 
-/** Line-art burger: sesame top bun, patty, wavy lettuce, bottom bun. */
+/** Line-art burger: sesame top bun, patty, wavy lettuce, bottom bun. Still
+ * used as the menu pop-up's placeholder tile (below); the values band no
+ * longer draws it (see valueIcons). */
 function BurgerIcon({ className = "" }: IconProps) {
   return (
     <svg {...base} className={className}>
@@ -38,48 +35,64 @@ function BurgerIcon({ className = "" }: IconProps) {
   );
 }
 
-/** Sound-wave heart: a solid heart between two pairs of arcs. */
-function VibesIcon({ className = "" }: IconProps) {
-  return (
-    <svg {...base} className={className}>
-      <path
-        d="M24 39.5c-.6 0-1.2-.2-1.7-.6C18 35.3 12 30 12 23.6A7.6 7.6 0 0 1 19.6 16c1.9 0 3.6.8 4.4 2 .8-1.2 2.5-2 4.4-2a7.6 7.6 0 0 1 7.6 7.6c0 6.4-6 11.7-10.3 15.3-.5.4-1.1.6-1.7.6Z"
-        fill="currentColor"
+/**
+ * The values band's three icons, Lorena's own (client email 2026-09-10 SS3),
+ * replacing the hand-drawn burger/heart/leaf above. Exported as trimmed
+ * alpha silhouettes (`public/icons/values/{burger,vibes,fresh}.png`,
+ * `scripts/build-assets.sh`) specifically so a CSS mask can paint them in
+ * `currentColor`, the same yellow-token inheritance the inline SVGs gave for
+ * free; a plain `<img>` could not do that.
+ *
+ * The three sources are different aspect ratios (burger 270x239, vibes
+ * 270x132, fresh 270x224: her vibes mark is a wide horizontal lockup, the
+ * other two are closer to square), so a shared square box either crops the
+ * wide one or strands it tiny in a mostly-empty square (the cut-off look her
+ * note SS3 flagged in the first place). Each box below holds the same ink
+ * AREA instead of the same footprint: width follows the source's own
+ * `aspect-[]` so nothing is stretched, and only the width is chosen per icon
+ * (from width = sqrt(area x ratio)) so the three read as one visual weight
+ * side by side rather than three different-sized silhouettes sharing one box.
+ */
+function maskIcon(src: string, box: string) {
+  return function ValueMaskIcon({ className = "" }: IconProps) {
+    return (
+      <span
+        aria-hidden="true"
+        className={[box, className].filter(Boolean).join(" ")}
+        style={{
+          display: "inline-block",
+          backgroundColor: "currentColor",
+          WebkitMaskImage: `url(${src})`,
+          maskImage: `url(${src})`,
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+        }}
       />
-      <g stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
-        <path d="M8.6 15.5a15 15 0 0 0 0 17M2.8 11.5a22 22 0 0 0 0 25" />
-        <path d="M39.4 15.5a15 15 0 0 1 0 17M45.2 11.5a22 22 0 0 1 0 25" />
-      </g>
-    </svg>
-  );
+    );
+  };
 }
 
-/** Two leaves on a stem. */
-function FreshIcon({ className = "" }: IconProps) {
-  return (
-    <svg {...base} className={className}>
-      <path
-        d="M23.4 27.6C21.7 18.6 26.9 11 39.5 8.4c1.6 5.6 1.1 11.2-2 15.6-3.5 5-9 6.4-14.1 3.6Z"
-        fill="currentColor"
-      />
-      <path
-        d="M21.2 30.6c-5.4 1.9-11 .1-14.1-4.5-2.7-4-3-9.2-1.3-14.3 11.4 1.4 16.5 8.6 15.4 18.8Z"
-        fill="currentColor"
-      />
-      <path
-        d="M9 39.5c4.6-6.4 9.5-10.7 14.7-13"
-        stroke="currentColor"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+const BurgerValueIcon = maskIcon(
+  "/icons/values/burger.png",
+  "w-[68px] aspect-[270/239] sm:w-[76px]",
+);
+const VibesValueIcon = maskIcon(
+  "/icons/values/vibes.png",
+  "w-[92px] aspect-[270/132] sm:w-[103px]",
+);
+const FreshValueIcon = maskIcon(
+  "/icons/values/fresh.png",
+  "w-[70px] aspect-[270/224] sm:w-[79px]",
+);
 
 export const valueIcons: Record<ValueIconName, (p: IconProps) => React.ReactElement> = {
-  burger: BurgerIcon,
-  vibes: VibesIcon,
-  fresh: FreshIcon,
+  burger: BurgerValueIcon,
+  vibes: VibesValueIcon,
+  fresh: FreshValueIcon,
 };
 
 /** Placeholder tile artwork in the menu pop-up, where we hold no photo. */
