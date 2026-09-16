@@ -219,3 +219,42 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
     its own trigger fires, not just into the viewport, before trusting the rect. A plain container
     that is not itself `.reveal` (e.g. the Values grid, as opposed to one of its three cards) does
     not need this, since a transform on a child never moves the parent's own box.
+
+### Reading the work with the client's eyes, corrected by Kazim 2026-09-16 (rounds 4 to 6)
+36. **Buying density by shrinking the product is not a trade to make quietly.** Asked for more
+    burgers on screen and a tighter gap, the first pass took `--plate-w` from 30vw to 19.5vw, a
+    35 percent shrink: a 76px plate against round 4's 117px. The count went up and the burgers
+    stopped reading as food. On a wheel the lever nobody reaches for is the RADIUS: at a fixed
+    angular step the arc distance between neighbours is `R x step`, so a bigger circle spreads
+    the same plates without touching their size. When a request has two obvious levers and one
+    of them costs the thing the page is selling, say so and reach for the other one.
+37. **A control's shape is a promise.** The mobile dish name shipped as a solid yellow pill above
+    the wheel, which on this site is exactly what the nav's ORDER ONLINE button looks like, so a
+    label was wearing a control's clothes and inviting a tap that does nothing. A label sits
+    where a label sits (under the thing it names, inside the wheel's own empty hub) and is
+    quieter than any button on the page. Check a new element against the page's existing
+    vocabulary before shipping it, not just against the brief.
+38. **Every measurement rule should ask the question the user's eye is asking.** The first rule
+    for when a mobile plate wears its name tag was an angular window round the top of the arc,
+    tuned at 390px. It was the wrong question: how much of a plate you can SEE depends on the
+    viewport's width, not on its angle, so the same window tagged a half-cut plate at 430 and
+    skipped a whole one at 375. Asking the geometry directly (is this plate fully on screen, and
+    is there room under it for its tag inside the clip) costs twelve rect reads and is right at
+    every width by construction. Prefer the rule that restates the user's own criterion over the
+    proxy that happens to fit today's screen.
+
+### The gate tests the site against itself, not against what she asked for, found 2026-09-16
+39. **A request with no home in a list evaporates, and no amount of QA will catch it.** Kazim
+    asked whether anything the client had asked for had been missed. Re-reading the whole intake
+    against the built code, including the meeting recording, turned up four requests that were
+    never refused, never built, and never written into any list: the burgers-dropping hero
+    sequence she was going to check with Eren about, Station 8's hours, the Locations title her
+    own blueprint centres, and the last menu photo. Each had survived two rounds of client
+    feedback and several QA gates, because a gate tests the site against itself: does it leak,
+    does it throw, does it match the blueprint's geometry. Nothing was testing the site against
+    the client's own asks. Two habits follow. Anything a client says, in any channel including a
+    call, lands the same day in `SCOPE.md` open questions or `tasks/todo.md`, even when the
+    answer is "we will decide later"; a decision recorded in a code comment is a decision, an
+    ask recorded nowhere is a drop. And at the end of a feedback round, re-read the intake
+    against the build rather than against our own handoffs, which only ever say what we believed
+    we did.
