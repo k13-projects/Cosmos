@@ -59,3 +59,9 @@ Whenever you have those, send them over and we will put them in the same day.
 
 Thank you,
 Kazim
+
+---
+
+**Superseded 2026-09-16** by `../lorena_reply_2026-09-16.md`: never sent, written before rounds
+4 to 6 went live and before the intake audit added the three open questions. Kept because it is
+the record of what we were going to say on the 15th.

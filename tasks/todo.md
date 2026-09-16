@@ -650,3 +650,51 @@ width. What is captured: `baseline-round4-390.png` (before), `candidateA-per-pla
 `candidateB-reel-caption-390.png` (the caption decision), `mobile-375-final.png` (the shipped
 390/375 look, wheel partly below the fold in the 375 crop), `desktop-1440-attempt.png` (rects
 correct per the numbers above, paint not trustworthy, kept for the record rather than discarded).
+
+---
+
+## Open loops found by the intake audit (2026-09-16)
+
+Kazim asked whether anything the client asked for had been missed. The whole intake was re-read
+against the built code: the meeting recording, the blueprint, her deck and structure documents,
+and all three email rounds. Full audit in the session record; what survived verification is
+below. These are written here because the audit's real finding is that **a request with no home
+in a list evaporates**, and four of these had none.
+
+**Open with the client (folded into `docs/intake/lorena_reply_2026-09-16.md`):**
+- [ ] **The opening sequence.** In the meeting she liked the burgers-dropping idea for the hero
+      and said she would check with Eren about that month's photo shoot. The answer never came
+      and nobody chased it. The hero is still a still photograph. Transcript 12:26:36 to 12:28:35.
+- [ ] **Station 8's hours.** The docx lists 11:00 AM to 9:00 PM; the card says "Opening soon"
+      because the hall has not opened. A studio judgement, never confirmed with her.
+- [ ] **The Locations title.** Her blueprint centres it with "Find us" under its right edge
+      (verified against `Cosmos Assets/_derived/mockup/mock_p1_s06.png`); we built it left
+      aligned. The only headline on the page that departs from her own alignment.
+- [ ] **Cauliflower Bites photo**, the last menu item without one. Never on the open-questions
+      list; only ever mentioned in an unsent draft.
+
+**Open with Eren, not Lorena:**
+- [ ] **The purple in transparent.** His request, which Lorena tried and disliked ("it is not the
+      color of the brand identity"), left at "he will talk with you about what kind of options"
+      (transcript 12:12:32 to 12:13:37). Never chased, never listed. Belongs in a note to him,
+      not in her email.
+
+**Client-facing document that was wrong: closed 2026-09-16.**
+- [x] `Cosmos_Development-Report_2026-09-02.html` told the client the animated wordmark was "the
+      signature moment of the site" and that the menu carried "no prices", both false within
+      hours of it being written. **Kazim confirmed it was never sent**, so nothing is in THG's
+      hands. Moved to `docs/reports/archive/` with the reason written beside it, because the
+      remaining risk was not the client's copy but ours: a wrong report sitting in the reports
+      folder is one someone mails later. A fresh one comes from `devreport Cosmos`, not from
+      correcting that file.
+
+**Answered but never told to her** (no action unless she asks):
+- Her round-2 "move the values band higher" was largely given back in round 3, to keep the plates
+  off "Fresh always" once she asked for the columns to be centred.
+- The animated hero logo was built and then removed (Lesson 14).
+- "Bold Flavour" beside "Unleash the flavor" keeps her own spelling mix; two handoffs promise this
+  was "flagged to her" and there is no record that it was.
+
+**Stale ticks corrected nowhere yet:** `tasks/todo.md` P3 and `SCOPE.md` still tick the animated
+hero logo as delivered, and the plate-name confirmation still reads open in `lib/content.ts`
+though she confirmed it on 2026-09-08.
