@@ -9,6 +9,8 @@ export interface PhotoBandProps {
    * fries 1332:618, chicken 1332:647, phone 1332:821.
    */
   ratio: number;
+  /** The photo's own average colour; the band's ground until it paints. */
+  tone: string;
 }
 
 /**
@@ -29,12 +31,17 @@ export interface PhotoBandProps {
  *   min-height  below ~390px the thinnest band would be under 180px, which
  *               reads as a stripe rather than a photograph. It costs a few
  *               pixels off the sides of the crop and no subject.
+ *
+ * The `tone` ground (lib/content.ts) covers the moment before the photograph
+ * arrives. These bands are lazy and nearly a screen tall on a desktop, so an
+ * unpainted one is a screen-high empty box sitting on the page's cream, which
+ * reads as a fault rather than as a photo on its way.
  */
-export default function PhotoBand({ src, alt, ratio }: PhotoBandProps) {
+export default function PhotoBand({ src, alt, ratio, tone }: PhotoBandProps) {
   return (
     <div
-      className="relative max-h-[min(96vh,900px)] min-h-[180px] w-full"
-      style={{ aspectRatio: String(ratio) }}
+      className="relative max-h-[min(96vh,900px)] min-h-[180px] w-full overflow-hidden"
+      style={{ aspectRatio: String(ratio), backgroundColor: tone }}
     >
       <Image src={src} alt={alt} fill sizes="100vw" className="object-cover" />
     </div>

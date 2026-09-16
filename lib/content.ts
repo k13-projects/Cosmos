@@ -256,21 +256,37 @@ export const menuSection = {
  * The fourth divider in the blueprint, under EXPLORE OUR MENU, is NOT a band:
  * see `spread` below.
  */
+/**
+ * `tone` is the photo's own average colour, and it is the band's ground until
+ * the photograph paints (Kazim, 2026-09-16: a big empty pale block under
+ * Reviews on a desktop screen).
+ *
+ * A band is a full-bleed element between 700 and 900px tall on a desktop, and
+ * its image is lazy: for as long as that image has not arrived, the band is an
+ * empty box the height of a screen, and an empty box over the page's cream
+ * reads as "the site is broken here", not as "a photo is coming". A flat warm
+ * ground makes the same moment read as the photograph's own shadow. Measured
+ * off each exported file (one-pixel downsample), not picked by eye, so it
+ * cannot drift from the photo it stands in for.
+ */
 export const photoBands = {
   fries: {
     src: "/photos/band-fries.webp",
     alt: "Four bowls of Cosmos loaded fries lined up on a wooden board, seen from above",
     ratio: 1332 / 618,
+    tone: "#B48050",
   },
   chicken: {
     src: "/photos/band-chicken.webp",
     alt: "A Cosmos crispy chicken sandwich topped with slaw, with loaded fries behind it",
     ratio: 1332 / 647,
+    tone: "#B89576",
   },
   phone: {
     src: "/photos/band-phone.webp",
     alt: "A guest photographing a Cosmos burger and a beer with their phone",
     ratio: 1332 / 821,
+    tone: "#C4997A",
   },
 } as const;
 
@@ -320,7 +336,20 @@ export type Location = {
   area: string;
   name: string;
   address: string;
+  /**
+   * The line a guest reads first, so it stays one short line on a phone.
+   * Anything that qualifies it goes in `hoursNote` instead of being packed
+   * in here with commas (Kazim, 2026-09-15: Oceanside's three-clause string
+   * ran to three lines on a 390px card and pushed its drawing out of view,
+   * while its four siblings sat on one line).
+   */
   hours: string;
+  /**
+   * The exception to `hours`, rendered under it in a quieter voice. Only
+   * where the week genuinely differs; a location that trades the same hours
+   * every day must not carry one, or the card invents a complication.
+   */
+  hoursNote?: string;
   mapsQuery: string;
   /** Set only when the location is NOT simply trading, so it stays meaningful. */
   status?: "Coming Soon";
@@ -343,8 +372,12 @@ export type Location = {
    * oceanside, global-fork and station-8 are now HER OWN ink drawings
    * (`Cosmos Assets/LORENA UPDATE 2026-09-10/`), landscape and considerably
    * more detailed than the Canny traces they replace, hence the mixed
-   * intrinsic sizes below. Miramar is deliberately untouched, K13's own Canny
-   * trace, because she said she prefers the one already on the site.
+   * intrinsic sizes below. Miramar keeps OUR drawing, because she said she
+   * prefers the one already on the site, but not our line: beside her four,
+   * the Canny trace was three times heavier and far more saturated, so one
+   * card in five read as a different hand (Kazim, 2026-09-15). It is now
+   * redrawn from its own centreline at her measured weight and ink, same
+   * framing, same content; see the Miramar step in scripts/build-assets.sh.
    */
   mark: { src: string; width: number; height: number; alt: string };
 };
@@ -384,7 +417,11 @@ export const locations: Location[] = [
     area: "Oceanside",
     name: "Cosmos Burger Oceanside",
     address: "208 N Coast Hwy, Oceanside, CA 92054",
-    hours: "Mon to Thu 11:00 AM to 8:45 PM, Fri and Sat to 9:45 PM, Sun to 8:45 PM",
+    // The live site lists Mon to Thu and Sun to 8:45 PM, Fri and Sat to 9:45 PM,
+    // opening at 11 every day. Written as the rule plus its exception rather
+    // than three clauses on one line: same facts, one line instead of three.
+    hours: "11:00 AM to 8:45 PM",
+    hoursNote: "Fri and Sat to 9:45 PM",
     mapsQuery: "Cosmos Burger, 208 N Coast Hwy, Oceanside, CA 92054",
     phone: "(760) 607-7083",
     ordering: {
@@ -415,7 +452,7 @@ export const locations: Location[] = [
       doordash:
         "https://www.doordash.com/store/cosmos-burger-san-clemente-48099431/113394124/",
     },
-    mark: { src: "/locations/trace/miramar.png", width: 800, height: 776, alt: "" },
+    mark: { src: "/locations/trace/miramar.png", width: 1000, height: 970, alt: "" },
   },
   {
     id: "little-italy",

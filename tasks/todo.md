@@ -395,3 +395,258 @@ standing request. Re-measured after: 104px, no leak at 390, no new console error
 call (Lesson 0). The reply to Lorena is drafted and waiting at
 `docs/intake/lorena_reply_2026-09-15.md`, to be sent by him **after** the merge is live, since
 every claim in it is checkable on the preview and she checks.
+
+## Round 4: Kazim's own read of the live preview (2026-09-15)
+
+### Job 1: the About band on a very wide monitor (34")
+- [x] Wide-screen composition: keep the copy and the plate wheel travelling together as the
+      viewport grows, so the gap between them stays bounded instead of growing without limit.
+      Tested 1024/1280/1440/1920/2560/3440.
+
+### Job 2: the mobile wheel, too crowded
+- [x] One set of six dishes on mobile, not the desktop's four-times-repeated 24, spaced to suit
+      the small ring. Desktop ring untouched.
+- [x] Bigger, calmer, better-spaced plates; kept every existing behaviour (scroll rotation, drag
+      momentum, tap-opens-menu, focus reveal, keyboard reach, reduced motion, `draggable={false}`).
+      Tested 320/375/390/430/768.
+
+---
+
+## Review — Round 4, wide-screen composition + the mobile wheel (Natalia, 2026-09-15)
+
+**What changed.** `app/globals.css` (`.plate-wheel`'s desktop `--hub-left` formula, the mobile
+`--wheel-r`/`--plate-w` clamps), `components/PlateWheel.tsx` (mobile ring rebuilt to 6 unique
+spokes, `overflow-clip` fix, belt height, `data-angle`-based focus targeting, a new `WheelSpoke`
+helper shared by both rings). `components/About.tsx` and `components/Values.tsx` were read but
+not touched; the wide-screen fix lives entirely in the wheel's own CSS, not the containers.
+
+### Job 1: the wide-screen gap, root cause and fix
+The wheel's hub was anchored to 100% of its own box, which spans the raw viewport (the wheel div
+is a sibling of the 1400px content column, not a child of it). Past 1400px the copy's own right
+edge only travels at HALF the viewport's growth rate (`mx-auto` centring a fixed-width container),
+while the old hub travelled at the FULL rate, so the gap between them opened without limit.
+Fixed by subtracting the same growing container margin from the hub's own position
+(`app/globals.css`, one line, documented in place), which makes the hub travel at that same
+half-rate past 1400px. The container's own `max-w-[1400px]` was deliberately left unchanged: the
+math shows growing it further would have REOPENED the same unbounded growth (tried, measured,
+rejected, see the file's own comment). Below 1400px the fix is a no-op: every clearance Round 3
+tuned there (1024, 1280) is byte-for-byte unchanged.
+
+**Measured (real `getBoundingClientRect()` sweeps, 3 degree steps, full revolution, gstack
+chrome-devtools):**
+
+| viewport | gap: copy to nearest plate, before | after | min clearance to values grid | min clearance to About copy |
+|---|---|---|---|---|
+| 1024 | (unchanged, Round 3's own 105/113) | 113 | 113 | 37 |
+| 1280 | (unchanged) | 123 | 123 | 239 |
+| 1440 | 358 | 345 | 144 | 345 |
+| 1920 | 544 | 291 | 74 | 291 |
+| 2560 | 864 | 291 | 71 | 291 |
+| 3440 | 1304 | 291 | 76 | 291 |
+
+The gap goes FLAT at 291px from 1920 up instead of climbing to 864 and then 1304; every clearance
+number stays comfortably positive (re-swept at 1 degree resolution at the tightest point, 2560,
+minimum 71.2px, never closer). No horizontal leak 1024 to 3440 (`scrollWidth` tracks `innerWidth`
+minus the browser's own constant 15px scrollbar reservation at every width). The values band's
+grid stayed centred at every width (left/right margin difference a constant 15px, the same
+scrollbar artifact, not drift) and never became three columns marooned in a wide row, since its
+own grid is still capped at `max-w-[780px]` regardless of viewport. Screenshots at 1440, 2560 and
+3440 (`docs/handoffs/screens/engineering_2026-09-15_v4/about-*.jpg`) show the composition reading
+as one connected cascade at every size, not a column and a stranded wheel.
+
+### Job 2: the mobile wheel, six dishes once
+`SPOKE_COUNT` (24, four copies of six, 15 degrees apart) stays exactly as it was for the desktop
+ring, lg and up. A second, separate spoke set drives the mobile ring: `MOBILE_SPOKE_COUNT = 6`,
+each of the six dishes exactly once, `MOBILE_SPOKE_STEP_DEG = -60` (360 / 6), spaced around the
+FULL circle rather than clustered into the blueprint's ~90 degree visible arc, so the ring never
+runs out of plates as it turns. Both spoke sets are always in the DOM (a plain `hidden lg:contents`
+/ `contents lg:hidden` CSS toggle, not a JS breakpoint branch), so server and first client render
+stay identical, no hydration risk. `--wheel-r` 150-190 to 165-215, `--plate-w` 96-132 to 112-156
+(bigger, per the brief); belt height 240px to 280px to give the wider 60 degree sag room.
+
+**The emptier arc, decided deliberately.** Six plates 60 degrees apart against a visible window
+measured at roughly 90 to 100 degrees means the window is WIDER than the spacing, so at least one
+plate is always inside it as the ring turns (confirmed: zero rotations out of a 180-sample full
+sweep at any tested width showed no plate at all). Most of the time 1 to 2 plates are visible at
+once (up to 4 counting a sliver at the clip edge), against the old design's 10+. This reads as a
+breath, not a hole, chosen over cramming more plates back in specifically because "too much, too
+crowded" was the whole brief; a wider window with more plates on screen was tried in earlier
+rounds and is the thing being undone here.
+
+**A real bug found and fixed, not shipped broken.** Testing the actual keyboard contract (focus
+every reachable plate, not just eyeballing a screenshot) found that tabbing to an off-screen
+primary plate made the BROWSER auto-scroll the belt's own `overflow: hidden` box to reveal it,
+`belt.scrollTop` landing at 244px with no scrollbar ever drawn. That silently broke the hub's own
+`getBoundingClientRect()` reads everywhere in the file (the drag gesture, the focus page-scroll
+correction), which is why it only showed up now: 24 densely-packed spokes almost always had a
+primary already near the visible arc, so the browser rarely needed to auto-scroll; six spokes
+spread round the whole circle are far more often off-screen at the moment of focus. Fixed with
+`overflow: clip` instead of `overflow: hidden` (the desktop ring's own x-axis already uses this),
+which cannot become a scroll container at all. Lesson 34.
+
+**Full behaviour contract, reverified live on the fixed build, not assumed carried over:**
+- All six dishes reachable by Tab, each correctly named, each landing inside the belt's visible
+  clip on focus, `belt.scrollTop` staying 0 throughout.
+- Touch drag-to-spin with momentum: a synthetic 130px `pointerType: "touch"` drag rotated the ring
+  and it kept turning after release (rotation still climbing 300ms later).
+- Click opens the menu pop-up; the same drag does not.
+- `prefers-reduced-motion` (forced via an init-script `matchMedia` override, this tool has no
+  direct reduced-motion flag): ring pinned at 0deg and static for a full second with nobody
+  touching it; a drag still moves it (0 to 35.84deg) and holds exactly there with zero drift a
+  full second after release, no momentum.
+- `draggable={false}` and `user-select: none` still present on every plate image/button.
+
+**Collision + reachability, swept the clip-aware way (Lesson 31), full revolution, 320/375/390/
+430/768:**
+
+| viewport | all 6 dishes reachable | min clearance to values grid | min clearance to About copy | belt-to-first-icon gap |
+|---|---|---|---|---|
+| 320 | yes | 80 | 125 | (not measured, `sm:` padding differs above 640) |
+| 375 | yes | 80 | 105 | 104 |
+| 390 | yes | 80 | 101 | 104 |
+| 430 | yes | 80 | 76 | 104 |
+| 768 | yes | 144 | 56 | 168 (crosses the `sm:` padding step) |
+
+No horizontal leak 320 to 768. The belt-to-first-values-icon gap stays 104px, unchanged from
+where James/Olga's round-3 fix left it: the belt grew 40px taller but the gap is structurally set
+by About's own `pb-10` plus Values' internal icon offset, not by the belt's height, so it never
+needed to move for this round's changes (worked through in the file's own comment).
+
+**Verification.** `npx tsc --noEmit` clean, `npm run build` clean. `npm run build && npx next
+start -p 9157`, `.next/cache/images` cleared before every restart, killed with
+`pkill -f next-server` (Lessons 3, 5). All measurement against that production server, never
+`next dev` (Lesson 30). Zero console errors at 375, 1440 and 3440 after load. Screenshots:
+`docs/handoffs/screens/engineering_2026-09-15_v4/`.
+
+**Not tested:** real touch hardware (synthetic `PointerEvent`s again, same as every prior round);
+a real mouse for the desktop hover tooltip (untouched by this round's edits, so not re-driven,
+same call QA made last round for the same reason). This machine hit its own documented flakiness
+mid-run (a navigation timeout, one browser tab that silently drifted into a stale, inconsistent
+render after several consecutive test scripts): both were caught by re-verifying on a fresh page
+rather than trusted, never shipped as a finding.
+
+---
+
+## Round 5: Kazim's own read of round 4 ("çok daha güzel olmuş"), two more asks (2026-09-15)
+
+### Job 1: the dishes need their names on mobile
+- [x] Give the phone a way to read each dish's name, not just desktop's hover tooltip. Measured
+      whether a caption fits under every visible plate at the new spacing; it doesn't (proved with
+      a live candidate + screenshot), so named the plate at the top of the arc instead, in a fixed
+      spot outside the belt's clip, updating as the wheel turns.
+
+### Job 2: more burgers on screen, without crowding
+- [x] Reduce the mobile gap between plates to a third or a half of round 4's 60deg, keeping the
+      ring full (repeats), and prove neighbouring plates neither overlap nor sit too close.
+      Landed on half (12 spokes, 30deg, two copies) with the plate size and belt shrunk to match.
+      Desktop ring proved untouched. Tested 375/390/430.
+
+---
+
+## Review: Round 5, mobile names + tighter spacing (Natalia, 2026-09-15)
+
+**What changed.** `components/PlateWheel.tsx` (mobile ring now 12 spokes, two copies of six, 30deg
+apart, mirroring the desktop ring's own repeat pattern; a new reel caption above the belt, updated
+imperatively from the same rAF loop and drag handler that already drive `--wheel-rot`), `app/
+globals.css` (mobile `--wheel-r`/`--plate-w` clamps re-tuned for twelve plates). Desktop constants
+and formula untouched (verified by diff and by live DOM read: 24 spokes, same `--hub-left`
+calc/clamp values, byte-identical to round 4's file).
+
+**Job 1, the caption shape.** Built and screenshotted both candidates at 390 before deciding
+(`docs/handoffs/screens/engineering_2026-09-15_v5/`): candidate A (every visible primary plate
+captioned, the pre-Lesson-33 shape, forced on live via an injected stylesheet, never shipped) shows
+overlapping pills and three of six primary captions extending outside the belt's own clip box,
+worst-case pairwise gap 3px (`candidateA-per-plate-390.png`); candidate B (one caption, fixed above
+the belt, naming whichever dish sits closest to the top of the arc) reads clean at the same
+rotation density (`candidateB-reel-caption-390.png`). Shipped B. It cannot collide with anything or
+be clipped mid-word because it never moves and never shares vertical space with a plate: it sits
+in a strip above the belt's own clip box, not inside it, `aria-hidden` since the real per-plate
+accessible name already exists on focus and an auto-changing live region would narrate the ambient
+rotation forever. Verified live: the caption text changes as the wheel turns (`Blue cheese` to
+`BBQ chicken sandwich` over an 8s window with the belt in view), stays put and pauses when the
+section scrolls out of view (matching the wheel's own on-screen gating), and updates correctly
+during a reduced-motion drag too (the rAF loop that normally drives it does not run there, so
+`onPointerMove` updates it directly, same pattern the code already uses for `write()`).
+
+**Job 2, the spacing.** Only two spoke counts tile the six dishes onto a full circle in the 20 to
+30deg range Kazim named: 12 spokes (30deg, "half") or 18 (20deg, "third"). Picked 30deg/12 spokes,
+the literal middle between round 4's one copy (too sparse) and round 3's four copies (too
+crowded), and verified by measurement that it clears rather than assuming it does: at the OLD
+plate size (round 4's 112 to 156px), 30deg already overlapped (the chord between neighbours is
+shorter than the plate width once spacing halves), so the plate size and belt genuinely had to
+absorb the change, not just the angle. `--wheel-r` 165-215 to 180-220, `--plate-w` 112-156 to
+68-84.
+
+**Measured, full rotation (2deg steps), real `getBoundingClientRect()`s, clip-aware (Lesson 31):**
+
+| viewport | min edge-to-edge gap, neighbouring plates | plates visible (any overlap w/ belt) | plates "substantially" visible (>=50% area) | no rotation shows a hole |
+|---|---|---|---|---|
+| 375 | 9.2px | 6 to 7 of 12 | 5 to 6 | confirmed, 180 samples |
+| 390 | 9.6px | 6 to 7 of 12 | 5 to 6 | confirmed, 180 samples |
+| 430 | 10.6px | 6 to 7 of 12 | 5 to 6 | confirmed, 180 samples |
+
+Comfortably positive at every width without being the wide-open gap round 4 had (worked out
+analytically first from the chord formula `2R sin(15deg)` against the average plate aspect ratio,
+landed within 1px of the swept numbers, then confirmed against the real rendered rects rather than
+trusted as estimated). 5 to 6 plates substantially visible at once, against round 4's 1 to 2: this
+is the "more burgers, not crowded" Kazim asked for, not just a numeric compromise.
+
+**Belt height, sag, gap to Values.** Belt height unchanged (280px): the arc itself keeps round 4's
+own vertical footprint, and the new caption lives in the margin ABOVE the belt (`mt-10` on the
+caption plus `mt-3` on the belt, replacing round 4's plain `mt-14`), never inside the clipped box,
+so it cannot compete for space with a plate by construction. Sag at 30deg is `R*(1-cos30)`, about
+24 to 30px across 375 to 430, well inside what the unchanged 280px belt already clears.
+Belt-to-first-values-icon gap: **80px** at every tested width (375/390/430), not round 4's reported
+104px, re-measured carefully after finding the discrepancy was a `.reveal` entrance-animation
+settle artifact (Lesson 35), not a real regression: reading the icon's rect right after scrolling
+it into the same viewport (round 4's likely method, and my own first pass) catches it still
+mid-entrance-transform; scrolling it well past its own reveal trigger first and re-reading settles
+at 80px both times, reproducibly. 80px matches the CSS math exactly (`pb-10` 40px + Values' own
+`pt-10` 40px), which a transient reveal offset cannot.
+
+**Desktop, proved untouched.** `SPOKE_COUNT`/`SPOKE_STEP_DEG`/`FIRST_ANGLE_DEG` and the `--hub-left`
+calc/clamp formula are byte-identical to round 4's file (confirmed by `git diff`, not just "I
+didn't mean to touch it"). Live at 1440: `--wheel-r`/`--plate-w`/`--hub-left`/`--hub-top` computed
+values match round 4's exactly, 24 spokes render, no horizontal leak (`scrollWidth` 1425 at a 1440
+viewport, the 15px is the scrollbar), clearances to the About copy and Values grid both stayed
+comfortably positive (313px, 108px). A same-session browser-tooling instability (documented in
+round 4's own handoff as a standing risk, not a product bug) made a clean desktop screenshot
+unreliable this round: the DOM/rect state read correctly and consistently, but the same tab's
+painted output stopped matching it partway through the session. Numeric proof stands on its own;
+see "Not tested" below for exactly what a screenshot could not confirm this round.
+
+**Full behaviour contract, reverified live on the changed build:**
+- All six primary mobile dishes reachable by Tab, each correctly named
+  (`Blue cheese`/`BBQ chicken sandwich`/`Better Mac burger`/`Cosmos burger`/`Spicy jam`/`Hot Chicks
+  sandwich`), each landing inside the belt's clip on focus, `belt.scrollTop` staying 0 throughout
+  (Lesson 34 still holds at the new spoke count). The six repeats (spokes 6-11) confirmed
+  `tabindex="-1"` and `aria-hidden="true"`.
+- Touch drag-to-spin with momentum: a synthetic 130px `pointerType: "touch"` drag rotated the ring
+  (209.65 to 219.21deg while dragging) and kept turning after release (219.21 to 248.44deg over
+  the next 300ms). The same drag's trailing click did not open the menu pop-up; a plain tap (no
+  movement) did, and closed again cleanly.
+- `prefers-reduced-motion` (forced via an init-script `matchMedia` override): ring pinned at 0deg
+  and static for 1.2s with nobody touching it; a drag still moves it (0 to 9.67deg) and holds
+  exactly there with zero drift 600ms after release, no momentum.
+- Scroll injects rotation velocity on top of ambient: 0.64deg over 300ms of pure ambient vs 4.21deg
+  over the same window right after a 250px scroll.
+- `draggable="false"` confirmed on the rendered `<img>`; `overflow-clip` confirmed in the belt's
+  rendered class list.
+
+**Verification.** `npx tsc --noEmit` clean, `npm run build` clean (no lint/type errors), no em/en
+dashes in either changed file. `npm run build && npx next start -p 9157`, `.next/cache/images`
+cleared before restart, killed with `pkill -f next-server` (Lessons 3, 5). All measurement against
+that production server, never `next dev` (Lesson 30). Screenshots:
+`docs/handoffs/screens/engineering_2026-09-15_v5/`.
+
+**Not tested:** real touch hardware (synthetic `PointerEvent`s again); a real mouse for the desktop
+hover tooltip (untouched by this round's edits). A clean desktop screenshot at 1440 and mobile
+screenshots at 430 (the full behaviour contract and every measurement table above were still
+captured live via `getBoundingClientRect()`/DOM reads, which do not depend on the paint): this
+session's browse tooling repeatedly stopped responding (navigation timeouts, then a tab whose
+painted frame stopped matching its own live DOM state, matching round 4's documented standing
+risk) and did not recover cleanly enough in the time available to get a second clean shot at every
+width. What is captured: `baseline-round4-390.png` (before), `candidateA-per-plate-390.png` and
+`candidateB-reel-caption-390.png` (the caption decision), `mobile-375-final.png` (the shipped
+390/375 look, wheel partly below the fold in the 375 crop), `desktop-1440-attempt.png` (rects
+correct per the numbers above, paint not trustworthy, kept for the record rather than discarded).

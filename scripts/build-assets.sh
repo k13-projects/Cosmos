@@ -364,6 +364,69 @@ PY
   echo "  locations/trace/$out.png ($(du -h "$PUB/locations/trace/$out.png" | cut -f1 | tr -d ' '))"
 done
 
+echo "==> Miramar mark (thinned to Lorena's own line weight, Kazim 2026-09-15)"
+# Miramar is the one hall whose drawing is still ours: Lorena asked in round 3
+# to keep the one already on the site. Kazim then caught what that left behind:
+# beside her four pen drawings, our Canny trace was three times heavier and far
+# more saturated, so one card in five read as a different hand.
+#
+# Measured, not eyeballed. Median stroke width by distance transform on the ink
+# mask: hers 1.91px at 1000w across all three, ours 3.82px; ink coverage hers
+# 11 to 15 percent, ours 22; her core ink is rgb(99,69,103), a muted grey
+# purple, against our saturated rgb(117,16,128).
+#
+# So the trace is re-drawn rather than recoloured: skeletonise the ink to a
+# single-pixel centreline (which also collapses Canny's double edge, where every
+# real line was drawn twice, once down each side), redraw that centreline at 2x
+# with a 3px round pen, then area-downscale to 1000w. That lands at exactly
+# 1.91px and 10.4 percent coverage, in her ink. Framing and content are
+# untouched, because the source IS the old trace.
+#
+# The old trace is the source and lives in the asset library, not in public/,
+# so this step can never eat its own output: re-running it on an already
+# skeletonised image would thin the drawing away a little more every time.
+MIRAMAR_SRC="$SRC/_derived/miramar-canny-2026-09-02.png"
+if [ ! -f "$MIRAMAR_SRC" ]; then
+  echo "  ERROR: Miramar trace source not found: _derived/miramar-canny-2026-09-02.png" >&2
+  exit 1
+fi
+python3 -c "import cv2, skimage" 2>/dev/null || {
+  echo "ERROR: python3 opencv-python + scikit-image not found (needed for the Miramar mark)." >&2
+  exit 1
+}
+python3 - "$MIRAMAR_SRC" "$PUB/locations/trace/miramar.png" <<'PY'
+import sys
+import numpy as np
+import cv2
+from PIL import Image
+from skimage.morphology import skeletonize
+
+src, out = sys.argv[1], sys.argv[2]
+alpha_in = np.array(Image.open(src).convert("RGBA").getchannel("A"))
+skeleton = skeletonize(alpha_in > 60).astype(np.uint8) * 255
+
+h2 = round(2000 * skeleton.shape[0] / skeleton.shape[1])
+big = cv2.resize(skeleton, (2000, h2), interpolation=cv2.INTER_NEAREST)
+big = cv2.dilate(big, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+
+h1 = round(1000 * skeleton.shape[0] / skeleton.shape[1])
+line = cv2.resize(big, (1000, h1), interpolation=cv2.INTER_AREA)
+line = cv2.GaussianBlur(line, (0, 0), 0.5)
+alpha = np.clip(line.astype(np.float32) * 1.6, 0, 255).astype(np.uint8)
+
+art = np.zeros((*alpha.shape, 4), np.uint8)
+art[..., 0], art[..., 1], art[..., 2] = 99, 69, 103  # her core ink
+art[..., 3] = alpha
+Image.fromarray(art).quantize(colors=128, method=Image.FASTOCTREE).save(out, optimize=True)
+
+mask = (alpha > 60).astype(np.uint8)
+dist = cv2.distanceTransform(mask, cv2.DIST_L2, 3)
+print(f"    miramar.png {alpha.shape[1]}x{alpha.shape[0]} "
+      f"stroke {np.median(dist[mask > 0]) * 2:.2f}px (hers: 1.91) "
+      f"coverage {100 * mask.mean():.1f}% (hers: 11 to 15)")
+PY
+echo "  locations/trace/miramar.png ($(du -h "$PUB/locations/trace/miramar.png" | cut -f1 | tr -d ' '))"
+
 echo "==> brand"
 LOGO_SRC="$SRC/LOGO & BRAND IDENTITY/COSMOS BURGER LOGO.svg"
 if [ ! -f "$LOGO_SRC" ]; then

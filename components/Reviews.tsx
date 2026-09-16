@@ -50,32 +50,31 @@ export default function Reviews() {
               {reviewsSection.subtitle}
             </p>
 
-            <div className="mt-6 flex gap-2">
-              <RailArrow
-                direction="prev"
-                tone="purple"
-                onClick={() => scrollByCard(-1)}
-                disabled={atStart}
-                label="Previous reviews"
-              />
-              <RailArrow
-                direction="next"
-                tone="purple"
-                onClick={() => scrollByCard(1)}
-                disabled={atEnd}
-                label="Next reviews"
-              />
-            </div>
           </header>
 
+          {/* The rail and its two controls. `relative` is what the arrows
+              position against at lg, and `rail-bleed-r` is on THIS box, not on
+              the <ul> inside it, so the box itself reaches the viewport's edge
+              and the right-hand arrow lands on the screen's edge rather than
+              on the container's.
+
+              `min-w-0` is load-bearing, not tidiness: a grid item's default
+              `min-width: auto` refuses to shrink below its content, and the
+              content here is a rail 1367px wide. The <ul> used to be the grid
+              item itself and shrank because `overflow-x-auto` makes a scroll
+              container; wrapping it handed that job to a plain div, which
+              simply grew, and the whole page leaked 977px sideways at 390. */}
+          <div className="relative min-w-0 rail-bleed-r">
           <ul
             ref={ref}
             /* scroll-pl matches the padding, or snap-start rests the rail at
                scrollLeft == padding-left and the first card loses its gutter. */
-            /* -mr-12 at lg carries the rail out through the section's own
-               gutter, so the second card is cut by the page edge the way the
-               blueprint draws it instead of stopping 48px short. */
-            className="rail reveal -mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:-mx-8 sm:scroll-pl-8 sm:px-8 lg:-mr-12 lg:ml-0 lg:scroll-pl-0 lg:pl-0 lg:pr-0"
+            /* `rail-bleed-r` (globals.css) carries the rail out through the
+               container's own right margin to the VIEWPORT's edge, so the cut
+               happens where the screen ends. It used to be `-mr-12`, which
+               only cleared the 48px gutter: correct up to 1400px, and short by
+               half the overflow on anything wider. */
+            className="rail reveal -mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth px-5 pb-4 sm:-mx-8 sm:scroll-pl-8 sm:px-8 lg:mx-0 lg:scroll-pl-0 lg:px-0"
           >
             {/* Keyed on the quote, not the author: attributions are deliberately
                 non-identifying and therefore repeat. */}
@@ -95,6 +94,43 @@ export default function Reviews() {
               </li>
             ))}
           </ul>
+
+            {/* One pair of controls, two placements, the same pattern the
+                Locations rail uses. Below lg they sit in a row under the rail,
+                where they cover nothing; from lg each one lands against the
+                rail's own edge, over the cards, vertically centred (Kazim,
+                2026-09-16: at the far left and far right of the reviews is
+                more useful than under the REVIEWS heading). The -8px is half
+                the rail's own pb-4, so they centre on the cards rather than on
+                the scroller. The Previous arrow sits just OUTSIDE the rail
+                (`-left-20`), in the cream the heading column leaves empty, so
+                it never covers a quote; the Next one has no such room, since
+                the rail now runs to the screen's edge, so it takes its disc
+                and sits over the card it scrolls.
+
+                They also lost `tone="purple"`, which drew bare magenta
+                chevrons with no disc. That tone was right while they sat on
+                the section's cream, under the heading; against a tan card it
+                is a 1.9:1 fill that reads as a smudge on the quote rather than
+                as a control. The default tone is the same purple disc the
+                Locations rail already uses over its own cards. */}
+            <div className="mt-4 flex items-center justify-center gap-2 lg:mt-0 lg:contents">
+              <RailArrow
+                direction="prev"
+                onClick={() => scrollByCard(-1)}
+                disabled={atStart}
+                label="Previous reviews"
+                className="lg:absolute lg:-left-20 lg:top-[calc(50%-8px)] lg:z-10 lg:-translate-y-1/2"
+              />
+              <RailArrow
+                direction="next"
+                onClick={() => scrollByCard(1)}
+                disabled={atEnd}
+                label="Next reviews"
+                className="lg:absolute lg:right-5 lg:top-[calc(50%-8px)] lg:z-10 lg:-translate-y-1/2"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>

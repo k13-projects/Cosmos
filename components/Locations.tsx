@@ -161,8 +161,8 @@ export default function Locations() {
                 />
                 <div className="relative z-10 flex w-full flex-1 flex-col">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="halo text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink lg:text-sm">
-                      {l.area}
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink lg:text-sm">
+                      <span className="halo-text">{l.area}</span>
                     </p>
                     {l.status && (
                       /* Not decoration: a guest who reads only the card would
@@ -173,24 +173,24 @@ export default function Locations() {
                     )}
                   </div>
 
-                  <h3 className="halo mt-2 text-[22px] font-bold leading-tight text-purple lg:text-[29px]">
-                    {l.name}
+                  <h3 className="mt-2 text-[22px] font-bold leading-tight text-purple lg:text-[29px]">
+                    <span className="halo-text">{l.name}</span>
                     {l.status && <span className="sr-only"> ({l.status})</span>}
                   </h3>
 
-                  <p className="halo mt-2 text-[15px] leading-snug text-purple/80 lg:text-[16px]">
-                    {l.address}
+                  <p className="mt-2 text-[15px] leading-snug text-purple/80 lg:text-[16px]">
+                    <span className="halo-text">{l.address}</span>
                   </p>
 
                   {/* Every text block carries `.halo` (globals.css): a cream ground with a
                       feathered edge that knocks the corner mark out wherever copy or a
                       control sits, so nothing ever overlaps (Kazim, 2026-09-02). */}
-                  <p className="halo mt-2 flex items-center gap-2 text-[15px] font-semibold text-purple lg:text-[16px]">
+                  <p className="halo mt-2 flex items-start gap-2 text-[15px] font-semibold leading-snug text-purple lg:text-[16px]">
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
                       aria-hidden="true"
-                      className="h-4 w-4 shrink-0 lg:h-[18px] lg:w-[18px]"
+                      className="mt-[3px] h-4 w-4 shrink-0 lg:mt-[2px] lg:h-[18px] lg:w-[18px]"
                     >
                       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                       <path
@@ -200,7 +200,23 @@ export default function Locations() {
                         strokeLinecap="round"
                       />
                     </svg>
-                    {l.hours}
+                    <span>
+                      {l.hours}
+                      {l.hoursNote && (
+                        /* The exception, under the rule rather than beside it
+                           (Kazim, 2026-09-15). `block` and the lighter weight
+                           keep the first line the one a guest reads, and keep
+                           the whole block to two lines on a 390px card, where
+                           Oceanside's old single comma-packed string ran to
+                           three and pushed its drawing out of the card. The
+                           clock icon above stays aligned to the first line
+                           because it is the flex item's own sibling, not part
+                           of this span. */
+                        <span className="block text-[13px] font-medium text-purple/85 lg:text-[14px]">
+                          {l.hoursNote}
+                        </span>
+                      )}
+                    </span>
                   </p>
 
                   {l.phone && (
