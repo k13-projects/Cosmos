@@ -20,27 +20,68 @@ import { useModals } from "./ModalProvider";
  * Angles are CSS angles: 0 points right, positive turns clockwise, y grows
  * downward, which is the convention the fit was done in.
  *
- * THE RING. The blueprint draws six plates on a visible arc; this is now an
- * endless wheel, so the set repeats four times at 15 degrees (360 / 24) to
- * close the circle with no gap. 15 is the blueprint's own 14.1 rounded to a
- * step that divides 360, so the density on the visible arc is unchanged. The
- * ring's own phase (FIRST_ANGLE_DEG) never has to change for a different hub
- * position: because all 24 spokes are laid out around the full circle, which
- * portion is "in view" is decided entirely by where the hub sits and how big
- * R is, not by which index is spoke 0.
+ * THE RING (desktop, lg+). The blueprint draws six plates on a visible arc;
+ * this is now an endless wheel, so the set repeats four times at 15 degrees
+ * (360 / 24) to close the circle with no gap. 15 is the blueprint's own 14.1
+ * rounded to a step that divides 360, so the density on the visible arc is
+ * unchanged. The ring's own phase (FIRST_ANGLE_DEG) never has to change for a
+ * different hub position: because all 24 spokes are laid out around the full
+ * circle, which portion is "in view" is decided entirely by where the hub
+ * sits and how big R is, not by which index is spoke 0.
  *
- * TWO HUBS, ONE COMPONENT. `--wheel-r`, `--plate-w`, `--hub-top` and
- * `--hub-left` (app/globals.css, on `.plate-wheel` / `.wheel-hub`) carry two
- * values each: the lg+ ("desktop") ring described above, and a second,
- * smaller one under 1024px (Lorena, client email 2026-09-10 SS5: "the wheel
- * does not work on mobile," she saw the old static three-plate row and read
- * it as broken). The mobile hub sits centred, at the BOTTOM of its own belt
- * (`top: 100%`, `left: 50%`) rather than off the right edge, so the ring's
- * TOP arc is what pokes into view, like the rim of a wheel mostly buried
- * below the fold. Nothing else in this file (the rAF loop, the drag gesture,
- * focus handling) knows or cares which hub is live: every measurement is
- * read back from the DOM (`hub.getBoundingClientRect()`), so the same code
- * drives both. The one place breakpoint genuinely matters in JS is
+ * THE RING (mobile, below 1024px) IS A DIFFERENT LAYOUT, NOT A SCALED COPY.
+ * Round 3 put the same 24-spoke, four-times-repeated set on the mobile belt
+ * and just shrank it (too crowded); round 4 cut it to six spokes, one copy
+ * each, spaced 60 degrees apart (too sparse: 1 to 2 plates visible at a
+ * time). Round 5 (2026-09-15, Kazim's own read of round 4: "reduce the gap
+ * to a third, or a half... more burgers visible, but not overlapping and
+ * not too close either") lands in between: MOBILE_SPOKE_COUNT is now 12,
+ * two copies of the six dishes, 30 degrees apart (360 / 12) rather than
+ * three copies at 20 degrees. Going all the way to three copies was tried
+ * and measured (see the handoff) and lands the same plates closer together
+ * than the "not too close" half of the brief wants once the six dishes
+ * still have to fit the ring with no gap (the geometry forces repeats: 30
+ * degrees needs 12 spokes to close the circle, 20 degrees needs 18). Same
+ * full-circle spacing logic as round 4 and as the desktop ring: repeats,
+ * not just the visible arc, or the wheel runs out of plates as it turns.
+ * The repeats are what made round 3 crowded, so this round does not just
+ * halve the angle and leave the plate size alone: `--wheel-r` and
+ * `--plate-w` (app/globals.css) both move so twelve plates clear each
+ * other by measurement, not by assumption; see the render below for how
+ * many are visible at once now.
+ *
+ * ROUND 5, SECOND PASS (same day, James's own read + measurement). The
+ * first pass bought its clearance mostly by shrinking `--plate-w` (a ~35%
+ * cut), which reads as small floating props, not food; the lever it left
+ * unused was `--wheel-r`, since the arc distance between neighbours at a
+ * fixed angle grows with R just as much as it shrinks with plate size.
+ * Plate size restored to within ~8% of round 4, R raised substantially
+ * instead (app/globals.css has the numbers), re-measured until the real
+ * minimum edge-to-edge gap landed between 16 and 24px, not the 9 to 11px
+ * the first pass measured. The reel caption also moved: Kazim asked for
+ * the name UNDER the burgers, and a solid yellow pill this prominent reads
+ * as the nav's own ORDER ONLINE button, not a name (James). It is still
+ * one fixed label with the same update mechanism, just below the belt now
+ * instead of above it, and styled as plain text rather than a button.
+ *
+ * TWO HUBS, ONE COMPONENT, TWO SPOKE SETS. `--wheel-r`, `--plate-w`,
+ * `--hub-top` and `--hub-left` (app/globals.css, on `.plate-wheel` /
+ * `.wheel-hub`) carry two values each: the lg+ ("desktop") ring described
+ * above, and a second, smaller one under 1024px. The mobile hub sits
+ * centred, at the BOTTOM of its own belt (`top: 100%`, `left: 50%`) rather
+ * than off the right edge, so the ring's TOP arc is what pokes into view,
+ * like the rim of a wheel mostly buried below the fold. Both spoke sets are
+ * always in the DOM (render below), toggled by a plain CSS media query
+ * (`hidden lg:contents` / `contents lg:hidden`) rather than a JS viewport
+ * check, so server and first client render are byte-identical: no
+ * hydration mismatch to chase (Lesson 30's dev/prod gap is exactly the kind
+ * of thing a JS-side breakpoint branch invites). Both sets share the ONE
+ * hub element, so the rAF loop, the drag gesture and the pause/resume logic
+ * below are written once and drive whichever set is visible; nothing in
+ * this file (the rAF loop, the drag gesture, focus handling) knows or cares
+ * which hub is live except where noted: every measurement is read back from
+ * the DOM (`hub.getBoundingClientRect()`, `data-angle`), so the same code
+ * drives both. The two places breakpoint genuinely matters in JS are
  * `desktopMQ` below: which way is "into view" for a keyboard-focused plate,
  * and whether touch should be allowed to grab the wheel (see both usages).
  *
@@ -74,6 +115,19 @@ const FIRST_ANGLE_DEG = -148.8;
 const SPOKE_STEP_DEG = -15;
 const SPOKE_COUNT = 24;
 
+/** Mobile ring (below 1024px): two copies of the six dishes (Kazim, round 5:
+ * "reduce the gap to a third, or a half" from round 4's single copy). */
+const MOBILE_SPOKE_COUNT = 12;
+/** 360 / 12: spaced around the FULL circle, not the visible arc, so the ring
+ * never runs out of plates as it turns (see the geometry note above). */
+const MOBILE_SPOKE_STEP_DEG = -30;
+/** -90 (straight up, toward the belt's open top) so the wheel's rest pose
+ * (reduced motion, first paint) shows one dish centred with the rest
+ * evenly flanking it, rather than a seam sitting dead centre. Also the
+ * angle the reel caption below reads "current" from: whichever spoke sits
+ * closest to -90 is the one poking furthest into view. */
+const MOBILE_FIRST_ANGLE_DEG = -90;
+
 /** Ambient turn: one plate-step every 7 seconds. */
 const AMBIENT_DEG_PER_S = 15 / 7;
 /** Extra degrees the wheel turns per pixel of scroll, on top of ambient. */
@@ -96,6 +150,8 @@ const DRAG_VEL_SMOOTHING = 0.3;
 const DRAG_STALE_MS = 80;
 
 const angleFor = (i: number): number => FIRST_ANGLE_DEG + i * SPOKE_STEP_DEG;
+const mobileAngleFor = (i: number): number => MOBILE_FIRST_ANGLE_DEG + i * MOBILE_SPOKE_STEP_DEG;
+
 
 /**
  * lg+ (1024px) is where the desktop, off-screen-right hub takes over from the
@@ -171,12 +227,35 @@ const FOCUS_SCROLL_SETTLE_MS = 500;
  * Hover or focus names the dish on an instant yellow pill. The plates are real
  * buttons rather than decoration because a focusable control that does nothing
  * is worse than no control: each opens the menu pop-up, which is where the
- * dishes are actually listed. Only the first six carry a name and a tab stop.
- * The other eighteen are the same six dishes again, so announcing them would
- * read the menu out four times; they stay clickable and hoverable and are
+ * dishes are actually listed. Only the first six of each ring's spokes carry a
+ * name and a tab stop (desktop: spokes 0 to 5 of 24; mobile: 0 to 5 of 12).
+ * The repeats are the same six dishes again, so announcing them would read
+ * the menu out several times over; they stay clickable and hoverable and are
  * hidden from assistive tech. Tabbing to one of the six turns the wheel until
  * that plate is in view, because a focus ring on an off-screen plate is a
  * keyboard trap in everything but name.
+ *
+ * MOBILE ALSO GETS A READ-AT-A-GLANCE CAPTION (Kazim, round 5: "on desktop
+ * the name appears when the mouse is over a plate, and on mobile we skip
+ * that part entirely"). A touchscreen has no hover, so the per-plate pill
+ * above only ever shows for a keyboard or screen-reader visit; a visitor
+ * scrolling with a thumb never saw a name at all. Round 3/4 tried naming
+ * every visible plate at once and it collided and got sliced by the belt's
+ * own clip edge no matter how few captions were on screen (Lessons 32/33):
+ * an always-on label's position is exactly as moving as the plate it's
+ * pinned to. This round's fix keeps that lesson rather than re-fighting it:
+ * ONE caption, in a fixed spot below the belt (Kazim's own words, "under
+ * the burgers"), outside its clip entirely, naming whichever dish currently
+ * sits closest to the top of the arc (the one most fully in view). It
+ * updates as the wheel turns, so it reads like a reel with the current dish
+ * named, and because it never moves it can never collide with anything or
+ * be cut mid-word. It is plain text, not a pill: an early build used the
+ * same yellow-pill-on-purple shape as the site's own buttons (the nav's
+ * ORDER ONLINE), which reads as a control, not a name (James's read,
+ * caught before ship). It is `aria-hidden`: a screen-reader visitor already
+ * gets every dish's real name off the button itself on focus, and an
+ * automatically-changing live region would narrate the ambient rotation
+ * forever, which is not a name, it's noise.
  */
 export default function PlateWheel({
   sectionRef,
@@ -185,10 +264,12 @@ export default function PlateWheel({
   sectionRef: React.RefObject<HTMLElement | null>;
 }) {
   const hubRef = useRef<HTMLDivElement>(null);
+  const captionRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const hub = hubRef.current;
     const section = sectionRef.current;
+    const captionEl = captionRef.current;
     if (!hub || !section) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -274,6 +355,8 @@ export default function PlateWheel({
       boost *= Math.exp(-dt / BOOST_DECAY_S);
 
       write();
+      updateCaption(rot);
+      updateTags(rot);
       frame = requestAnimationFrame(tick);
     };
 
@@ -321,6 +404,101 @@ export default function PlateWheel({
       return d;
     };
 
+    /**
+     * The mobile reel caption (see the doc comment above the component): finds
+     * whichever of the twelve mobile spokes currently sits closest to the
+     * mobile ring's own view angle (-90, straight up, `viewAngleDeg` with the
+     * desktop query not matching) and writes that dish's name into the fixed
+     * caption element, but only on an actual change, so this is a no-op every
+     * other frame. Desktop never calls this (the caption element does not
+     * exist there; `captionEl` is null and this returns immediately).
+     */
+    let lastCaptionIdx = -1;
+    const updateCaption = (rotation: number): void => {
+      if (!captionEl) return;
+      const target = viewAngleDeg(desktopMQ);
+      let best = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < MOBILE_SPOKE_COUNT; i++) {
+        const dist = Math.abs(shortest(mobileAngleFor(i) + rotation - target));
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      }
+      const idx = best % about.plates.length;
+      if (idx === lastCaptionIdx) return;
+      lastCaptionIdx = idx;
+      captionEl.textContent = about.plates[idx].name;
+    };
+
+    /**
+     * The mobile name tags (Kazim, 2026-09-16: a tag stuck right under the
+     * plate, yellow, rounded, purple type).
+     *
+     * Every plate carrying one all the time is what round 3 shipped and had to
+     * take back: the belt clips vertically while the ring never stops turning,
+     * so a tag on a low plate is sliced mid-word by the clip edge, and the
+     * plates crowding the arc's ends stack their tags into each other. Both
+     * failures happen at the ARC'S ENDS, and neither happens near the top,
+     * where the plates are widest apart on screen and nothing is near the clip.
+     *
+     * So the tag is not a property of the plate, it is a property of where the
+     * plate currently IS: fully on screen it wears one, half cut by an edge it
+     * does not, and it fades as the wheel carries it in and out. `updateTags`
+     * below is that test.
+     */
+    // The mobile ring only. Both rings live under the same hub and the hidden
+    // one's spokes still answer a query, so tagging every `[data-spoke]` would
+    // set the attribute on twenty four elements that render nothing.
+    const plateEls = Array.from(
+      hub.querySelectorAll<HTMLElement>('[data-ring="mobile"] [data-spoke]'),
+    );
+    const tagged = new Set<HTMLElement>();
+    let lastTagRot = Number.NaN;
+    /**
+     * A plate wears its tag when the plate is FULLY on screen, and not before.
+     *
+     * The first rule tried was an angular window round the top of the arc, and
+     * it was the wrong question: how much of a plate you can see depends on the
+     * viewport's width, not on its angle, so a window tuned at 390 tagged a
+     * half-cut plate at 430 and skipped a whole one at 375. Asking the geometry
+     * directly costs twelve rect reads, throttled to every two degrees of turn,
+     * and it is right at every width by construction.
+     *
+     * Both edges matter and they fail differently. Horizontally the viewport
+     * cuts the plate, so its tag would be cut with it, which is the sliced
+     * "EN", "E" that round 3 shipped and had to take back. Vertically the belt
+     * clips, and the tag hangs BELOW its plate, so the plate can be entirely
+     * visible while its tag is not: hence the tag's own height in the test,
+     * not the plate's bottom.
+     */
+    const updateTags = (rotation: number): void => {
+      if (desktopMQ.matches) return; // mobile only: desktop names on hover
+      if (Math.abs(rotation - lastTagRot) < 2) return;
+      lastTagRot = rotation;
+      const belt = hub.parentElement;
+      if (!belt) return;
+      const beltBottom = belt.getBoundingClientRect().bottom;
+      for (const el of plateEls) {
+        const r = el.getBoundingClientRect();
+        const tag = el.querySelector<HTMLElement>(".plate-tip");
+        const tagRoom = (tag?.offsetHeight ?? 34) + 6;
+        const show =
+          r.left >= 2 &&
+          r.right <= window.innerWidth - 2 &&
+          r.bottom + tagRoom <= beltBottom;
+        if (show === tagged.has(el)) continue;
+        if (show) {
+          el.setAttribute("data-tag", "");
+          tagged.add(el);
+        } else {
+          el.removeAttribute("data-tag");
+          tagged.delete(el);
+        }
+      }
+    };
+
     /** Tooltips are hidden while the wheel is being thrown; see globals.css. */
     const syncDragFlag = (): void => {
       if (dragged || hoverBlocked) hub.setAttribute("data-drag", "");
@@ -362,6 +540,7 @@ export default function PlateWheel({
     const endDrag = (event?: PointerEvent): void => {
       if (pointerId === null) return;
       if (event && event.pointerId !== pointerId) return;
+      const touchRelease = event?.pointerType === "touch" || event?.pointerType === "pen";
 
       // A press that barely moved and was let go quickly is a click. Anything
       // else is a drag, and a drag must never open the menu pop-up.
@@ -384,8 +563,18 @@ export default function PlateWheel({
 
       const threw = dragged;
       dragged = false;
-      if (threw) suspendHover();
-      else syncDragFlag();
+      // `suspendHover` is waiting for a real `pointermove` to prove the hand
+      // moved, and a finger never provides one: it lifts and nothing moves
+      // again. So on touch the suspension is released here, at the release
+      // itself, which is the only moment a touchscreen can offer (Kazim,
+      // 2026-09-16; Lessons 25, a pause whose only exit may never arrive).
+      // There is nothing to suspend on touch anyway, since hover does not
+      // exist there, and the desktop path is untouched.
+      if (threw && !touchRelease) suspendHover();
+      else {
+        hoverBlocked = false;
+        syncDragFlag();
+      }
 
       // Hand the wheel back to the ambient loop at the speed it had. `boost` is
       // the amount ABOVE ambient and decays with the same e-fold the scroll
@@ -439,8 +628,11 @@ export default function PlateWheel({
       }
 
       // The rAF loop is not running under reduced motion, and the wheel still
-      // has to follow the hand there.
+      // has to follow the hand there. Same for the reel caption: tick() would
+      // normally keep it in sync, but tick() never runs under reduced motion.
       write();
+      updateCaption(rot);
+      updateTags(rot);
     };
 
     const onPointerUp = (event: PointerEvent): void => endDrag(event);
@@ -551,8 +743,16 @@ export default function PlateWheel({
       ) {
         return;
       }
+      // The button's own data-angle, not angleFor(spoke): the desktop and
+      // mobile spoke sets use different angle formulas for the same index
+      // (24 spokes at 15deg vs 6 at 60deg), so the angle has to be read off
+      // whichever button was actually focused, not recomputed from a single
+      // ring's own constants.
+      const btn =
+        event.target instanceof Element ? event.target.closest<HTMLElement>("[data-spoke]") : null;
+      const angle = btn?.dataset.angle !== undefined ? Number(btn.dataset.angle) : angleFor(spoke);
       // Turn the shortest way round until this plate sits in the visible window.
-      const wanted = viewAngleDeg(desktopMQ) - angleFor(spoke);
+      const wanted = viewAngleDeg(desktopMQ) - angle;
       let target = wanted;
       while (target - rot > 180) target -= 360;
       while (target - rot < -180) target += 360;
@@ -605,12 +805,16 @@ export default function PlateWheel({
       if (reduced.matches) {
         rot = 0;
         hub.style.setProperty("--wheel-rot", "0deg"); // static arc, blueprint pose
+        updateCaption(rot);
+        updateTags(rot);
         return;
       }
       lastScrollY = window.scrollY;
       window.addEventListener("scroll", onScroll, { passive: true });
       document.addEventListener("visibilitychange", onVisibility);
       observer.observe(section);
+      updateCaption(rot); // first paint, before tick()'s own first frame lands
+      updateTags(rot);
       start();
     };
 
@@ -644,51 +848,109 @@ export default function PlateWheel({
   }, [sectionRef]);
 
   return (
-    // pointer-events-none so the band's copy stays selectable underneath; each
-    // plate turns them back on for itself.
-    //
-    // Mobile (<1024): a normal-flow, fixed-height, fully clipped belt (see the
-    // geometry note above for why `overflow-hidden`, not a spill).
-    // lg+: the desktop ring, unchanged from before: `absolute inset-0`,
-    // `overflow-x-clip` (the hub sits off the right edge and would otherwise
-    // widen the document) with the y axis left open so the lowest plate can
-    // still spill over the seam into the values band, as the blueprint draws
-    // it. `hidden` clips both axes; `clip` leaves the other one visible.
-    <div className="plate-wheel pointer-events-none relative mt-14 h-[240px] w-full overflow-hidden lg:absolute lg:inset-0 lg:mt-0 lg:h-auto lg:w-auto lg:overflow-x-clip lg:overflow-y-visible">
-      <div ref={hubRef} className="wheel-hub h-0 w-0">
-        {Array.from({ length: SPOKE_COUNT }, (_, spoke) => {
-          const plate = about.plates[spoke % about.plates.length];
-          const isPrimary = spoke < about.plates.length;
-          return (
-            <div
-              key={spoke}
-              className="absolute left-0 top-0 h-0 w-0"
-              style={{ transform: `rotate(${angleFor(spoke)}deg) translateX(var(--wheel-r))` }}
-            >
-              {/* Centres the plate on the spoke's tip. Its own element so every
-                  node below carries exactly one transform. */}
-              <div
-                className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2"
-                style={{ width: "var(--plate-w)" }}
-              >
-                <Plate
-                  plate={plate}
-                  spoke={spoke}
-                  index={spoke % about.plates.length}
-                  primary={isPrimary}
-                  // Undo the spoke's angle and the hub's live rotation, so the
-                  // plate hangs upright at every position on the wheel, while
-                  // it is being dragged as much as while it turns on its own.
-                  style={{
-                    transform: `rotate(calc(${-angleFor(spoke)}deg - var(--wheel-rot, 0deg)))`,
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
+    <>
+      {/* pointer-events-none so the band's copy stays selectable underneath;
+          each plate turns them back on for itself.
+
+          Mobile (<1024): a normal-flow, fixed-height, fully clipped belt (see
+          the geometry note above for why clipped, not a spill). `mt-14`:
+          round 4's own spacing from the About copy, unchanged; the reel
+          caption below is a new sibling AFTER this div, not a change to what
+          sits above it. `h-[440px]`: round 5's own re-solve (James's read,
+          same day): the plate size Kazim's first cut sacrificed was restored
+          near round 4's own size, and the radius grew instead (the geometry
+          note above), which needs more vertical room to keep the same
+          visible arc than the old 280px belt could give the bigger circle.
+          `overflow-clip`, not `overflow-hidden`: round 4's own keyboard test
+          found that focusing an off-screen primary plate made the BROWSER
+          auto-scroll this belt's own internal scrollport to reveal it,
+          `belt.scrollTop` landing at 244px with no visible scrollbar (an
+          `overflow:hidden` box is still a scrollable/focus-scrollable region
+          per spec, scrollbar or not), silently desyncing every
+          `hub.getBoundingClientRect()` read the drag gesture and
+          `centreHub()` depend on from where the hub visually is.
+          `overflow: clip` (already used on the desktop ring's x-axis below)
+          clips identically but was built specifically to never become a
+          scroll container, so there is no scrollport for a focus event to
+          move: `belt.scrollTop` stays 0 no matter what receives focus inside
+          it.
+          lg+: the desktop ring, unchanged from before: `absolute inset-0`,
+          `overflow-x-clip` (the hub sits off the right edge and would
+          otherwise widen the document) with the y axis left open so the
+          lowest plate can still spill over the seam into the values band, as
+          the blueprint draws it. `clip` on both axes here, `visible` leaves
+          the other one open. */}
+      <div className="plate-wheel pointer-events-none relative mt-10 h-[var(--belt-h)] w-full overflow-clip lg:absolute lg:inset-0 lg:mt-0 lg:h-auto lg:w-auto lg:overflow-x-clip lg:overflow-y-visible">
+        <div ref={hubRef} className="wheel-hub h-0 w-0">
+          {/* Desktop ring (lg+): unchanged, 24 spokes (4 copies of the six),
+              15deg apart. `hidden lg:contents`: gone from layout below
+              1024px; at lg+ a transparent grouping wrapper (`display:
+              contents`) so every spoke below still positions directly
+              against `.wheel-hub`, not this wrapper (see the geometry note
+              above on the two rings sharing one hub). */}
+          <div className="hidden lg:contents">
+            {Array.from({ length: SPOKE_COUNT }, (_, spoke) => (
+              <WheelSpoke
+                key={`d${spoke}`}
+                plate={about.plates[spoke % about.plates.length]}
+                spoke={spoke}
+                angle={angleFor(spoke)}
+                index={spoke % about.plates.length}
+                primary={spoke < about.plates.length}
+              />
+            ))}
+          </div>
+
+          {/* Mobile ring (below 1024px): two copies of the six dishes, 30deg
+              apart round the FULL circle (Kazim, round 5; see the geometry
+              note above for why the full circle, not the visible arc, and
+              why two copies rather than one or three). `contents lg:hidden`:
+              the mirror of the wrapper above, present below 1024px, gone at
+              lg+. Both sets are always in the DOM (a plain CSS toggle, not a
+              JS breakpoint branch) so the server and the first client render
+              are identical. Same repeat pattern as the desktop ring above:
+              `plate % about.plates.length` cycles the six dishes, `primary`
+              is true only for the first pass (spokes 0 to 5) so the second
+              copy stays out of the tab order and hidden from assistive
+              tech, same as desktop's repeats. */}
+          <div data-ring="mobile" className="contents lg:hidden">
+            {Array.from({ length: MOBILE_SPOKE_COUNT }, (_, spoke) => (
+              <WheelSpoke
+                key={`m${spoke}`}
+                plate={about.plates[spoke % about.plates.length]}
+                spoke={spoke}
+                angle={mobileAngleFor(spoke)}
+                index={spoke % about.plates.length}
+                primary={spoke < about.plates.length}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Mobile-only reel caption (round 5; see the doc comment above the
+          component for why this is one fixed label rather than a per-plate
+          one). Round 5, second pass (Kazim's own words, "under the burgers",
+          and James's read: a solid yellow pill this prominent reads as the
+          nav's ORDER ONLINE button, not a name). Moved BELOW the belt as a
+          plain sibling AFTER it, and restyled as quiet text: no pill, no
+          background, no uppercase `.display` weight, just yellow type on the
+          purple ground the way `About`'s own body copy already relies on
+          contrast rather than a card to read. `mt-4`: breathing room from the
+          belt's own clip line, small and deliberate, not fighting for the
+          same vertical space as a plate (that space is inside the belt's own
+          overflow-clip box above; this element is outside it entirely, in
+          normal flow, so it is structurally incapable of ever sharing a
+          pixel with a plate or being cut mid-word by the clip line, the same
+          guarantee the first pass had, just on the other side of the arc
+          now). `aria-hidden`: purely a visual affordance for a sighted touch
+          visitor, not a substitute for the real per-plate accessible name
+          each button already carries (unchanged, still focus-revealed,
+          Lesson 33). The initial text is the first mobile spoke's own dish
+          (spoke 0 sits at the rest pose's top, MOBILE_FIRST_ANGLE_DEG), so
+          there is no empty label before JS runs or under reduced motion
+          before the effect's first paint. */}
+    </>
   );
 }
 
@@ -696,10 +958,62 @@ export default function PlateWheel({
 
 type PlateData = (typeof about.plates)[number];
 
+/**
+ * One spoke: places a `Plate` at `angle` degrees round the hub, at radius
+ * `--wheel-r`. Shared by both rings (desktop's 24-spoke map and mobile's
+ * 6-spoke map both call this) so their markup structure can never drift
+ * apart from each other.
+ */
+function WheelSpoke({
+  plate,
+  spoke,
+  angle,
+  index,
+  primary,
+}: {
+  plate: PlateData;
+  /** Position within the caller's own set; passed straight through to `Plate`. */
+  spoke: number;
+  /** This spoke's angle in the wheel's own CSS convention (see angleFor/mobileAngleFor). */
+  angle: number;
+  index: number;
+  primary: boolean;
+}) {
+  return (
+    <div
+      className="absolute left-0 top-0 h-0 w-0"
+      style={{ transform: `rotate(${angle}deg) translateX(var(--wheel-r))` }}
+    >
+      {/* Centres the plate on the spoke's tip. Its own element so every
+          node below carries exactly one transform. */}
+      <div
+        className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: "var(--plate-w)" }}
+      >
+        <Plate
+          plate={plate}
+          spoke={spoke}
+          angle={angle}
+          index={index}
+          primary={primary}
+          // Undo the spoke's angle and the hub's live rotation, so the
+          // plate hangs upright at every position on the wheel, while
+          // it is being dragged as much as while it turns on its own.
+          style={{ transform: `rotate(calc(${-angle}deg - var(--wheel-rot, 0deg)))` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 interface PlateProps {
   plate: PlateData;
   /** Position on the ring, used by the wheel's hover, focus and drag handling. */
   spoke?: number;
+  /** This spoke's angle (`data-angle`): read back on keyboard focus, since
+   * the desktop and mobile sets use different angle formulas for the same
+   * `spoke` index and the wheel has to know which one actually fired. */
+  angle: number;
   /** Index within the six-plate set, for the float animation's offset. */
   index: number;
   /**
@@ -718,24 +1032,23 @@ interface PlateProps {
  * above).
  *
  * The tooltip's CSS is itself responsive, because it is the SAME markup on
- * both rings:
- *   lg+ (the desktop ring)   hover/keyboard only, CSS-only (group-hover /
- *     group-focus-visible) so it appears on the same frame as the pointer,
- *     has no timer to cancel and cannot be stranded open by a lost event.
- *     Opens to the LEFT: the arc lives on the right edge, so a right-hand
- *     tooltip would be off-screen. Unchanged from before this round.
- *   below lg (the mobile ring)   always on, the same treatment the old
- *     touch row used and for the same reason: a touchscreen has no hover, so
- *     a reveal-on-hover tooltip is invisible on the exact device this ring
- *     turns for. Sits under the plate, capped and wrapped so the longest name
- *     can never reach past the belt's own clipped edge.
+ * both rings, and the SAME visibility rule on both (Lesson 33: no always-on
+ * caption is safe inside a clipped, continuously-turning ring, no matter how
+ * few): hidden by default, revealed only on `:focus-visible`. A touchscreen
+ * has no hover to lose; a tap already opens the menu and names the dish
+ * there.
+ *   lg+ (the desktop ring)   opens to the LEFT: the arc lives on the right
+ *     edge, so a right-hand tooltip would be off-screen. Unchanged from
+ *     before this round.
+ *   below lg (the mobile ring)   sits under the plate, capped and wrapped so
+ *     the longest name can never reach past the belt's own clipped edge.
  *
  * `draggable={false}` and `onDragStart` are not belt and braces, they are the
  * fix (Lessons 24): a photo inside a control is a drag source to the browser,
  * and its native drag hijacks the gesture, offers the file for download on
  * drop, and swallows the pointer events the wheel needs to un-pause itself.
  */
-function Plate({ plate, spoke, index, primary, style }: PlateProps) {
+function Plate({ plate, spoke, angle, index, primary, style }: PlateProps) {
   const { openMenu } = useModals();
   const tipId = `${useId()}plate-tip`;
 
@@ -745,6 +1058,7 @@ function Plate({ plate, spoke, index, primary, style }: PlateProps) {
       onClick={openMenu}
       onDragStart={(event) => event.preventDefault()}
       data-spoke={spoke}
+      data-angle={angle}
       tabIndex={primary ? undefined : -1}
       aria-hidden={primary ? undefined : true}
       aria-describedby={primary ? tipId : undefined}
@@ -785,8 +1099,8 @@ function Plate({ plate, spoke, index, primary, style }: PlateProps) {
         role="tooltip"
         aria-hidden={primary ? undefined : true}
         className={[
-          "plate-tip pointer-events-none absolute z-10 w-max rounded-[999px] bg-yellow px-3 py-1.5",
-          "text-[13px] leading-tight text-purple shadow-[0_8px_20px_rgba(43,3,48,0.35)] sm:px-4 sm:py-2",
+          "plate-tip pointer-events-none absolute z-10 w-max rounded-[999px] bg-yellow px-2.5 py-1",
+          "text-[11px] leading-[1.15] text-purple shadow-[0_8px_20px_rgba(43,3,48,0.35)] sm:px-4 sm:py-2 sm:text-[13px]",
           // Mobile ring: QA gate, 2026-09-15 (James's read of the built
           // screenshots, confirmed live). The always-on-for-primaries design
           // this replaced put all six primary captions on screen at once
@@ -802,8 +1116,8 @@ function Plate({ plate, spoke, index, primary, style }: PlateProps) {
           // keyboard and screen-reader users get the same reveal desktop
           // does. Non-primary repeats are unfocusable (tabIndex -1), so this
           // is inert for them, same as before.
-          "bottom-[-1.9em] left-1/2 max-w-[24vw] -translate-x-1/2 whitespace-normal text-center opacity-0",
-          "transition-opacity duration-[80ms] group-focus-visible:opacity-100",
+          "bottom-[-1.35em] left-1/2 max-w-[27vw] -translate-x-1/2 whitespace-normal text-center opacity-0",
+          "transition-opacity duration-200 group-focus-visible:opacity-100 group-data-[tag]:opacity-100",
           // Desktop ring: hover/focus only, opens left of the plate.
           "lg:bottom-auto lg:left-auto lg:right-[84%] lg:top-1/2 lg:max-w-none lg:translate-x-0",
           "lg:-translate-y-1/2 lg:whitespace-nowrap lg:text-[15px] lg:group-hover:opacity-100",

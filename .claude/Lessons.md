@@ -183,3 +183,39 @@ On `hail mary` / `hm` (or `hail mary that shit` / `hm pls`): new branch → comm
     continuously-animated, clipped container, a label's visibility must be tied to a discrete,
     non-animating trigger (focus, hover, a click-to-reveal state) — never "on by default while
     true," even for a subset of elements, even if the subset is small.
+
+### `overflow: hidden` is still a scrollport, corrected by Natalia 2026-09-15 (round 4, mobile wheel)
+34. **An `overflow: hidden` box has no visible scrollbar, but the browser can still scroll it, and
+    a keyboard focus event will.** Cutting the mobile wheel from 24 repeated spokes to 6 unique
+    ones (Kazim's own instruction, round 4) made a focused primary plate far more often sit outside
+    the belt's currently-visible window than before (six plates spread round the full circle are
+    rarely all near the visible arc at once, where 24 densely-packed ones almost always had one
+    close by already). Tabbing to an off-screen plate made the BROWSER auto-scroll the belt's own
+    internal scrollport to reveal it, `belt.scrollTop` landing at 244px with no scrollbar ever
+    drawn, since `overflow: hidden` still creates a scrollable region per spec, scrollbar or not.
+    That silently desynced every `hub.getBoundingClientRect()` read the drag gesture (`angleOf`)
+    and the focus page-scroll correction (`centreHub`) depend on from where the hub visually was,
+    breaking keyboard reach for exactly the plates that most needed it. The fix is `overflow: clip`
+    in place of `overflow: hidden` on any box meant as a pure visual clip with no scroll intent:
+    unlike `hidden`, `clip` was built specifically to never become a scroll container, so there is
+    no scrollport for a focus event (or anything else) to move, `scrollTop` stays 0 no matter what
+    receives focus inside it. Caught by testing the actual keyboard contract (focus every reachable
+    control, not just eyeballing a screenshot) rather than assuming a clip box with no visible
+    scrollbar is inert. Any clipped, non-scrolling box that contains a focusable control needs the
+    same check, not just this project's wheel.
+
+### Reveal-animated elements measure wrong until they've actually revealed, corrected by Natalia 2026-09-15 (round 5)
+35. **A `.reveal` card's `getBoundingClientRect()` is only trustworthy after its scroll-triggered
+    entrance has actually fired.** Measuring the gap between the mobile wheel's belt and the
+    Values band's first icon gave 104px right after a same-viewport `scrollIntoView`, matching
+    round 4's own reported number exactly, but 80px once the Values section was deliberately
+    scrolled well past its reveal trigger first. The two never agree because `.reveal` cards ship
+    with an entrance transform (a fade-up offset) that only clears once their own
+    `IntersectionObserver` fires; a transform never changes a box's own layout height, so a
+    still-mid-transform child reads its pre-settle position, not its resting one. 80px is the one
+    a real visitor sees, since nobody can be looking at the gap between the belt and an icon that
+    has not scrolled into view yet. Any measurement of a `.reveal` element (or a container whose
+    box depends on one) needs a deliberate settle step first: scroll it meaningfully past where
+    its own trigger fires, not just into the viewport, before trusting the rect. A plain container
+    that is not itself `.reveal` (e.g. the Values grid, as opposed to one of its three cards) does
+    not need this, since a transform on a child never moves the parent's own box.

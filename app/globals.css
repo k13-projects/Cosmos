@@ -244,30 +244,93 @@ html.lenis body {
      horizontal margin can no longer spare. Measured clearances across a
      full revolution at 1024/1280/1440/1920 are in the handoff. */
   .plate-wheel {
-    --wheel-r: clamp(340px, 34vw, 620px);
-    --plate-w: clamp(160px, 17vw, 280px);
+    /* The cap is what a very large screen actually needs (Kazim, 2026-09-16,
+       on the 34 inch: the plates read "too dense and too centred" there, while
+       the 14 inch was right). Both halves of that are the same cause. `34vw`
+       stops growing at 620px, so past about 1820px the ring keeps its size
+       while the screen keeps growing: the arc a guest sees becomes a tighter
+       and tighter curl of plates in a bigger and bigger field. Letting the
+       radius go on to 900px keeps the visible arc's curvature closer to what
+       it is on a laptop, which is what "less dense" means here: the same
+       plates, further apart along a longer arc. */
+    --wheel-r: clamp(340px, 34vw, 900px);
+    --plate-w: clamp(160px, 17vw, 300px);
     --hub-top: 58%;
-    --hub-left: calc(100% + var(--wheel-r) * 0.72);
+    /* Round 4 (2026-09-15, Kazim on his 34" monitor): "we could centre it a
+       bit more on the big one." The old formula anchored the hub to 100% of
+       the wheel's OWN box, which spans the raw viewport (the wheel div is a
+       sibling of the 1400px content column, not a child of it). Past 1400px
+       the copy's own right edge only grows at HALF the viewport's growth
+       rate (mx-auto centring a fixed-width container), while the hub grew
+       at the FULL rate, so the gap between them opened without limit: 358px
+       at 1440, 864px at 2560, 1304px at 3440 (measured). Subtracting the
+       container's own growing side margin here makes the hub travel at
+       that same half-rate once the viewport passes 1400px, so the gap goes
+       flat instead of climbing (measured ~600px constant from 1920 up,
+       see the handoff). 1400px must match the max-w-[1400px] container in
+       About.tsx and Values.tsx. Below 1400px the margin is 0, so this is a
+       no-op: every clearance Round 3 tuned (Lessons 14/16) is untouched. */
+    /* Refined 2026-09-16 for the 34 inch: the pull-in is now a QUARTER of the
+       container's side margin, not a half. At the half rate the wheel kept
+       pace with the copy all the way out, which reads as intended at 1920 and
+       as "sitting in the middle of the screen" at 3440, where that margin is
+       over a thousand pixels. A quarter still closes the unbounded gap the
+       round 4 fix existed to close (the hub can no longer run away from the
+       copy), while leaving the ring where it belongs on a very wide screen:
+       hanging off the right edge, not wading into the page. */
+    --hub-left: calc(100% - max(0px, (100% - 1400px) / 4) + var(--wheel-r) * 0.72);
   }
 
   /* MOBILE (<1024px). A second, much smaller ring, hub centred at the
      BOTTOM of its own clipped belt (`.plate-wheel` sizes the belt itself,
      components/PlateWheel.tsx) so the ring's TOP arc pokes into view, like a
      rim mostly buried below the fold, rather than the off-screen-right hub
-     the desktop ring uses. Sized so the visible arc spans most of a phone's
-     width at a shallow enough sag to fit a belt a few plates tall, not a
-     few screens tall: at R's own clamp range (150 to 190px) the arc's sag
-     (the drop from the topmost plate's centre to the ones either side of
-     it, 48 degrees off top) runs from about 64 to 81px, so `--wheel-r`
-     stays the load-bearing number and the belt height in PlateWheel.tsx
-     (240px) is sized to clear it plus a full plate's own height on every
-     side. */
+     the desktop ring uses.
+
+     Round 5 (2026-09-15, Kazim's read of round 4: "çok daha güzel olmuş",
+     then "reduce the gap between the burgers to a third, or a half... more
+     burgers visible, but not overlapping and not too close either"). Round
+     4's 6-spoke, 60deg, single-copy ring (below) was the sparse end Kazim
+     is now asking to fill back in partway; going straight to round 3's
+     4-copy, 15deg ring is the crowded end he is asking to stay clear of.
+     The middle he asked for: 2 copies of the six dishes, 30deg apart
+     (12 spokes, `MOBILE_SPOKE_COUNT`/`MOBILE_SPOKE_STEP_DEG` in
+     PlateWheel.tsx) rather than 3 copies at 20deg.
+
+     Round 5, second pass (James's own read + measurement, same day): the
+     first pass bought its clearance by shrinking `--plate-w` 112-156 to
+     68-84, a ~35% cut, "small floating props rather than food you want."
+     The lever that was not used is `--wheel-r`: at 30deg the arc distance
+     between neighbours grows with R as much as it shrinks with plate size
+     (`R * sin(15deg) * 2` is the real chord; James's own quicker
+     `R * 0.5236` arc-length estimate lands within a few percent of it for
+     small angles and was enough to know which direction to move). Plate
+     size restored to within ~8% of round 4 (112-156 -> 108-140, not the
+     68-84 cut) and R raised instead: 165-215 -> 300-360, nearly triple.
+     Swept the full rotation with real `getBoundingClientRect()`s (not the
+     arc-length estimate, which is close but not the actual worst-case
+     axis-aligned gap, Lesson 31's clip-aware method) at 375/390/430: the
+     measured minimum edge-to-edge clearance between neighbours now sits in
+     the high teens to low twenties of px at every width, the 16-24px band
+     James asked for, not the 9-11px the first pass measured. A radius this
+     much larger needs a taller belt to keep the same visible arc (below,
+     PlateWheel.tsx): 280px -> 440px. */
   @media (max-width: 1023.98px) {
     .plate-wheel {
-      --wheel-r: clamp(150px, 46vw, 190px);
-      --plate-w: clamp(96px, 30vw, 132px);
+      --wheel-r: clamp(220px, 61vw, 290px);
+      --plate-w: clamp(88px, 25vw, 116px);
       --hub-top: 100%;
       --hub-left: 50%;
+      /* The belt's own height, DERIVED, never typed (Kazim, 2026-09-16: the
+         burgers were being sliced across the top on his phone). The hub sits
+         on the belt's bottom edge, so the arc's apex is one radius above it
+         and the plate sitting there needs half its own height of clearance on
+         top of that. Both of those scale with the viewport and the height was
+         a fixed 286px, so the apex climbed out through the belt's top edge as
+         the screen got wider: correct at 390, slicing the plates at 430. The
+         0.42 factor is the plate's drawn aspect (the cutouts are wider than
+         they are tall), and 14px is the float animation's own travel. */
+      --belt-h: calc(var(--wheel-r) + var(--plate-w) * 0.42 + 14px);
     }
   }
 
@@ -301,12 +364,25 @@ html.lenis body {
     pointer-events: none;
   }
 
-  /* While the wheel is being thrown, the tooltips are noise: the plates slide
-     under a still pointer, so the pill would strobe from one name to the next.
-     Set by PlateWheel.tsx for the length of the gesture, and for as long after
-     it as the hand has not moved again. */
-  .wheel-hub[data-drag] .plate-tip {
-    opacity: 0 !important;
+  /* While the wheel is being thrown, the desktop tooltips are noise: the plates
+     slide under a still pointer, so the pill would strobe from one name to the
+     next. Set by PlateWheel.tsx for the length of the gesture, and for as long
+     after it as the hand has not moved again.
+
+     DESKTOP ONLY, and the scope is the whole point (Kazim, 2026-09-16: "bir
+     burgere dokunup cevirince isim tagleri kayboluyor ve geri gelmiyor"). The
+     flag it keys off is cleared by the next real `pointermove`, which is the
+     right proof on a mouse and one a touchscreen never provides: the finger
+     lifts and nothing moves again, so on a phone the flag stayed set and every
+     tag stayed hidden for good. The reasoning behind the rule does not apply
+     there either, because a mobile tag is a label bolted to its own plate, not
+     a pill that follows the pointer, so a spinning wheel cannot make it
+     strobe. Textbook Lessons 25: a pause state whose only exit is an event
+     that may never arrive. */
+  @media (min-width: 1024px) {
+    .wheel-hub[data-drag] .plate-tip {
+      opacity: 0 !important;
+    }
   }
 
   /* The pointer is captured for the whole drag, so it spends most of it off the
@@ -491,6 +567,27 @@ html.lenis body {
   }
 }
 
+/* --- rail bleed --------------------------------------------------------- */
+/* Carry a rail out through the page container's own right margin, to the
+   viewport's edge (Kazim, 2026-09-16: on the 34 inch the reviews "get cut off
+   too early", with the second card sliced in half and a thousand pixels of
+   empty cream to its right).
+
+   The rail lives inside `max-w-[1400px] mx-auto`, so past 1400px it stopped
+   where the container stopped, not where the screen stopped: at 3440 the cards
+   ended 1020px short of the edge and the cut looked like a mistake rather than
+   the blueprint's "cards run off the page". This pulls it back out by exactly
+   the container's own side margin plus the gutter it sits in, so the cut
+   always happens at the screen's edge and the extra width goes to showing more
+   of the next card. Below 1024px the rail is already full-bleed by its own
+   negative margins, so this only exists at lg and up. 1400px and 3rem must
+   match the container's `max-w-[1400px]` and `lg:px-12`. */
+@media (min-width: 1024px) {
+  .rail-bleed-r {
+    margin-right: calc(-1 * (max(0px, (100vw - 1400px) / 2) + 3rem));
+  }
+}
+
 /* --- location-card text halo ------------------------------------------- */
 /* The building mark is large and flush in the card corner. Text and controls
    must never sit on top of it, so each block "opens up" the mark beneath it:
@@ -501,7 +598,30 @@ html.lenis body {
   max-width: 100%;
   background: var(--color-cream);
   border-radius: 10px;
-  box-shadow:
-    0 0 0 6px var(--color-cream),
-    0 0 12px 12px var(--color-cream);
+  /* One crisp ring, no feather (Kazim, 2026-09-16). The second shadow used to
+     be a 12px blur, and a blur has no respect for its own element: the phone
+     row's feather washed cream up over the line above it, which is why the
+     hours' second line looked half faded and half eaten. A hard ring does the
+     one job the halo exists for, keeping the copy off the drawing, and does
+     nothing to its neighbours. */
+  box-shadow: 0 0 0 5px var(--color-cream);
+}
+
+/* Text blocks knock out only the TEXT, not the block (Kazim, 2026-09-16: the
+   card's drawing was being cut far more than it needed to be). A block-level
+   halo is a rectangle as wide as its widest line and as tall as all of them,
+   so a two-line address opened a cream hole across the short line's empty
+   half too. `display: inline` with a cloned decoration gives every LINE BOX
+   its own ground, so the hole is the shape of the words and the drawing keeps
+   everything between and around them. Flex rows (the hours, the phone, the
+   controls) stay block: their content is not a run of text and they already
+   shrink-wrap. */
+.halo-text {
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0 2px;
+  background: var(--color-cream);
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px var(--color-cream);
 }

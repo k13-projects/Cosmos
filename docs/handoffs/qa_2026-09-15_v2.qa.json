@@ -1,0 +1,102 @@
+{
+  "report": "docs/handoffs/qa_2026-09-15_v2.md",
+  "date": "2026-09-15",
+  "round": 4,
+  "tester": "Olga (qa-test-engineer)",
+  "package_tested": "docs/handoffs/engineering_2026-09-15_v4.md",
+  "build": "npm run build && npx next start -p 9157 (rebuilt fresh, .next/cache/images cleared)",
+  "status": "PASS",
+  "blocking_findings": 0,
+  "human_gate_items": 1,
+  "code_changes_made": false,
+  "items": [
+    {
+      "id": "job1-wide-screen-gap",
+      "desc": "About band composition travels together on wide monitors instead of an unbounded gap",
+      "verdict": "PASS",
+      "note": "Independently re-measured, full rotation, 1-3deg steps. Confirms flattening from 1920px up. Values-grid clearance measured 69.4px at 1920/2560/3440 (engineering claimed 71-76px) -- confirmed real, not a rounding artifact, re-swept at 1deg resolution.",
+      "measurements": {
+        "1024": { "text_gap_px": 60, "values_grid_clearance_px": 105, "heading_clearance_px": 202 },
+        "1280": { "text_gap_px": 246, "values_grid_clearance_px": 121, "heading_clearance_px": 200 },
+        "1440": { "text_gap_px": 352, "values_grid_clearance_px": 139, "heading_clearance_px": 210 },
+        "1920": { "text_gap_px": 298, "values_grid_clearance_px": 69.4, "heading_clearance_px": 134 },
+        "2560": { "text_gap_px": 298, "values_grid_clearance_px": 69.4, "heading_clearance_px": 134 },
+        "3440": { "text_gap_px": 298, "values_grid_clearance_px": 69.4, "heading_clearance_px": 134 }
+      }
+    },
+    {
+      "id": "job1-values-band-centred",
+      "desc": "Values band stays centred, does not read as three columns marooned in a wide row",
+      "verdict": "PASS",
+      "note": "Left/right margin diff constant 14px (scrollbar) at 2560 and 3440. Screenshotted."
+    },
+    {
+      "id": "job1-near-miss-judgment",
+      "desc": "Judgment call requested: is 69-76px close enough to read as a near miss",
+      "verdict": "FINDING, not blocking",
+      "note": "Never overlaps text (130px+ to the Fresh always heading itself), but the values grid's third column crowds the wheel more than the other two columns and more than Round 3's tuned range. Flagged as Human Gate item, not fixed -- tightening this gap was Kazim's own ask this round."
+    },
+    {
+      "id": "job2-mobile-rotation-holes",
+      "desc": "Count visible plates across full rotation at 375/390/430, any rotation read as a hole",
+      "verdict": "PASS",
+      "note": "180 samples per width (2deg step), clip-intersected. Min 3, max 4 visible at every width, zero samples at zero -- no hole at any tested width."
+    },
+    {
+      "id": "job2-keyboard-reach",
+      "desc": "All six dishes reachable by keyboard, belt.scrollTop stays 0 (Lesson 34)",
+      "verdict": "PASS",
+      "note": "Tested individually with real settle time. All six landed inside belt clip box, correct captions, scrollTop 0 after every focus."
+    },
+    {
+      "id": "job2-tap-vs-drag",
+      "desc": "Tap opens menu pop-up, drag never does",
+      "verdict": "PASS",
+      "note": "Synthetic PointerEvent touch drag did not open dialog; clean tap did."
+    },
+    {
+      "id": "job2-momentum",
+      "desc": "Drag-to-spin has real momentum, no dead stop",
+      "verdict": "PASS",
+      "note": "-25.33deg at release, kept moving to -75.05deg over next 300ms."
+    },
+    {
+      "id": "job2-reduced-motion",
+      "desc": "Complete stillness under prefers-reduced-motion; drag still works, holds with no drift",
+      "verdict": "PASS",
+      "note": "0deg static 1.5s idle. Drag moved to -33.69deg and held exactly, zero drift after 1s."
+    },
+    {
+      "id": "job2-desktop-ring-untouched",
+      "desc": "Desktop ring's deliberate spill over the values band still intact after overflow:clip change",
+      "verdict": "PASS",
+      "note": "Confirmed via live class list (overflow-x-clip / overflow-y-visible unchanged) and visible in wide-screen screenshots."
+    },
+    {
+      "id": "miramar-card",
+      "desc": "Miramar mark reads as one hand with the other four, at 375 and 1440",
+      "verdict": "PASS",
+      "note": "Screenshotted alongside Oceanside/Global Fork/Station 8 at 1440, and alone at 375. Same fine purple pen-line weight now."
+    },
+    {
+      "id": "whole-page-sweep",
+      "desc": "Zero console errors, zero horizontal leak at 320/375/390/768/1024/1280/1440/1920/2560/3440",
+      "verdict": "PASS"
+    },
+    {
+      "id": "menu-popup-scroll",
+      "desc": "Menu pop-up still scrolls (Lesson 29) at wide viewport",
+      "verdict": "PASS",
+      "note": "data-lenis-prevent present on the real scroll container, scrollTop=800 held after set."
+    },
+    {
+      "id": "fitcheck",
+      "desc": "fitcheck run since a breakpoint-gated component and layout anchor both changed",
+      "verdict": "PASS",
+      "note": "Ran measure.js harness inline at 320/1024/2560 (avoided spinning up a second browser process on an already loaded machine). Zero leak, zero AA tap-target failures. One pre-existing, out-of-scope hiddenButFocusable flag on footer social links, unrelated to this round's changes."
+    }
+  ],
+  "fixes_made": [],
+  "next": "release-engineer (Kate)",
+  "human_gate": "Values-grid clearance trade-off on wide monitors (69-76px, never overlapping) -- Kazim's call whether to accept or ask for more breathing room."
+}
