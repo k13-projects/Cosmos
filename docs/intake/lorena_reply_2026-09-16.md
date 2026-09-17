@@ -1,5 +1,5 @@
 > **Not sent on its own.** Kazim's call, 2026-09-17: everything goes to Tiger in one email, so this
-> reply was merged whole into `K13-WarRoom/docs/TIGER_SIGNOFF_EMAIL_2026-09-15.html` as its COSMOS
+> reply was merged whole into `K13-WarRoom/docs/TIGER_SIGNOFF_EMAIL_2026-09-17_sent-to-client.html` as its COSMOS
 > section, with its three asks and three questions intact. The text below is the source of that
 > section; the email is what actually goes out.
 
