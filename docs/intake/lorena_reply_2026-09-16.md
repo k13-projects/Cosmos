@@ -1,3 +1,8 @@
+> **Not sent on its own.** Kazim's call, 2026-09-17: everything goes to Tiger in one email, so this
+> reply was merged whole into `K13-WarRoom/docs/TIGER_SIGNOFF_EMAIL_2026-09-15.html` as its COSMOS
+> section, with its three asks and three questions intact. The text below is the source of that
+> section; the email is what actually goes out.
+
 # Reply to Lorena, ready to send (2026-09-16)
 
 Supersedes `lorena_reply_2026-09-15.md`, which was written before rounds 4 to 6 went live and
@@ -74,8 +79,9 @@ out so they no longer cover its drawing.
    now". The card currently says "Opening soon" instead. Confirm that is right, and tell us the
    date when you have one.
 3. **The Locations title.** Your blueprint centres "LOCATIONS" with "Find us" under its right
-   edge; we built it left aligned like the other headings. Yours is the better read on that
-   section. Say the word and we will put it back the way you drew it.
+   edge; we built it left aligned so it matches every other section
+   heading on the page, which is the only reason it differs from your drawing. Now that it is up
+   and you can see it in place, tell us which you prefer and we will set it that way.
 
 Thank you,
 Kazim
