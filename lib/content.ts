@@ -401,7 +401,10 @@ export const locations: Location[] = [
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 890 Palomar Airport Rd, Carlsbad, CA 92011",
     ordering: {
-      toastPickup: "", // TODO(client): Toast storefront not public
+      // Lorena, 2026-09-17: her own Toast storefront links, one per hall. Wired
+      // as pick-up only, which is the claim her link actually supports; if a
+      // hall also delivers through Toast, that URL goes in toastDelivery.
+      toastPickup: "https://order.toasttab.com/online/cosmos-burger-windmill-food-hall-890-palomar-airport-road",
       toastDelivery: "",
       // Public on burgerscosmos.com; the locale prefix has been stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-carlsbad-26018232/29386346/",
@@ -425,7 +428,8 @@ export const locations: Location[] = [
     mapsQuery: "Cosmos Burger, 208 N Coast Hwy, Oceanside, CA 92054",
     phone: "(760) 607-7083",
     ordering: {
-      toastPickup: "",
+      // Lorena, 2026-09-17.
+      toastPickup: "https://order.toasttab.com/online/cosmos-burgers-oceanside",
       toastDelivery: "",
       // Public on burgerscosmos.com; the locale prefix has been stripped.
       doordash:
@@ -445,7 +449,8 @@ export const locations: Location[] = [
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 1720 N El Camino Real, San Clemente, CA 92672",
     ordering: {
-      toastPickup: "",
+      // Lorena, 2026-09-17.
+      toastPickup: "https://order.toasttab.com/online/cosmos-burger-miramar-food-hall-1720-north-el-camino-real",
       toastDelivery: "",
       // Lorena, 2026-09-08 (docs/intake/client_email_2026-09-08.md); tracking
       // query stripped, like the two live-site links above.
@@ -462,7 +467,8 @@ export const locations: Location[] = [
     hours: "11:00 AM to 9:00 PM",
     mapsQuery: "Cosmos Burger, 550 W Date St, San Diego, CA 92101",
     ordering: {
-      toastPickup: "",
+      // Lorena, 2026-09-17.
+      toastPickup: "https://order.toasttab.com/online/cosmos-burger-little-italy-550-w-date-st-suite-b",
       toastDelivery: "",
       // Lorena, 2026-09-08; tracking query stripped.
       doordash: "https://www.doordash.com/store/cosmos-burger-san-diego-48099429/115426349/",
@@ -910,8 +916,10 @@ export const reviews: Review[] = [
  */
 export const contact = {
   heading: "Contact info",
+  /** Still with Eren, 2026-09-17: which address and phone to publish. */
   phone: "",
-  email: "",
+  // Lorena, 2026-09-17.
+  email: "info@burgerscosmos.com",
   /** The one channel that is definitely monitored. Always shown. */
   fallback: "Questions? Message us on Instagram.",
 } as const;

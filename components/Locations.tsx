@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { locations, telHref } from "@/lib/content";
+import StatusBadge from "./StatusBadge";
 import { OrderOnlineButton } from "./Buttons";
 import RailArrow from "./RailArrow";
 import { useRail } from "./useRail";
@@ -164,13 +165,7 @@ export default function Locations() {
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-magenta-ink lg:text-sm">
                       <span className="halo-text">{l.area}</span>
                     </p>
-                    {l.status && (
-                      /* Not decoration: a guest who reads only the card would
-                         otherwise drive to a hall that has not opened. */
-                      <span className="shrink-0 rounded-full border-2 border-purple/30 px-2.5 py-1 text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-purple">
-                        {l.status}
-                      </span>
-                    )}
+                    {l.status && <StatusBadge status={l.status} />}
                   </div>
 
                   <h3 className="mt-2 text-[22px] font-bold leading-tight text-purple lg:text-[29px]">

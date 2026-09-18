@@ -8,6 +8,7 @@ import {
   type Location,
   type OrderChannel,
 } from "@/lib/content";
+import StatusBadge from "./StatusBadge";
 
 /**
  * Per-location ordering.
@@ -85,11 +86,7 @@ function LocationRow({ location, highlight }: { location: Location; highlight: b
           </p>
           <h3 className="mt-0.5 text-lg font-semibold leading-tight text-purple">{location.name}</h3>
         </div>
-        {location.status && (
-          <span className="shrink-0 rounded-full border-2 border-purple/30 px-2.5 py-1 text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-purple">
-            {location.status}
-          </span>
-        )}
+        {location.status && <StatusBadge status={location.status} />}
       </div>
 
       {location.status ? (
