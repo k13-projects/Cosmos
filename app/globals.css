@@ -194,6 +194,34 @@ html.lenis body {
     }
   }
 
+  /* ---------- hero camera drift ----------
+     Lorena, 2026-09-17: the hero read as a static product shot and there is no
+     footage to cut to. This is the still photograph on a slow camera: it enters
+     with a short push on load and then settles from 106% to its own frame over
+     90s, which is slow enough that nobody catches it moving and long enough
+     that the band is never quite the same picture twice.
+
+     `scale` only, never `translate`: the image is a `fill` layer cropped to the
+     blueprint's aspect, so scaling holds the framing while any pan would slide
+     the front row of burgers out of the bottom of the band.
+
+     `forwards` matters. The animation runs once and holds the settled frame, so
+     a visitor who scrolls back up to the top does not find the hero mid-move,
+     and nothing keeps painting after the band has left the screen. */
+  .hero-drift {
+    animation: hero-drift 90s var(--ease-brand) forwards;
+    transform-origin: 50% 46%;
+    will-change: transform;
+  }
+  @keyframes hero-drift {
+    0% {
+      transform: scale(1.085);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
   /* ---------- ambient float (About plate cascade) ---------- */
   .float {
     animation: float 4s ease-in-out infinite;
@@ -544,6 +572,13 @@ html.lenis body {
   .float {
     animation: none !important;
     transform: none !important;
+  }
+  /* The camera does not run. The settled frame is the still, which is exactly
+     the picture the band carried before this animation existed. */
+  .hero-drift {
+    animation: none !important;
+    transform: none !important;
+    will-change: auto;
   }
   .btn:hover {
     transform: none !important;

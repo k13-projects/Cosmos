@@ -14,6 +14,23 @@ import { hero, site } from "@/lib/content";
  * The <h1> is the page's accessible name only. The band carries no visible
  * heading, so a visible one would have to be invented; a screen reader still
  * needs the document to say what this page is.
+ *
+ * MOTION (2026-09-17). Lorena: "we don't have any footage available for now.
+ * What options do we have to animate the main section so it doesn't look like
+ * just a static product image?" This is the answer that needs nothing from
+ * anybody: a slow camera on the still we already have. The photograph drifts in
+ * from 106% over a minute and a half and settles, the way a locked-off shot
+ * breathes, and it enters on load with a short push rather than appearing. No
+ * new asset, no layout change, nothing for the page to wait for, and it does
+ * not touch the blueprint's framing, since the crop is the same at either end.
+ *
+ * Deliberately NOT a scroll-linked parallax: the hero is the first thing on the
+ * page, so a scroll effect only plays as the band is leaving, which is the one
+ * moment nobody is looking at it.
+ *
+ * The bigger option, the burgers dropping in and assembling, is a separate
+ * build and is quoted to her as such; it needs the cutouts art-directed, not
+ * just animated.
  */
 export default function Hero() {
   return (
@@ -33,13 +50,18 @@ export default function Hero() {
         className="relative max-h-[86vh] min-h-[min(460px,78vh)] w-full"
         style={{ aspectRatio: String(hero.ratio) }}
       >
+        {/*
+          `hero-drift` lives in globals.css beside the other motion, so the one
+          reduced-motion block at the bottom of that file governs it like
+          everything else. Under reduced motion it holds the settled frame.
+        */}
         <Image
           src={hero.src}
           alt={hero.alt}
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="hero-drift object-cover"
         />
 
         {/*
