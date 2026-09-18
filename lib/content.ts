@@ -479,11 +479,17 @@ export const locations: Location[] = [
     id: "ucsd",
     area: "UCSD Campus",
     name: "Station 8 Public Market",
-    address: "9165 Theatre District Drive, La Jolla, CA 92037",
+    // Lorena, 2026-09-18: "yesterday I sent you an address, but today they
+    // confirmed that it would be better to use this one". Third version of this
+    // address in two days, and the same correction is on the hall's own site
+    // and on Lobster Lab's card for the same hall.
+    address: "Scholars Dr S & Revelle College Dr, La Jolla, CA 92037",
     // Station 8 has not opened. Bare opening times beside a Coming Soon badge
     // read as "open now", so the hours say what is actually true instead.
     hours: "Opening soon",
-    mapsQuery: "Station 8 Public Market, 9165 Theatre District Dr, La Jolla, CA 92037",
+    // Her own paste from Google Maps, verbatim: it is the string Google handed
+    // her, so it is the one known to drop the pin in the right place.
+    mapsQuery: "Station 8 Public Market, Scholars Dr, South &, Revelle College Drive, La Jolla, CA 92037",
     status: "Coming Soon",
     ordering: { toastPickup: "", toastDelivery: "", doordash: "" },
     mark: { src: "/locations/trace/station-8.png", width: 1000, height: 579, alt: "" },
